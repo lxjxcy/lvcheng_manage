@@ -205,10 +205,7 @@
             type: [],
             resource: '',
             buildingname:"",
-
             desc: '',
-
-
           },
           buildingN:'222',
           multipleSelection: [],

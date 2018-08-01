@@ -222,6 +222,47 @@ padding:8px 26px;
   .el-input__prefix{
     left:0.18rem
   }
+
+  /*设置权限*/
+  .active{
+    height:500px;
+    /*overflow: scroll;*/
+
+    overflow:hidden;
+    overflow-y:auto;
+  }
+  .set-title{
+    height:40px;
+    background: #f9f8f8;
+    line-height: 40px;
+    font-size: 20px;
+    margin:5px 0;
+  }
+   .scope{
+     overflow: hidden;
+   }
+  .scope li{
+    list-style: none;
+    margin:0 10px;
+    min-height:200px;
+    min-width:200px;
+    border:1px solid #ccc
+  }
+  .list-s2{
+    width:100px !important;
+    text-align: center;
+    line-height: 30px;
+    border:none !important
+  }
+  .sured,.closed{
+    background: #109dfe;
+    color: #fff;
+    padding:5px 10px;
+    margin:20px 0;
+  }
+  .set{
+    margin-top:20px;
+  }
   /*.goback{*/
     /*height:25px;*/
     /*line-height: 25px;*/

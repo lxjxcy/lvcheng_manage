@@ -22,7 +22,30 @@
 
     <div class="nav-middle">
       <ul>
-        <li class="l"><i class="iconfont">&#xe612;</i>迁移设备</li>
+        <li class="l" @click="move = true"><i class="iconfont">&#xe612;</i>迁移设备</li>
+        <el-dialog
+          title="设备迁移"
+          :visible.sync="move"
+          width="30%"
+          :before-close="handleClose">
+          <div class="move">
+            <el-tree
+              :data="data2"
+              show-checkbox
+              node-key="id"
+              ref="tree"
+              highlight-current
+              :props="defaultProps">
+            </el-tree>
+
+          </div>
+          <span slot="footer" class="dialog-footer">
+            <el-button @click="move = false">取 消</el-button>
+            <el-button type="primary" @click="move = false">确 定</el-button>
+          </span>
+        </el-dialog>
+
+
         <li class="l"><i class="iconfont">&#xe645;</i>设备授权</li>
       </ul>
     </div>
@@ -132,12 +155,161 @@
 
     data() {
       return {
+        move:false,
         multipleSelection: [],
         getLnformation:false,
         formInline: {
           equipmentId: '',
           equipmentName:"",
           address: ''
+        },
+        data2: [{
+          id: 1,
+          label: '高科技产业园1',
+          children: [{
+            id: 2,
+            label: '一号楼',
+            children: [{
+              id: 3,
+              label: '第一层',
+              children:[
+                {
+                  id: 4,
+                  label: '101',
+                },
+                {
+                  id: 5,
+                  label: '102',
+                },
+
+              ]
+            }, {
+              id: 6,
+              label: '第二层',
+              children:[
+                {
+                  id: 7,
+                  label: '201',
+                },
+                {
+                  id: 8,
+                  label: '202',
+                },
+
+              ]
+            }]
+          },
+            {
+              id: 9,
+              label: '一号楼',
+              children: [{
+                id: 10,
+                label: '第一层',
+                children:[
+                  {
+                    id: 11,
+                    label: '101',
+                  },
+                  {
+                    id: 12,
+                    label: '102',
+                  },
+
+                ]
+              }, {
+                id: 13,
+                label: '第二层',
+                children:[
+                  {
+                    id: 14,
+                    label: '201',
+                  },
+                  {
+                    id: 15,
+                    label: '202',
+                  },
+
+                ]
+              }]
+            },
+
+          ]},
+          {
+            id: 16,
+            label: '高科技产业园2',
+            children: [{
+              id: 17,
+              label: '一号楼',
+              children: [{
+                id: 18,
+                label: '第一层',
+                children:[
+                  {
+                    id: 19,
+                    label: '101',
+                    disabled: true
+                  },
+                  {
+                    id: 20,
+                    label: '102',
+                  },
+
+                ]
+              }, {
+                id: 21,
+                label: '第二层',
+                children:[
+                  {
+                    id: 22,
+                    label: '201',
+                  },
+                  {
+                    id: 23,
+                    label: '202',
+                  },
+
+                ]
+              }]
+            },
+              {
+                id: 24,
+                label: '一号楼',
+                children: [{
+                  id: 25,
+                  label: '第一层',
+                  children:[
+                    {
+                      id: 26,
+                      label: '101',
+                    },
+                    {
+                      id: 27,
+                      label: '102',
+                    },
+
+                  ]
+                }, {
+                  id: 28,
+                  label: '第二层',
+                  children:[
+                    {
+                      id: 29,
+                      label: '201',
+                    },
+                    {
+                      id: 30,
+                      label: '202',
+                    },
+
+                  ]
+                }]
+              },
+
+            ]
+          }],
+        defaultProps: {
+          children: 'children',
+          label: 'label'
         },
         currentPage3: 1,
         tableData3: [{
@@ -190,7 +362,6 @@
         formation:{
           equipmentid:"SB002",
 
-
         }
       }
     },
@@ -203,6 +374,7 @@
         console.log(val)
         return val == 1? '高级': '';
       },
+
 
     },
     methods: {

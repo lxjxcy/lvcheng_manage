@@ -40,6 +40,12 @@ import masterplate from '@/view/home/garden/masterplate'
 import gardenAppuser from '@/view/home/garden/gardenAppuser'
 import gardenLog from '@/view/home/garden/gardenLog'
 
+
+//列表
+import buildingList from '@/view/home/goList/buildingList'
+import floorList from '@/view/home/goList/floorList'
+import roomList from '@/view/home/goList/roomList'
+
 Vue.use(Router)
 
 export default new Router({
@@ -110,6 +116,21 @@ export default new Router({
           path: '/garden/gardenLog',
           name: 'gardenLog',
           component: gardenLog
+        },
+        {
+          path: '/garden/buildingList',
+          name: 'buildingList',
+          component: buildingList
+        },
+        {
+          path: '/garden/floorList',
+          name: 'floorList',
+          component: floorList
+        },
+        {
+          path: '/garden/roomList',
+          name: 'roomList',
+          component: roomList
         }
       ]
     },
@@ -152,7 +173,13 @@ export default new Router({
           path: '/park/parkLog',
           name: 'parkLog',
           component: parkLog
+        },
+        {
+          path: '/park/buildingList',
+          name: 'buildingList',
+          component: buildingList
         }
+
 
       ]
     },

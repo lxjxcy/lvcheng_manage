@@ -7,7 +7,7 @@ import store from './store/index.js'
 import ElementUI from 'element-ui';
 import 'element-ui/lib/theme-chalk/index.css';
 import myHeader from './view/home/myHeader';
-// import myFooter from './view/home/myFooter';
+import myFooter from './view/home/myFooter';
 import iView from 'iview';
 import 'iview/dist/styles/iview.css';
 
@@ -16,7 +16,7 @@ Vue.use(iView);
 Vue.use(ElementUI);
 Vue.config.productionTip = false
 Vue.component(myHeader.name, myHeader)
-// Vue.component(myFooter.name, myFooter)
+Vue.component(myFooter.name, myFooter)
 /* eslint-disable no-new */
 new Vue({
 	el: '#app',
