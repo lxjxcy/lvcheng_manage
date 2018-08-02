@@ -33,6 +33,7 @@ import equipment from '@/view/home/room/equipment'
 import authorization from '@/view/home/room/authorization'
 import roomAppuser from '@/view/home/room/roomAppuser'
 import roomLog from '@/view/home/room/roomLog'
+import EquipmentAuthorization from '@/view/home/room/EquipmentAuthorization'
 
 import gardenManagement from '@/view/home/garden/gardenManagement'
 import gardenUser from '@/view/home/garden/gardenUser'
@@ -212,6 +213,11 @@ export default new Router({
           path: '/room/roomLog',
           name: 'roomLog',
           component: roomLog
+        },
+        {
+          path: '/room/EquipmentAuthorization',
+          name: 'EquipmentAuthorization',
+          component: EquipmentAuthorization
         }
       ]
     },

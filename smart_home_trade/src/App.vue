@@ -178,16 +178,16 @@ padding:8px 26px;
 
   /*弹框*/
   .el-dialog__header{
-    color:#fff;
-    background: #109dfd !important;
-    padding:10px 20px;
-    color:#fff;
+    /*border-bottom: 1px solid #ccc;*/
+    /*color:#fff;*/
+    /*background: #109dfd !important;*/
+/*padding:10px 20px;*/
   }
   .el-dialog__title{
-    color:#fff;
+    /*color:#fff;*/
   }
   .el-dialog__headerbtn .el-dialog__close{
-    color:#fff;
+    /*color:#fff;*/
     font-size: 20px;
     position: relative;
     top:-5px;

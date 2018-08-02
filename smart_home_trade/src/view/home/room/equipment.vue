@@ -37,7 +37,6 @@
               highlight-current
               :props="defaultProps">
             </el-tree>
-
           </div>
           <span slot="footer" class="dialog-footer">
             <el-button @click="move = false">取 消</el-button>
@@ -46,7 +45,7 @@
         </el-dialog>
 
 
-        <li class="l"><i class="iconfont">&#xe645;</i>设备授权</li>
+        <li class="l"  @click="eAuthorization()"><i class="iconfont">&#xe645;</i>设备授权</li>
       </ul>
     </div>
     <div class="main-table">
@@ -405,6 +404,13 @@
         console.log(row)
           this.getLnformation=true;
      }
+     ,
+    //  设备授权
+      eAuthorization(){
+        this.$router.push({name:'EquipmentAuthorization',params:{
+            id:"123",
+          }})
+      }
     },
   }
 </script>
