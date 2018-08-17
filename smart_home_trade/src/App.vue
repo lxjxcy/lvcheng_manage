@@ -50,30 +50,26 @@ export default {
   }
   header{
     height:0.5rem;
-    background: #05509c;
+    background: #2bc999;
   }
 
-
+  /*按钮颜色*/
+  .el-button--primary{
+    background-color:#14ac86;
+    border-color: #14ac86;
+  }
+  .el-button:focus, .el-button:hover{
+    background-color:#2bc999
+  }
   /*左侧*/
   aside{
     font-size: 20px;
   }
-  aside li a{
-    /*height:60px;*/
-    /*line-height: 60px;*/
-    /*!*text-align: center;*!*/
-    /*cursor: pointer;*/
-    display: block;
-    color:#000;
-    /*text-decoration: none;*/
+  .el-col-12{
+    width:100%;
   }
-  /*aside li a:hover i{*/
-    /*color:#fff;*/
-  /*}*/
-  /*aside li a:hover{*/
-    /*background:#00bde5;*/
-    /*color:#fff;*/
-  /*}*/
+
+
 
   .all{
     display: flex;
@@ -92,20 +88,20 @@ export default {
     line-height: 0.4rem;
   }
   aside{
-    background: #faf8f7;
+    background: #2f4050;
     flex: 1;
-    box-shadow: 5px 0px 6px #2fc0fb;
+    /*box-shadow: 5px 0px 6px #2fc0fb;*/
   }
   aside a{
     text-align: center;
     font-size: 18px;
   }
   aside i{
-    color: #2fc0fb;
+    color: #fff;
     font-size: 26px;
   }
   main{
-    flex: 4.7;
+    flex: 6;
     padding-left: 7px;overflow: hidden;
   }
   .nowuser{
@@ -168,14 +164,17 @@ padding:8px 26px;
     margin-bottom: 8px;
   }
   .nav-middle li{
-    padding:3px 5px;
-    background:#109eff;
+    padding:0  5px;
+    background:#00af82;
     color: #fff;
+    height:30px;
+    line-height: 30px;
     margin:0 10px;
-    border-radius: 4px;
     cursor: pointer;
   }
-
+  .nav-middle li:hover{
+    background:#2bc999 ;
+  }
   /*弹框*/
   .el-dialog__header{
     /*border-bottom: 1px solid #ccc;*/
@@ -262,6 +261,10 @@ padding:8px 26px;
   }
   .set{
     margin-top:20px;
+  }
+  .goback{
+    background: #faf8f7;
+    line-height: 30px;
   }
   /*.goback{*/
     /*height:25px;*/

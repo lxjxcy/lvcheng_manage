@@ -4,47 +4,37 @@ Vue.use(Vuex)
 
 export default new Vuex.Store({
   state: {
-    // userInfo: {
-    //   name: 'xxxxx',
-    //   isLogin: false,
-    //   num: 0,
-    //   add: 0
-    // },
-    // count: 0,
-    // // 新增waiting  状态
-    // waiting: false,
-    // // 额外需要增加的数字
-    // anotherIncrement: 5
+    parame:{
+      garden_buildNmae:'',
+      garden_buildId:'',
+      build_floorName:'',
+      build_floorId:'',
+    },
+    userInfo:{
+      loginName:'',
+      userLevel:'',
+      status:''
+    },
+    islogin:false,
+    token:null
   },
   mutations: {
-    // setName: function(state, name) {
-    //   state.userInfo.name = name
-    // },
-    // jia: function(state) {
-    //   // 加1
-    //   state.userInfo.num += 0.5
-    // },
-    // INCREMENT: function(state) {
-    //   state.count++;
-    // },
-    // // // 减1
-    // DECREMENT: function(state) {
-    //   state.count--
-    // },
-    // INCREMENT_WITH_VALUE(state, value) {
-    //   state.count = state.count + value.intValue + value.anotherValue;
-    // },
-    // // // 显示和隐藏waiting
-    // SHOW_WAITING_MESSAGE(state) {
-    //   state.waiting = true;
-    // },
-    // HIDE_WAITING_MESSAGE(state) {
-    //   state.waiting = false;
-    // }
+      setToken(state,token){
+        state.token=token;
+        sessionStorage.setItem('token',token)
+      },
+    getUser(state,loginname){
+      state.userInfo.loginName=loginname;
+      sessionStorage.setItem('loginName',loginname)
+    },
+    exitUser(state){
+        state.token=null;
+        sessionStorage.removeItem('token')
+    }
   },
 
   actions: {
-    // increment({
+    // increment(
     //             commit
     //           }) {
     //   commit("INCREMENT")

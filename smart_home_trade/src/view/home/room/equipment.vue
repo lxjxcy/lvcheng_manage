@@ -367,14 +367,13 @@
     filters: {
       equipmentStop: function (val) {
         console.log(val)
+
         return val == 1? '关闭' : val == 0 ? '开启' : '';
       },
       equipmentHight: function (val) {
         console.log(val)
         return val == 1? '高级': '';
       },
-
-
     },
     methods: {
       handleSizeChange(val) {

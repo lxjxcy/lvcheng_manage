@@ -11,13 +11,15 @@ module.exports = {
         assetsSubDirectory: 'static',
         assetsPublicPath: '/',
         proxyTable: {
-            '/user': {
-                target: 'http://192.168.31.144:8081',
+            '/SmartHomeTrade': {
+                target: 'http://192.168.1.205:8009',
                 changeOrigin: true,
                 pathRewrith: {
-                    '^/user': '/user'
+                    '^/SmartHomeTrade': '/SmartHomeTrade'
                 },
-            }
+            },
+
+
         },
 
         // Various Dev Server settings

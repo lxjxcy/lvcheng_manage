@@ -17,6 +17,24 @@ Vue.use(ElementUI);
 Vue.config.productionTip = false
 Vue.component(myHeader.name, myHeader)
 Vue.component(myFooter.name, myFooter)
+
+router.beforeEach((to, from, next) => {
+  if (to.meta.Auth) {
+    if (store.state.token!=null) {
+      next();
+    } else {
+      router.push({ name: 'login' })
+    }
+  } else {
+    next();
+  }
+})
+if(window.sessionStorage.getItem('token')){
+  store.commit('setToken',window.sessionStorage.getItem('token'))
+}
+if(window.sessionStorage.getItem('loginName')){
+  store.commit('getUser',window.sessionStorage.getItem('loginName'))
+}
 /* eslint-disable no-new */
 new Vue({
 	el: '#app',

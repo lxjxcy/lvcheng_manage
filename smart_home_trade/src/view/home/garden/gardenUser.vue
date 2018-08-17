@@ -1,15 +1,18 @@
 <template>
   <div class="gardenUser">
     <div class="top-nav">
-      <el-form :inline="true" :model="formInline" class="demo-form-inline">
+      <el-form :inline="true" :model="formSearch" ref="formSearch" class="demo-form-inline">
         <el-form-item label="姓名">
-          <el-input v-model="formInline.username" placeholder=""></el-input>
+          <el-input v-model="formSearch.name" placeholder=""></el-input>
         </el-form-item>
         <el-form-item label="电话">
-          <el-input v-model="formInline.tel" placeholder=""></el-input>
+          <el-input v-model="formSearch.userMobile" placeholder=""></el-input>
         </el-form-item>
         <el-form-item>
           <el-button type="primary" @click="onSubmit">查询</el-button>
+        </el-form-item>
+        <el-form-item>
+          <el-button @click="resetForm('formSearch')">重置</el-button>
         </el-form-item>
       </el-form>
     </div>
@@ -30,16 +33,14 @@
                 <el-input type="password" v-model="addformValidate.password" auto-complete="off" style="width:220px"></el-input>
               </el-form-item>
               <el-form-item label="姓名" :label-width="formLabelWidth" prop="name" placeholder="请输入姓名">
-                <el-input type="password" v-model="addformValidate.name" auto-complete="off" style="width:220px"></el-input>
+                <el-input type="text" v-model="addformValidate.name" auto-complete="off" style="width:220px"></el-input>
               </el-form-item>
               <el-form-item label="管理层级" prop="userLevel" :label-width="formLabelWidth">
-                <el-select v-model="addformValidate.userLevel" placeholder="请选择活动区域">
-                  <el-option label="系统管理员" value="1"></el-option>
+                <el-select v-model="addformValidate.userLevel" placeholder="" @change="getUserLevel">
                   <el-option label="园区管理员" value="2"></el-option>
                   <el-option label="大楼管理员" value="3"></el-option>
                   <el-option label="楼层管理员" value="4"></el-option>
                   <el-option label="房间管理员" value="5"></el-option>
-                  <el-option label="设备管理员" value="6"></el-option>
                 </el-select>
               </el-form-item>
               <el-form-item label="电话" :label-width="formLabelWidth" prop="userMobile" placeholder="请输入电话">
@@ -48,16 +49,18 @@
               <el-form-item label="邮箱" :label-width="formLabelWidth" prop="userEmail" placeholder="请输入姓名">
                 <el-input v-model="addformValidate.userEmail" auto-complete="off" style="width:220px"></el-input>
               </el-form-item>
+              <el-form-item label="设备权限" :label-width="formLabelWidth" prop="resource" >
+                <el-radio-group v-model="addformValidate.resource">
+                  <el-radio label="查看"></el-radio>
+                  <el-radio label="操作"></el-radio>
+                </el-radio-group>
+              </el-form-item>
             </el-form>
           </div>
           <span slot="footer" class="dialog-footer">
                   <el-button type="primary" @click="adduser('addformValidate')">确 定</el-button>
                 </span>
         </el-dialog>
-
-
-
-
         <!--修改-->
         <li class="l"  @click="change()"><i class="iconfont">&#xe645;</i>修改</li>
         <el-dialog
@@ -70,25 +73,25 @@
               <el-form-item label="姓名" :label-width="formLabelWidth" prop="name" >
                 <el-input v-model="changeformValidate.name" auto-complete="off" style="width:220px" placeholder="请输入姓名"></el-input>
               </el-form-item>
-              <el-form-item label="电话" :label-width="formLabelWidth" prop="telphone">
-                <el-input v-model="changeformValidate.telphone" auto-complete="off"  placeholder="请输入电话" style="width:220px"></el-input>
+              <el-form-item label="电话" :label-width="formLabelWidth" prop="userMobile">
+                <el-input v-model="changeformValidate.userMobile" auto-complete="off"  placeholder="请输入电话" style="width:220px"></el-input>
               </el-form-item>
             </el-form>
           </div>
           <span slot="footer" class="dialog-footer">
-              <el-button type="primary" @click="changeUser = false">确 定</el-button>
+              <el-button type="primary" @click="change_User('changeformValidate')">确 定</el-button>
             </span>
         </el-dialog>
         <!--删除-->
         <li class="l"  @click="deleted()"><i class="iconfont">&#xe504;</i>删除</li>
-        <li class="l">设置权限</li>
+        <li class="l"  @click="setAccess()">设置权限</li>
       </ul>
 
     </div>
     <div class="main-table">
 
       <el-table
-        :data="tableData3"
+        :data="listNextAdmin"
         ref="multipleTable"
         v-loading="loading"
         style="width: 100%"
@@ -101,8 +104,8 @@
           width="50">
         </el-table-column>
         <el-table-column
-          prop="user"
-          label=" 账户"
+          prop="id"
+          label="编号"
           width="120">
         </el-table-column>
 
@@ -112,33 +115,34 @@
           width="200">
         </el-table-column>
         <el-table-column
-          prop="telphone"
+          prop="userMobile"
           label="联系电话"
           width="180">
         </el-table-column>
         <el-table-column
-          prop="tpyestyle"
           label="类型"
           width="180">
+          <template slot-scope="scope">
+            {{scope.row.userLevel | userlevelStop}}
+          </template>
         </el-table-column>
         <el-table-column
           label="管辖范围">
           <template slot-scope="scope">
-            <el-button @click="handleClick(scope.row)" type="text" size="small">查看</el-button>
+            <el-button @click="lookScope(scope.row)" type="text" size="small">查看</el-button>
+            <el-button @click="setScope(scope.row)" type="text" size="small">设置</el-button>
           </template>
+
         </el-table-column>
-
-
       </el-table>
       <div class="block">
         <el-pagination
           @size-change="handleSizeChange"
           @current-change="handleCurrentChange"
-          :current-page="currentPage3"
-          :page-sizes="[100, 200, 300, 400]"
-          :page-size="100"
+          :page-sizes="[10, 20, 30, 40]"
+          :page-size="10"
           layout="total, sizes, prev, pager, next, jumper"
-          :total="1000">
+          :total="total">
         </el-pagination>
       </div>
 
@@ -152,7 +156,6 @@
   import axios from  'axios'
   export default {
     name: "gardenUser",
-
     data() {
       //手机号验证
       const userMobile = (rule, value, callback) => {
@@ -168,6 +171,14 @@
       const loginName = (rule, value, callback) => {
         if (value === '') {
           callback(new Error('姓名不能为空'));
+        }else {
+          callback();
+        }
+      };
+      //层级管理验证userLevel
+      const userLevel = (rule, value, callback) => {
+        if (value === '') {
+          callback(new Error('曾经不能为空'));
         }else {
           callback();
         }
@@ -199,15 +210,21 @@
         }
       };
       return {
+        total:0,
+        userParams:{
+          pageSize:10,
+          currentPage:1
+        },
         multipleSelection: [],
 
         add:false,//添加框
         changeUser:false,//修改框
         formLabelWidth: '100px',
-        loading: false,
+        loading: true,
         changeformValidate:{
+          id:'',
           name: '',
-          telphone: ''
+          userMobile: ''
         },
         addformValidate: {
           loginName: '',
@@ -215,12 +232,14 @@
           name:'',
           userMobile:'',
           userEmail:'',
-          userLevel:''
-
+          userLevel:'',
+          resource:''
         },
-        formInline: {
-          username: '',
-          tel:""
+        userLevelv:0,
+
+        formSearch: {
+          name: null,
+          userMobile:null
         },
         ruleValidate: {
           loginName: [
@@ -238,92 +257,115 @@
           userEmail: [
             { required: true,validator: userEmail, trigger: 'blur' }
           ],
+          userLevel:[
+            { required: true,validator: userLevel, trigger: 'blur' }
+          ],
+          resource: [
+            { required: true, message: '请选择设备权限', trigger: 'change' }
+          ],
 
         },
         formInline: {
           username: '',
           tel:""
         },
-        currentPage3: 1,
-        tableData3: [{
-          user: 'lxj',
-          name:"23",
-          telphone: '13017449988',
-          management:'卢雪姣',
-          tpyestyle:"园区管理员",
-        }, {
-          user: 'lxj',
-          name:"23",
-          telphone: '13017449988',
-          management:'卢雪姣',
-          tpyestyle:"园区管理员",
-        },
-          {
-            user: 'lxj',
-            name:"23",
-            telphone: '13017449988',
-            management:'卢雪姣',
-            tpyestyle:"园区管理员",
-          },
-          {
-            user: 'lxj',
-            name:"23",
-            telphone: '13017449988',
-            management:'卢雪姣',
-            tpyestyle:"园区管理员",
-          },
-          {
-            user: 'lxj',
-            name:"23",
-            telphone: '13017449988',
-            management:'卢雪姣',
-            tpyestyle:"园区管理员",
-          },
-          {
-            user: 'lxj',
-            name:"23",
-            telphone: '13017449988',
-            management:'卢雪姣',
-            tpyestyle:"园区管理员",
-          },
-          {
-            user: 'lxj',
-            name:"23",
-            telphone: '13017449988',
-            management:'卢雪姣',
-            tpyestyle:"园区管理员",
-          },
-          {
-            user: 'lxj',
-            name:"23",
-            telphone: '13017449988',
-            management:'卢雪姣',
-            tpyestyle:"园区管理员",
-          },]
+        listNextAdmin: []
       }
     },
-    methods: {
-      handleSizeChange(val) {
-        console.log(`每页 ${val} 条`);
+    mounted(){
+      this.getUserlist()
+
+    },
+    filters: {
+      userlevelStop: function (val) {
+        return val== 1 ? 'admin' : val == 2? '园区管理员' :val == 3? '大楼管理员' : val == 4? '楼层管理员' : val == 5? '房间管理员':""
       },
+    },
+    methods: {
+      // 获取用户列表
+      getUserlist(){
+        var that=this;
+        axios.post("/SmartHomeTrade/user/selectNextAdmin",that.userParams).then(function (res) {
+          console.log(res)
+          that.listNextAdmin =res.data.data.listNextAdmin;
+          that.loading=false;
+          that.total=res.data.data.Count;
+        })
+      },
+
+      //每页显示多少条
+      handleSizeChange(val) {
+        var that=this;
+        that.userParams.pageSize=val;
+        that.userParams.currentPage=1;
+        that.getUserlist()
+      },
+      //当前页
       handleCurrentChange(val) {
-        console.log(`当前页: ${val}`);
+        var that=this;
+        that.userParams.currentPage=val;
+        that. getUserlist()
       },
       handleSelectionChange(val) {
         this.multipleSelection = val;
         console.log(val)
       },
+      //关闭弹框
+      handleClose(done) {
+        done();
+      },
+      //查询
       onSubmit() {
-        console.log('submit!');
+        var that=this;
+        if(that.formSearch.name!=null||that.formSearch.userMobile!=null){
+          that.loading=true;
+          console.log(that.formSearch);
+          axios.post('/SmartHomeTrade/user/selectNextAdminByNmOrMobile',that.formSearch).then(function (res) {
+            console.log(res);
+            that.listNextAdmin=res.data.data.AdminList;
+            that.loading=false
+          })
+        }
+      },
+      //清空查询
+      resetForm() {
+        var that=this;
+        that.formSearch={
+          name:null,
+          userMobile:null,
+        }
+        that.getUserlist()
       },
       //添加
       adduser(addformValidate){
-        // var param=this.addformValidate
-        this.$refs[addformValidate].validate((valid) => {
+
+        var that=this;
+        that.$refs[addformValidate].validate((valid) => {
           if (valid) {
-          //axios.post('/user/registAdUser,param).then(function(res){
-            // console.log(res)
-            // })
+            if(that.addformValidate.resource=="查看"){
+              that.addformValidate.resource=2
+            }else{
+              that.addformValidate.resource=1
+            }
+            var param={
+              loginName: that.addformValidate.loginName,
+              password: that.addformValidate.password,
+              name:that.addformValidate.name,
+              userMobile:that.addformValidate.userMobile,
+              userEmail:that.addformValidate.userEmail,
+              userLevel:that.userLevelv,
+              userDeviceAuth:'that.addformValidate.resource,'
+
+            }
+            axios.post("/SmartHomeTrade/user/registAdUser",param).then(function (res) {
+              console.log(res.data.message)
+              that.$message({
+                type: 'success',
+                message: res.data.message
+              });
+              that.getUserlist()
+              that.add=false;
+            })
           } else {
             console.log('error submit!!');
             return false;
@@ -331,47 +373,103 @@
         });
             // this.add=false;
       },
+
+      //获取层级id
+      getUserLevel(value){
+        console.log(value)
+        this.userLevelv=value;
+
+      },
+      //  管理员转换状态
+      userLevel: function (row, column) {
+        return row.userLevel == 1 ? 'admin' : row.userLevel == 2? '园区管理员' : row.userLevel == 3? '大楼管理员' : row.userLevel == 4? '楼层管理员' : row.userLevel == 5? '房间管理员':""
+      },
       // 修改
       change(){
         if(this.multipleSelection==''){
           this.$message({
             type: 'info',
-            message: '请选择要修改的大楼删除'
+            message: '请选择要修改的大楼'
           });
         }else {
           this.changeUser=true;
           console.log(this.multipleSelection[0].name)
           this.changeformValidate.name=this.multipleSelection[0].name;
-          this.changeformValidate.telphone=this.multipleSelection[0].telphone;
+          this.changeformValidate.userMobile=this.multipleSelection[0].userMobile;
+          this.changeformValidate.id=this.multipleSelection[0].id
         }
       },
+      change_User(changeformValidate){
+        var that=this;
+        that.$refs[changeformValidate].validate((valid) => {
+          if (valid) {
+            axios.post('/SmartHomeTrade/user/updateNextAdmin',that.changeformValidate).then(function (res) {
+                  console.log(res)
+              that.$message({
+                type: 'success',
+                message: res.data.message
+              });
+              that.getUserlist()
+              that.changeUser=false;
+            })
+          } else {
+            console.log('error submit!!');
+            return false;
+          }
+        });
+      },
+
+
       //  删除
       deleted() {
         if(this.multipleSelection!=''){
-          this.$confirm('此操作将永久删除, 是否继续?', '提示', {
+          var that=this;
+          that.$confirm('此操作将永久删除, 是否继续?', '提示', {
             confirmButtonText: '确定',
             cancelButtonText: '取消',
             type: 'warning'
           }).then(() => {
             //发送ajax
-            this.$message({
-              type: 'success',
-              message: '删除成功!'
-            });
+            axios.post('/SmartHomeTrade/user/deleteAdmin',{
+              id:that.multipleSelection[0].id
+            }).then(function (res) {
+              that.$message({
+                type: 'success',
+                message: res.data.message
+              });
+              that.getUserlist()
+
+
+            })
+
           }).catch(() => {
-            this.$message({
+            that.$message({
               type: 'info',
               message: '已取消删除'
             });
           });
         }else {
-          this.$message({
+          that.$message({
             type: 'info',
             message: '请选择要删除的大楼删除'
           });
         }
 
-      }
+      },
+    //  设置权限
+      setAccess(){
+          if(this.multipleSelection==''){
+            this.$message({
+              type: 'info',
+              message: '请选择用户'
+            });
+          }else {
+            this.$router.push("/park/setAccess")
+          }
+        },
+
+
+
 
     },
   }

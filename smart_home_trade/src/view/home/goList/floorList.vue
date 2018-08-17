@@ -1,9 +1,19 @@
 <template>
   <div class="floorList">
-    <div class="goback">
+    <!--系统管理员-->
+    <div class="goback" v-if="headuserLevel==1">
       <Breadcrumb separator=">">
+        <span>当前位置：</span>
         <BreadcrumbItem to="/garden/gardenManagement">园区管理</BreadcrumbItem>
         <BreadcrumbItem to="/garden/buildingList">大楼列表</BreadcrumbItem>
+        <BreadcrumbItem>楼层列表</BreadcrumbItem>
+      </Breadcrumb>
+    </div>
+    <!--园区管理员-->
+    <div class="goback" v-if="headuserLevel==2">
+      <Breadcrumb separator=">">
+        <span>当前位置：</span>
+        <BreadcrumbItem to="/park/buildingManagement">大楼管理</BreadcrumbItem>
         <BreadcrumbItem>楼层列表</BreadcrumbItem>
       </Breadcrumb>
     </div>
@@ -25,7 +35,7 @@
     </div>
 
     <div class="nav-middle">
-      <div class="l" style="font-size: 20px;font-weight: 400"><span v-model="paramed">{{this.$route.params.goName}}</span>---楼层列表</div>
+      <div class="l" style="font-size: 20px;font-weight: 400"><span v-model="paramed">{{this.$store.state.parame.build_floorName}}</span>---楼层列表</div>
       <ul class="r">
         <li class="l"><i class="iconfont">&#xe612;</i>添加</li>
         <li class="l"><i class="iconfont">&#xe645;</i>修改</li>
@@ -101,6 +111,7 @@
     multipleSelection: [],
     data() {
       return {
+        headuserLevel:1,
         paramed:'',
         formInline: {
           roomId: '',

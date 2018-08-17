@@ -2,49 +2,47 @@
     <div class="setAccess">
       <div class="goback">
         <Breadcrumb separator=">">
-          <BreadcrumbItem to="/park/parkUser">用户管理</BreadcrumbItem>
+          <BreadcrumbItem to="/garden/gardenUser">用户管理</BreadcrumbItem>
           <BreadcrumbItem>设置权限</BreadcrumbItem>
         </Breadcrumb>
       </div>
-      <div class="set-title">
-        设置权限
-      </div>
       <div class="active">
-        <div class="scope">
-          <h2>管辖范围</h2>
-          <ui>
-            <li class="l">
-              <el-tree
-                :data="data2"
-                show-checkbox
-                node-key="id"
-                ref="tree"
-                :props="defaultProps">
-              </el-tree>
-            </li>
-            <li class="l list-s2">
-              <div class="sured" @click="getCheckedKeys()">---》授权</div>
-              <div class="closed">《---取消</div>
-            </li>
-            <li class="l"></li>
-          </ui>
+        <!--<div class="scope">-->
+          <!--<h2>管辖范围</h2>-->
+          <!--<ui>-->
+            <!--<li class="l">-->
+              <!--<el-tree-->
+                <!--:data="data2"-->
+                <!--show-checkbox-->
+                <!--node-key="id"-->
+                <!--ref="tree"-->
+                <!--:props="defaultProps">-->
+              <!--</el-tree>-->
+            <!--</li>-->
+            <!--<li class="l list-s2">-->
+              <!--<div class="sured" @click="getCheckedKeys()">-&#45;&#45;》授权</div>-->
+              <!--<div class="closed">《-&#45;&#45;取消</div>-->
+            <!--</li>-->
+            <!--<li class="l"></li>-->
+          <!--</ui>-->
 
-        </div>
-        <div class="set">
-          <h2 class="set-h2">设置权限</h2>
-          <el-radio v-model="radio" label="1">查看</el-radio>
-          <el-radio v-model="radio" label="2">设置</el-radio>
-        </div>
+        <!--</div>-->
+        <!--<div class="set">-->
+          <!--<h2 class="set-h2">设备权限</h2>-->
+          <!--<el-radio v-model="radio" label="1">查看</el-radio>-->
+          <!--<el-radio v-model="radio" label="2">操作</el-radio>-->
+        <!--</div>-->
         <div class="Operate set">
           <h2 class="set-h2">操作权限</h2>
           <el-tree
             :data="data3"
             show-checkbox
+            @check-change="changes"
+            ref="tree"
             node-key="id"
             :props="defaultProps">
           </el-tree>
-
-
+          <el-button @click="getHalfCheckedNodes()">通过 node 获取</el-button>
         </div>
       </div>
 
@@ -59,154 +57,152 @@
           checkAll: false,
           checkedCities: [],
           radio: '',
-          data2: [{
-            id: 1,
-            label: '高科技产业园1',
-            children: [{
-              id: 2,
-              label: '一号楼',
-              children: [{
-                id: 3,
-                label: '第一层',
-                children:[
-                  {
-                    id: 4,
-                    label: '101',
-                  },
-                  {
-                    id: 5,
-                    label: '102',
-                  },
-
-                ]
-              }, {
-                id: 6,
-                label: '第二层',
-                children:[
-                  {
-                    id: 7,
-                    label: '201',
-                  },
-                  {
-                    id: 8,
-                    label: '202',
-                  },
-
-                ]
-              }]
-            },
-              {
-                id: 9,
-                label: '一号楼',
-                children: [{
-                  id: 10,
-                  label: '第一层',
-                  children:[
-                    {
-                      id: 11,
-                      label: '101',
-                    },
-                    {
-                      id: 12,
-                      label: '102',
-                    },
-
-                  ]
-                }, {
-                  id: 13,
-                  label: '第二层',
-                  children:[
-                    {
-                      id: 14,
-                      label: '201',
-                    },
-                    {
-                      id: 15,
-                      label: '202',
-                    },
-
-                  ]
-                }]
-              },
-
-            ]},
-            {
-              id: 16,
-              label: '高科技产业园2',
-              children: [{
-                id: 17,
-                label: '一号楼',
-                children: [{
-                  id: 18,
-                  label: '第一层',
-                  children:[
-                    {
-                      id: 19,
-                      label: '101',
-                      disabled: true
-                    },
-                    {
-                      id: 20,
-                      label: '102',
-                    },
-
-                  ]
-                }, {
-                  id: 21,
-                  label: '第二层',
-                  children:[
-                    {
-                      id: 22,
-                      label: '201',
-                    },
-                    {
-                      id: 23,
-                      label: '202',
-                    },
-
-                  ]
-                }]
-              },
-                {
-                  id: 24,
-                  label: '一号楼',
-                  children: [{
-                    id: 25,
-                    label: '第一层',
-                    children:[
-                      {
-                        id: 26,
-                        label: '101',
-                      },
-                      {
-                        id: 27,
-                        label: '102',
-                      },
-
-                    ]
-                  }, {
-                    id: 28,
-                    label: '第二层',
-                    children:[
-                      {
-                        id: 29,
-                        label: '201',
-                      },
-                      {
-                        id: 30,
-                        label: '202',
-                      },
-
-                    ]
-                  }]
-                },
-
-              ]
-            }],
-          defaultProps: {
-            children: 'children',
-            label: 'label'
-          },
+          // data2: [{
+          //   id: 1,
+          //   label: '高科技产业园1',
+          //   children: [{
+          //     id: 2,
+          //     label: '一号楼',
+          //     children: [{
+          //       id: 3,
+          //       label: '第一层',
+          //       children:[
+          //         {
+          //           id: 4,
+          //           label: '101',
+          //         },
+          //         {
+          //           id: 5,
+          //           label: '102',
+          //         },
+          //
+          //       ]
+          //     }, {
+          //       id: 6,
+          //       label: '第二层',
+          //       children:[
+          //         {
+          //           id: 7,
+          //           label: '201',
+          //         },
+          //         {
+          //           id: 8,
+          //           label: '202',
+          //         },
+          //
+          //       ]
+          //     }]
+          //   },
+          //     {
+          //       id: 9,
+          //       label: '一号楼',
+          //       children: [{
+          //         id: 10,
+          //         label: '第一层',
+          //         children:[
+          //           {
+          //             id: 11,
+          //             label: '101',
+          //           },
+          //           {
+          //             id: 12,
+          //             label: '102',
+          //           },
+          //
+          //         ]
+          //       }, {
+          //         id: 13,
+          //         label: '第二层',
+          //         children:[
+          //           {
+          //             id: 14,
+          //             label: '201',
+          //           },
+          //           {
+          //             id: 15,
+          //             label: '202',
+          //           },
+          //
+          //         ]
+          //       }]
+          //     },
+          //
+          //   ]},
+          //   {
+          //     id: 16,
+          //     label: '高科技产业园2',
+          //     children: [{
+          //       id: 17,
+          //       label: '一号楼',
+          //       children: [{
+          //         id: 18,
+          //         label: '第一层',
+          //         children:[
+          //           {
+          //             id: 19,
+          //             label: '101',
+          //             disabled: true
+          //           },
+          //           {
+          //             id: 20,
+          //             label: '102',
+          //           },
+          //
+          //         ]
+          //       }, {
+          //         id: 21,
+          //         label: '第二层',
+          //         children:[
+          //           {
+          //             id: 22,
+          //             label: '201',
+          //           },
+          //           {
+          //             id: 23,
+          //             label: '202',
+          //           },
+          //
+          //         ]
+          //       }]
+          //     },
+          //       {
+          //         id: 24,
+          //         label: '一号楼',
+          //         children: [{
+          //           id: 25,
+          //           label: '第一层',
+          //           children:[
+          //             {
+          //               id: 26,
+          //               label: '101',
+          //             },
+          //             {
+          //               id: 27,
+          //               label: '102',
+          //             },
+          //           ]
+          //         }, {
+          //           id: 28,
+          //           label: '第二层',
+          //           children:[
+          //             {
+          //               id: 29,
+          //               label: '201',
+          //             },
+          //             {
+          //               id: 30,
+          //               label: '202',
+          //             },
+          //           ]
+          //         }]
+          //       },
+          //
+          //     ]
+          //   }],
+          // defaultProps: {
+          //   children: 'children',
+          //   label: 'label'
+          // },
 
           data3: [
             {
@@ -496,9 +492,15 @@
         };
       },
       methods:{
-        getCheckedKeys() {
+        getHalfCheckedNodes() {
+          console.log(this.$refs.tree.getHalfCheckedNodes());
           console.log(this.$refs.tree.getCheckedNodes());
         },
+        changes(a,b,c){
+          console.log(a)
+          console.log(b)
+          console.log(c)
+        }
 
 
       }

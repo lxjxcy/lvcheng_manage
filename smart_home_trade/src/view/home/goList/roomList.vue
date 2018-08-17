@@ -1,11 +1,36 @@
 <template>
   <div class="roomList">
-    <Breadcrumb separator=">">
-      <BreadcrumbItem to="/garden/gardenManagement">园区管理</BreadcrumbItem>
-      <BreadcrumbItem to="/garden/buildingList">大楼列表</BreadcrumbItem>
-      <BreadcrumbItem to="/garden/floorList">楼层列表</BreadcrumbItem>
-      <BreadcrumbItem>房间列表</BreadcrumbItem>
-    </Breadcrumb>
+    <!--系统管理员-->
+    <div class="goback" v-if="headuserLevel==1">
+      <Breadcrumb separator=">">
+        <span>当前位置：</span>
+        <BreadcrumbItem to="/garden/gardenManagement">园区管理</BreadcrumbItem>
+        <BreadcrumbItem to="/garden/buildingList">大楼列表</BreadcrumbItem>
+        <BreadcrumbItem to="/garden/floorList">楼层列表</BreadcrumbItem>
+        <BreadcrumbItem>房间列表</BreadcrumbItem>
+      </Breadcrumb>
+    </div>
+       <!--园区管理员-->
+    <div class="goback" v-if="headuserLevel==2">
+      <Breadcrumb separator=">">
+        <span>当前位置：</span>
+        <BreadcrumbItem to="/park/buildingManagement">大楼管理</BreadcrumbItem>
+        <BreadcrumbItem to="/park/floorList">楼层列表</BreadcrumbItem>
+        <BreadcrumbItem>房间列表</BreadcrumbItem>
+      </Breadcrumb>
+    </div>
+    <!--大楼管理员-->
+    <div class="goback" v-if="headuserLevel==3">
+      <Breadcrumb separator=">">
+        <span>当前位置：</span>
+        <BreadcrumbItem to="/building/floorManagment">楼层管理</BreadcrumbItem>
+        <BreadcrumbItem>房间列表</BreadcrumbItem>
+      </Breadcrumb>
+    </div>
+
+
+
+
     <div class="top-nav">
       <el-form :inline="true" :model="formInline" class="demo-form-inline">
         <el-form-item label="名称">
@@ -97,6 +122,8 @@
     multipleSelection: [],
     data() {
       return {
+        headuserLevel:3,
+
         formInline: {
           roomId: '',
           roomName:"",

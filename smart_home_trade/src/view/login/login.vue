@@ -4,19 +4,19 @@
         <div class="box">
           <div class="title">用户登录</div>
           <div class="conent">
-            <el-form :model="ruleForm2" status-icon :rules="rules2" ref="ruleForm2" label-width="100px" class="demo-ruleForm">
-              <el-form-item label="用户名" prop="user">
-                <el-input type="username" v-model="ruleForm2.user" auto-complete="off"></el-input>
+            <el-form :model="loginForm" status-icon :rules="rules2" ref="loginForm" label-width="100px" class="demo-ruleForm">
+              <el-form-item label="用户名" prop="loginName"  >
+                <el-input type="username" v-model="loginForm.loginName" auto-complete="off"></el-input>
               </el-form-item>
-              <el-form-item label="密码" prop="pass">
-                <el-input type="password" v-model="ruleForm2.pass" auto-complete="off"></el-input>
+              <el-form-item label="密码" prop="password"  >
+                <el-input type="password" v-model="loginForm.password" auto-complete="off"></el-input>
               </el-form-item>
-              <el-form-item label="验证码" prop="checkMa">
-                <el-input type="text" v-model="ruleForm2.checkMa" auto-complete="off" class="checkma"></el-input>
-                <div v-model="ruleForm2.check" auto-complete="off" class="check">{{ruleForm2.check}}</div>
+              <el-form-item label="验证码" prop="code"  >
+                <el-input type="text" v-model="loginForm.code" auto-complete="off" class="checkma"></el-input>
+                <div v-model="imgUrl" auto-complete="off" class="check" @click="getImg()"><img :src="imgUrl" alt="" ></div>
               </el-form-item>
               <el-form-item>
-                <el-button type="primary" @click="submitForm('ruleForm2')">登录</el-button>
+                <el-button type="primary" @click="submitForm('loginForm')" style="position: relative;top:-10px;">登录</el-button>
               </el-form-item>
             </el-form>
           </div>
@@ -42,65 +42,92 @@
           if (value === '') {
             callback(new Error('请输入密码'));
           } else {
-            // if (this.ruleForm2.checkPass !== '') {
-            //   this.$refs.ruleForm2.validateField('checkPass');
-            // }
             callback();
           }
         };
         var validatecheckMa = (rule, value, callback) => {
           if (value === '') {
-            callback(new Error('请输入次验证码'));
-          } else if (value !== this.ruleForm2.check) {
-            callback(new Error('验证码不正确!'));
+            callback(new Error('请输入验证码'));
           } else {
             callback();
           }
         };
         return {
-          ruleForm2: {
-            user:'',
-            pass: '',
-            check:'123',
-            checkMa: '',
+          loginForm: {
+            loginName:'',
+            password: '',
+            code: '',
           },
+          check:'123',
+          checkMa: '',
+          imgUrl:'',
           rules2: {
-            user: [
-              { validator: validateUser, trigger: 'blur' }
+            loginName: [
+              { required: true,validator: validateUser, trigger: 'blur' }
             ],
-            pass: [
-              { validator: validatePass, trigger: 'blur' }
+            password: [
+              { required: true,validator: validatePass, trigger: 'blur' }
             ],
-            checkMa: [
-              { validator: validatecheckMa, trigger: 'blur' }
+            code: [
+              { required: true,validator: validatecheckMa, trigger: 'blur' }
             ],
 
           }
         };
       },
+      mounted(){
+         this.getImg()
+      },
       methods: {
-        submitForm(formName) {
-          axios.post('/user/loginUser', {
-            loginName: this.ruleForm2.user,
-            password: this.ruleForm2.pass
-          })
-            .then(function (response) {
-              console.log(response);
-          
-            }) .catch(function (error) {
-              console.log(error);
-            });
+          getImg(){
+            var that=this;
+            axios.post("/SmartHomeTrade/user/getCode").then(function (res) {
+              console.log(res)
+              that.imgUrl= `data:image/jpeg;base64,`+res.data.data.base;
+              console.log(that.imgUrl)
+            })
+          },
+
+        //  获取验证码
+
+        submitForm(loginForm) {
+
+          var that=this;
+          console.log(that.loginForm)
+          that.$refs[loginForm].validate((valid) => {
+            if (valid) {
+              axios.post('/SmartHomeTrade/user/loginUser',that.loginForm).then(function (res) {
+                that.$refs[loginForm].resetFields();
+                console.log(res)
+                if(res.data.message=='登录成功'){
+                  that.$set(that.$store.state, 'islogin',true)
+                  that.$store.commit('setToken',res.data.data.user.status)
+                  that.$store.commit('getUser',res.data.data.user.loginName)
+                }
+
+                that.$message.error(res.data.message);
+                if(res.data.data.user.userLevel==1){
+                  that.$router.push('/garden/gardenManagement')
+                }else if(res.data.data.user.userLevel==2){
+                  that.$router.push('/park/MyPark')
+                }else if(res.data.data.user.userLevel==3){
+                  that.$router.push('/building/MyBuilding')
+                }else if(res.data.data.user.userLevel==4){
+                  that.$router.push('/floor/myFloor')
+                }else{
+                  that.$router.push( '/room/myRoom')
+                }
+                that.$set(that.$store.state.userInfo, 'userLevel',res.data.data.user.userLevel)
+                that.$set(that.$store.state.userInfo, 'status',res.data.data.user.status)
 
 
-          // this.$refs[formName].validate((valid) => {
-          //   if (valid) {
-          //     //发送axios，请求登录接口
-          //     alert('submit!');
-          //   } else {
-          //     console.log('登录失败!!');
-          //     return false;
-          //   }
-          // });
+              })
+            } else {
+              console.log('error submit!!');
+              return false;
+            }
+          });
+
         }
       }
     }
@@ -145,6 +172,15 @@
   .check{
     width:30%;
     float: left;
+  }
+  .check img{
+    height:40px;
+    width:100%;
+    position: relative;
+    left:-4px;
+    border:1px solid #dfe0e4;
+    /*border-left:none*/
+    cursor: pointer;
   }
   .el-button{
     padding:12px 0;

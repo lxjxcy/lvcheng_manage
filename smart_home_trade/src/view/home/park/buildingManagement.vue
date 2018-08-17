@@ -24,13 +24,15 @@
       <div class="nav-middle">
         <ul>
           <li class="l" @click="addBuilding = true"><i class="iconfont">&#xe612;</i>添加</li>
-          <el-dialog title="添加大楼" :visible.sync="addBuilding" width="40%">
+          <el-dialog title="添加大楼" :visible.sync="addBuilding" width="30%">
             <div class="add-buliding">
-              <el-form :model="form">
-                <el-form-item label="大楼名称" :label-width="formLabelWidth">
-                  <el-input v-model="form.name" auto-complete="off" style="width:220px"></el-input>
+              <el-form :model="form" label-width="100px">
+                <el-form-item label="大楼名称">
+                  <el-input v-model="form.name"></el-input>
                 </el-form-item>
-                <el-form-item label="所属区域" :label-width="formLabelWidth">
+
+
+                <el-form-item label="所属区域">
                   <el-select v-model="form.region" placeholder="请选择活动区域">
                     <el-option label="区域一" value="shanghai"></el-option>
                     <el-option label="区域二" value="beijing"></el-option>
@@ -46,11 +48,11 @@
 
 
           <li class="l" @click="change()"><i class="iconfont" >&#xe645;</i>修改</li>
-              <el-dialog title="修改大楼" :visible.sync="changeBuilding" width="40%">
+              <el-dialog title="修改大楼" :visible.sync="changeBuilding" width="30%">
                 <div class="add-buliding">
-                  <el-form :model="form">
-                    <el-form-item label="大楼名称" :label-width="formLabelWidth">
-                      <el-input v-model="form.buildingname" auto-complete="off" style="width:220px"></el-input>
+                  <el-form :model="form"  label-width="100px">
+                    <el-form-item label="大楼名称">
+                      <el-input v-model="form.buildingname" auto-complete="off" label-width="100px"></el-input>
                     </el-form-item>
                   </el-form>
                 </div>
@@ -442,7 +444,9 @@
 
 <style scoped>
   .add-buliding{
+    padding-right: 0.53rem;
     /*text-align: center;*/
-    padding-left:0.8rem;
+    /*padding-left:0.8rem;*/
   }
+
 </style>
