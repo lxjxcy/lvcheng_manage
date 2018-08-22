@@ -59,7 +59,9 @@ export default {
     border-color: #14ac86;
   }
   .el-button:focus, .el-button:hover{
-    background-color:#2bc999
+    background-color:#2bc999;
+    color:#fff;
+
   }
   /*左侧*/
   aside{
@@ -273,5 +275,10 @@ padding:8px 26px;
     /*border-bottom:2px solid #2fc0fb ;*/
     /*background: #a2deea;*/
   /*}*/
+
+  /*登录*/
+  .el-form-item__content{
+    line-height: 40px;
+  }
 
 </style>

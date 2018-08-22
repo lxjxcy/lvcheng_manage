@@ -143,9 +143,9 @@
         },
         back(){
           var that=this;
-          var status=Number(that.$store.state.userInfo.status)
+          // var status=Number(that.$store.state.userInfo.status)
           axios.post('/SmartHomeTrade/user/exitUser',{
-            status:status,
+            status:1,
             loginName:that.$store.state.userInfo.loginName
           }).then(function (res) {
             console.log(res)

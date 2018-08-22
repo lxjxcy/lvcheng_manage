@@ -126,11 +126,17 @@
         <el-table-column
           prop="hierarchical"
           label="层级">
-          <template slot-scope="scope">
+          {
+            hierarchical?
+             <template slot-scope="scope">
             <el-breadcrumb separator-class="el-icon-arrow-right">
-              <el-breadcrumb-item v-for="item in scope.row.hierarchical">{{item.value}}</el-breadcrumb-item>
+              <el-breadcrumb-item v-for="item in scope.row.hierarchical"  :key="index">{{item.value}}</el-breadcrumb-item>
             </el-breadcrumb>
           </template>
+          :[]
+
+          }
+         
         </el-table-column>
       </el-table>
       <div class="block">

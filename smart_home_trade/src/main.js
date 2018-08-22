@@ -20,28 +20,33 @@ Vue.component(myFooter.name, myFooter)
 
 router.beforeEach((to, from, next) => {
   if (to.meta.Auth) {
-    if (store.state.token!=null) {
+
+    if (store.state.token != null) {
       next();
     } else {
-      router.push({ name: 'login' })
+      router.push({
+        name: 'login'
+      })
     }
   } else {
     next();
   }
 })
-if(window.sessionStorage.getItem('token')){
-  store.commit('setToken',window.sessionStorage.getItem('token'))
+
+
+if (window.sessionStorage.getItem('token')) {
+  store.commit('setToken', window.sessionStorage.getItem('token'))
 }
-if(window.sessionStorage.getItem('loginName')){
-  store.commit('getUser',window.sessionStorage.getItem('loginName'))
+if (window.sessionStorage.getItem('loginName')) {
+  store.commit('getUser', window.sessionStorage.getItem('loginName'))
 }
 /* eslint-disable no-new */
 new Vue({
-	el: '#app',
-	router,
-	store,
-	components: {
-		App
-	},
-	template: '<App/>'
+  el: '#app',
+  router,
+  store,
+  components: {
+    App
+  },
+  template: '<App/>'
 })

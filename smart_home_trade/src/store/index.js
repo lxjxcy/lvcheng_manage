@@ -4,32 +4,46 @@ Vue.use(Vuex)
 
 export default new Vuex.Store({
   state: {
-    parame:{
-      garden_buildNmae:'',
-      garden_buildId:'',
-      build_floorName:'',
-      build_floorId:'',
+    parame: {
+      garden_buildNmae: '',
+      garden_buildId: '',
+      build_floorName: '',
+      build_floorId: '',
     },
-    userInfo:{
-      loginName:'',
-      userLevel:'',
-      status:''
+    userInfo: {
+      loginName: '',
+      userLevel: '',
+      status: '',
+      tel: '',
     },
-    islogin:false,
-    token:null
+    set: [{
+      id: 121,
+      label: '添加'
+    }, {
+      id: 122,
+      label: '修改'
+    }, {
+      id: 123,
+      label: '设置管理员'
+    }, {
+      id: 124,
+      label: '主机清单'
+    }],
+    islogin: false,
+    token: null
   },
   mutations: {
-      setToken(state,token){
-        state.token=token;
-        sessionStorage.setItem('token',token)
-      },
-    getUser(state,loginname){
-      state.userInfo.loginName=loginname;
-      sessionStorage.setItem('loginName',loginname)
+    setToken(state, token) {
+      state.token = token;
+      sessionStorage.setItem('token', token)
     },
-    exitUser(state){
-        state.token=null;
-        sessionStorage.removeItem('token')
+    getUser(state, loginname) {
+      state.userInfo.loginName = loginname;
+      sessionStorage.setItem('loginName', loginname)
+    },
+    exitUser(state) {
+      state.token = null;
+      sessionStorage.removeItem('token')
     }
   },
 

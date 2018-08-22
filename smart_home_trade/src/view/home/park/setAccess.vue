@@ -2,6 +2,7 @@
     <div class="setAccess">
       <div class="goback">
         <Breadcrumb separator=">">
+        <span>当前位置：</span>
           <BreadcrumbItem to="/garden/gardenUser">用户管理</BreadcrumbItem>
           <BreadcrumbItem>设置权限</BreadcrumbItem>
         </Breadcrumb>
@@ -32,12 +33,13 @@
           <!--<el-radio v-model="radio" label="1">查看</el-radio>-->
           <!--<el-radio v-model="radio" label="2">操作</el-radio>-->
         <!--</div>-->
+
         <div class="Operate set">
           <h2 class="set-h2">操作权限</h2>
           <el-tree
             :data="data3"
             show-checkbox
-            @check-change="changes"
+           :default-checked-keys="checkedlist"
             ref="tree"
             node-key="id"
             :props="defaultProps">
@@ -56,6 +58,7 @@
         return {
           checkAll: false,
           checkedCities: [],
+          checkedlist:[],
           radio: '',
           // data2: [{
           //   id: 1,
@@ -199,10 +202,10 @@
           //
           //     ]
           //   }],
-          // defaultProps: {
-          //   children: 'children',
-          //   label: 'label'
-          // },
+          defaultProps: {
+            children: 'children',
+            label: 'label'
+          },
 
           data3: [
             {
@@ -493,14 +496,11 @@
       },
       methods:{
         getHalfCheckedNodes() {
-          console.log(this.$refs.tree.getHalfCheckedNodes());
-          console.log(this.$refs.tree.getCheckedNodes());
+          // console.log(this.$refs.tree.getCheckedKeys());
+          console.log(this.$refs.tree.getCheckedNodes(false,true))
+           
         },
-        changes(a,b,c){
-          console.log(a)
-          console.log(b)
-          console.log(c)
-        }
+        
 
 
       }

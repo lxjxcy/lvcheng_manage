@@ -120,9 +120,6 @@
               children:[ ]}
               this.department.push(addlist)
         }
-
-
-
       }
     }
 </script>

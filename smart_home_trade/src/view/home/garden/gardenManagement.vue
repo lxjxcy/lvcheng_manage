@@ -7,7 +7,7 @@
           <el-input v-model="formSearch.gardenId" placeholder=""></el-input>
         </el-form-item>
         <el-form-item label="名称"  prop="roomId">
-          <el-input v-model="formSearch.gardenName" placeholder=""></el-input>
+          <el-input v-model="formSearch.yardName" placeholder=""></el-input>
         </el-form-item>
 
         <el-form-item label="管理员"  prop="management">
@@ -34,12 +34,13 @@
             <el-form label-width="100px" :model="addG" ref="addG" :rules="rules">
               <el-form-item
                 label="园区名称"
-                prop="gardenName"
+                prop="yardName"
+
               >
-                <el-input v-model="addG.gardenName"></el-input>
+                <el-input v-model="addG.yardName" @blur="getaddInfo(addG.yardName)"></el-input>
               </el-form-item>
-              <el-form-item label="省"  prop="province">
-                <el-select v-model="addG.province" placeholder="请选择省" @change="getCity">
+              <el-form-item label="省"  prop="provinceName">
+                <el-select v-model="addG.provinceName" placeholder="请选择省" @change="getCity">
                   <el-option
                     v-for="item in provincelist"
                     :key="item.provinceId"
@@ -49,8 +50,8 @@
                 </el-select>
               </el-form-item>
 
-              <el-form-item label="市"  prop="city">
-                <el-select v-model="addG.city" placeholder="请选择市" @change="getRegion">
+              <el-form-item label="市"  prop="cityName">
+                <el-select v-model="addG.cityName" placeholder="请选择市" @change="getRegion">
                   <el-option
                     v-for="item in citylist"
                     :key="item.cityId"
@@ -59,8 +60,8 @@
                   </el-option>
                 </el-select>
               </el-form-item>
-              <el-form-item label="区"  prop="region">
-                <el-select v-model="addG.region" placeholder="请选择区域" @change="getAddress">
+              <el-form-item label="区"  prop="areaName">
+                <el-select v-model="addG.areaName" placeholder="请选择区域" @change="getAddress">
                   <el-option
                     v-for="item in regionlist"
                     :key="item.areaId"
@@ -69,11 +70,11 @@
                   </el-option>
                 </el-select>
               </el-form-item>
-              <el-form-item label="园区地址" prop="address">
-                <el-input v-model="addG.address"></el-input>
+              <el-form-item label="园区地址" prop="detailAddress">
+                <el-input v-model="addG.detailAddress"></el-input>
               </el-form-item>
               <el-form-item label="添加大楼" prop="addbuild">
-                <el-switch v-model="addG.addbuild"></el-switch>
+                <el-switch v-model="addbuild"></el-switch>
               </el-form-item>
             </el-form>
           </div>
@@ -115,9 +116,6 @@
           :before-close="handleClose">
           <div class="add">
             <el-form label-width="100px" :model="changeG" ref="changeG" :rules="changrules">
-              <el-form-item label="园区名称" prop="gardenName">
-                <el-input v-model="changeG.gardenName"></el-input>
-              </el-form-item>
               <el-form-item label="园区地址" prop="gdAddress">
                 <el-input v-model="changeG.gdAddress"></el-input>
               </el-form-item>
@@ -200,11 +198,11 @@
           width="100">
         </el-table-column>
         <el-table-column
-          prop="gardenName"
+          prop="yardName"
           label="园区名称"
           width="100">
           <template slot-scope="scope">
-            <el-button @click="goBuildinglist(scope.row.gardenName,scope.row.gardenId)" type="text" size="small">{{scope.row.gardenName}}</el-button>
+            <el-button @click="goBuildinglist(scope.row.yardName,scope.row.gardenId)" type="text" size="small">{{scope.row.yardName}}</el-button>
           </template>
         </el-table-column>
         <el-table-column
@@ -253,6 +251,7 @@
     data() {
       return {
         total:10,
+        loading:false,
         params:{
           pageSize:10,
           currentPage:1
@@ -266,26 +265,31 @@
           }],
         },
         addG:{
-          gardenName:"",
-          province:"",
-          city:"",
-          region:"",
-          address:'',
-          addbuild: false,
+          yardId:null,
+         yardName:"",
+          provinceName:'',
+          provinceId:'',
+          cityName:"",
+          cityId:'',
+          areaName:'',
+          areaId:'',
+          detailAddress:'',
+         
         },
+         addbuild: false,
         addaddressid:'',//地址合并
 
         rules: {
-          gardenName: [
+          yardName: [
             {  required: true,message: '园区名称不能为空', trigger: 'blur' }
           ],
-          province: [
+          provinceName: [
             {  required: true,message: '省不能为空', trigger: 'blur' }
           ],
-          city: [
+          cityName: [
             {  required: true,message: '市不能为空', trigger: 'blur' }
           ],
-          region: [
+          areaName: [
             {  required: true, message: '区域不能为空',trigger: 'blur' }
           ],
           address: [
@@ -293,12 +297,11 @@
           ]
         },
         changeG:{
-          gardenName:"",
           gdAddress:'',
           id:''
         },
         changrules:{
-          gardenName: [
+          yardName: [
             {  required: true,message: '园区名称不能为空', trigger: 'blur' }
           ],
           gdAddress: [
@@ -316,7 +319,7 @@
         administrator:false,
         formSearch: {//搜索
           gardenId:null,
-          gardenName:null,
+          yardName:null,
           adminName:null,
         },
         currentPage3: 1,
@@ -328,7 +331,7 @@
         listGardenCount: [
           {
             gardenId:1,
-            gardenName:'122园区',
+            yardName:'122园区',
             bCount:'555',
             dCount:'34',
             adminName:'addd',
@@ -336,7 +339,7 @@
           },
           {
             gardenId:1,
-            gardenName:'122园区',
+            yardName:'122园区',
             bCount:'555',
             dCount:'34',
             adminName:'addd',
@@ -344,7 +347,7 @@
           },
           {
             gardenId:1,
-            gardenName:'122园区',
+            yardName:'122园区',
             bCount:'555',
             dCount:'34',
             adminName:'addd',
@@ -352,7 +355,7 @@
           },
           {
             gardenId:1,
-            gardenName:'122园区',
+            yardName:'122园区',
             bCount:'555',
             dCount:'34',
             adminName:'addd',
@@ -360,7 +363,7 @@
           },
           {
             gardenId:1,
-            gardenName:'122园区',
+            yardName:'122园区',
             bCount:'555',
             dCount:'34',
             adminName:'addd',
@@ -368,14 +371,14 @@
           },
           {
             gardenId:1,
-            gardenName:'122园区',
+            yardName:'122园区',
             bCount:'555',
             dCount:'34',
             adminName:'addd',
             adminMobile:'13017084567'
           }, {
             gardenId:1,
-            gardenName:'122园区',
+            yardName:'122园区',
             bCount:'555',
             dCount:'34',
             adminName:'addd',
@@ -383,7 +386,7 @@
           },
           {
             gardenId:1,
-            gardenName:'122园区',
+            yardName:'122园区',
             bCount:'555',
             dCount:'34',
             adminName:'addd',
@@ -395,7 +398,6 @@
     mounted(){
     // this.getlist()
     },
-
     filters: {
       userlevelStop: function (val) {
         return val== 1 ? 'admin' : val == 2? '园区管理员' :val == 3? '大楼管理员' : val == 4? '楼层管理员' : val == 5? '房间管理员':""
@@ -405,13 +407,39 @@
       //  获取列表
       getlist(){
         var that=this
-        axios.post('/garden/selectGdCount',that.params).then(function (res) {
+        axios.post('/SmartHomeTrade/garden/selectGdCount',that.params).then(function (res) {
           if(res.data.message=='查询园区统计成功'){
             that.loading=false
           }
           that.total=res.data.data.Count
           that.listGardenCount=res.data.data.listGardenCount
         })
+      },
+      // 园区存在时获取园区信息
+      getaddInfo(name){
+        var that=this;
+          console.log(name)
+          axios.post("/SmartHomeTrade/garden/selectYardsByName",{
+            yardName:name,
+            action:2
+          }).then(function(res){
+            console.log(res.data.data[0].yardName)
+            if(res.data.data!=[]){
+               that.addG={
+                  yardId:res.data.data[0].yardId,
+                   yardName:res.data.data[0].yardName,
+                   provinceName:res.data.data[0].provinceName,
+                  provinceId:res.data.data[0].provinceId,        
+                  cityId:res.data.data[0].cityId,        
+                  areaId:res.data.data[0].areaId,
+                  provinceName:res.data.data[0].provinceName,
+                  cityName:res.data.data[0].cityName,
+                  areaName:res.data.data[0].areaName,
+                  detailAddress:res.data.data[0].detailAddress,
+                }
+            }
+            
+          })
       },
       //每页显示多少条
       handleSizeChange(val) {
@@ -442,7 +470,7 @@
       addgarden(){
         var that=this;
         that.addGarden=true;
-        axios.post("/garden/queryPro",{ }).then(function (res) {
+        axios.post("/SmartHomeTrade/garden/queryPro",{ }).then(function (res) {
           that.provincelist=res.data.data
           console.log(res)
         })
@@ -453,7 +481,7 @@
       onSubmit() {
         var that=this;
         that.loading=true
-        axios.post('/garden/selectGardenByNmIdAdmin',this.formSearch).then(function (res) {
+        axios.post('/SmartHomeTrade/garden/selectGardenByNmIdAdmin',this.formSearch).then(function (res) {
           that.listGardenCount=res.data.data;
           that.loading=false
         })
@@ -463,7 +491,7 @@
         var that=this;
         that.formSearch={
           gardenId:null,
-          gardenName:null,
+          yardName:null,
           adminName:null,
         }
         that.getlist()
@@ -480,19 +508,15 @@
       //添加园区和大楼
       addGb(){
         var that=this;
-        console.log(that.addbuildList.addbuildName);
-        var list=[]
-        for(var i=0;i<that.addbuildList.addbuildName.length;i++){
-          list.push(that.addbuildList.addbuildName[i].value)
-        }
-        alert(list)
-        var addparamGb={
-          addressId:that.addaddressid,
-          gardenName:that.addG.gardenName,
-          gdAddress:that.addG.address,
-          blockList:that.addbuildList.addbuildName
-        }
-        axios.post('/garden/insertGarden',addparamGb).then(function (res) {
+        console.log(that.addbuildList);
+
+       var bul=that.addbuildList;
+       var tel={
+        createOperator:that.$store.state.userInfo.tel
+       }
+        var addparamGb=Object.assign(bul, tel, that.addG)
+        console.log(addparamGb)
+        axios.post('/SmartHomeTrade/garden/insertGarden',addparamGb).then(function (res) {
           console.log(res)
           that.$message({
             type: 'success',
@@ -500,52 +524,71 @@
           });
           that.addGarden=false;
           that.addBuild=false;
-
         });
       },
 
       //获取市
       getCity : function(value){
-        var that=this;
-        axios.post("/garden/queryPro",{
+         var that=this;
+         that.addG.provinceId=value;
+        console.log(value)
+         let obj = {};  
+        obj = this.provincelist.find((item)=>{ 
+        return item.provinceId === value;
+        });  
+        that.addG.provinceName=obj.province;
+        axios.post("/SmartHomeTrade/garden/queryPro",{
           provinceId:value
         }).then(function (res) {
           that.citylist=res.data.data;
-          that.addG.city='';
-          that.addG.region=''
+          that.addG.cityName='';
+          that.addG.areaName='';
+           that.addG.cityId='';
+          that.addG.areaId='';       
         })
       },
       // 获取区域
       getRegion : function(value){
         var that=this;
-        axios.post("/garden/queryPro",{
+         that.addG.cityId=value;
+           console.log(value)
+         let obj = {};  
+        obj = this.citylist.find((item)=>{ 
+        return item.cityId === value;
+        });  
+        that.addG.cityName=obj.city;
+
+        axios.post("/SmartHomeTrade/garden/queryPro",{
           cityId:value
         }).then(function (res) {
           that.regionlist=res.data.data;
-          that.addG.region=''
+            that.addG.areaName='';
+            that.addG.areaId='';    
         })
       },
-     // 获取地址合并id
+     // 获取区域id
       getAddress(value){
-        this.addaddressid=value
+        var that=this;
+        that.addG.areaId=value; 
+         let obj = {};  
+        obj = this.regionlist.find((item)=>{ 
+        return item.areaId === value;
+        });  
+         that.addG.areaName=obj.area; 
       },
 
 
  //提交添加园区信息
   add_build(addG){
-
         var that=this;
+
     that.$refs[addG].validate((valid) => {
           if (valid) {
-            if(that.addG.addbuild==true){
+            if(that.addbuild==true){
               that.addBuild=true
             }else {
-              var addparamG={
-                addressId:that.addaddressid,
-                gardenName:that.addG.gardenName,
-                gdAddress:that.addG.address,
-              }
-              axios.post('/garden/insertGarden',addparamG).then(function (res) {
+              console.log(that.addG)
+              axios.post('/SmartHomeTrade/garden/insertGarden',that.addG).then(function (res) {
                 console.log(res)
                     that.$message({
                       type: 'success',
@@ -563,41 +606,59 @@
       //修改园区框显示
       change(){
         var that=this;
-        if(that.multipleSelection==''){
-          that.$message({
-            type: 'info',
-            message: '请选择要修改的大楼删除'
-          });
-        }else {
+          console.log()
           that.changeGarden=true;
-          that.changeG={
-            gardenName:that.multipleSelection[0].gardenName,
-            gdAddress:that.multipleSelection[0].gdAddress,
-            id:that.multipleSelection[0].gardenId
-          }
-          // this.form.buildingname=this.multipleSelection[0].buildingName;
-        }
+          axios.post("/SmartHomeTrade/garden/selectYardsByName",{
+           yardId:"016679e1a41d11e89a33000c290ea96d",
+            action:2
+          }).then(function(res){
+            console.log(res)
+              that.changeG={
+                gdAddress:res.data.data[0].detailAddress,
+                id:res.data.data[0].yardId
+              }
+          })
+
+
+
+        // var that=this;
+        // if(that.multipleSelection==''){
+        //   that.$message({
+        //     type: 'info',
+        //     message: '请选择要修改的大楼删除'
+        //   });
+        // }else {
+        //   that.changeGarden=true;
+        //   that.changeG={
+        //     yardName:that.multipleSelection[0].yardName,
+        //     gdAddress:that.multipleSelection[0].gdAddress,
+        //     id:that.multipleSelection[0].gardenId
+        //   }e
+        // }
       },
       //确认修改园区
       change_Garden(changeG){
-        var that=this;
-        this.$refs[changeG].validate((valid) => {
-          if (valid) {
-            axios.post("/garden/updateGarden" ,that.changeG).then(function (res) {
-              that.$message({
-                type: 'success',
-                message: res.data.message
-              });
-              that.getlist()
-              that.changeGarden=false;
 
-            })
 
-          } else {
-            console.log('error submit!!');
-            return false;
-          }
-        });
+
+        // var that=this;
+        // this.$refs[changeG].validate((valid) => {
+        //   if (valid) {
+        //     axios.post("/SmartHomeTrade/garden/updateGarden" ,that.changeG).then(function (res) {
+        //       that.$message({
+        //         type: 'success',
+        //         message: res.data.message
+        //       });
+        //       that.getlist()
+        //       that.changeGarden=false;
+
+        //     })
+
+        //   } else {
+        //     console.log('error submit!!');
+        //     return false;
+        //   }
+        // });
 
       },
       //  设置管理员
@@ -610,7 +671,7 @@
             message: '请选择大楼要设置的园区'
           });
         }else {
-          axios.post('/garden/selectAdmin',{
+          axios.post('/SmartHomeTrade/garden/selectAdmin',{
             userLevel:2
           }).then(function (res) {
             that.listUser=res.data.data
@@ -632,7 +693,7 @@
           userId:that.multipleSelection2[0].id
         }
 
-       axios.post('/garden/updateUser',that.setadmin).then(function (res) {
+       axios.post('/SmartHomeTrade/garden/updateUser',that.setadmin).then(function (res) {
          console.log(res)
          that.$message({
            type: 'success',
@@ -682,8 +743,7 @@
       //新增大楼input框
       add_buildName() {
         this.addbuildList.addbuildName.push({
-          value: '',
-          key: Date.now()
+          
         });
       },
       //  删除
@@ -696,7 +756,7 @@
             type: 'warning'
           }).then(() => {
             //发送ajax
-            axios.post('/garden/deleteGarden',{
+            axios.post('/SmartHomeTrade/garden/deleteGarden',{
               id:that.multipleSelection[0].gardenId
             }).then(function (res) {
               that.getlist()

@@ -11,12 +11,12 @@
               <el-form-item label="密码" prop="password"  >
                 <el-input type="password" v-model="loginForm.password" auto-complete="off"></el-input>
               </el-form-item>
-              <el-form-item label="验证码" prop="code"  >
+              <el-form-item label="验证码" prop="code" style='position: relative' >
                 <el-input type="text" v-model="loginForm.code" auto-complete="off" class="checkma"></el-input>
-                <div v-model="imgUrl" auto-complete="off" class="check" @click="getImg()"><img :src="imgUrl" alt="" ></div>
+                <span v-model="imgUrl" class="check" style="position: absolute;right:0" @click="getImg()"><img :src="imgUrl" alt="" ></span>
               </el-form-item>
               <el-form-item>
-                <el-button type="primary" @click="submitForm('loginForm')" style="position: relative;top:-10px;">登录</el-button>
+                <el-button type="primary" @click="submitForm('loginForm')" style="position: relative;top:-2px;">登录</el-button>
               </el-form-item>
             </el-form>
           </div>
@@ -63,13 +63,13 @@
           imgUrl:'',
           rules2: {
             loginName: [
-              { required: true,validator: validateUser, trigger: 'blur' }
+              { required: true,validator: validateUser, }
             ],
             password: [
-              { required: true,validator: validatePass, trigger: 'blur' }
+              { required: true,validator: validatePass,}
             ],
             code: [
-              { required: true,validator: validatecheckMa, trigger: 'blur' }
+              { required: true,validator: validatecheckMa}
             ],
 
           }
@@ -79,6 +79,7 @@
          this.getImg()
       },
       methods: {
+         //  获取验证码
           getImg(){
             var that=this;
             axios.post("/SmartHomeTrade/user/getCode").then(function (res) {
@@ -88,24 +89,36 @@
             })
           },
 
-        //  获取验证码
-
+       
         submitForm(loginForm) {
 
           var that=this;
+
           console.log(that.loginForm)
           that.$refs[loginForm].validate((valid) => {
             if (valid) {
               axios.post('/SmartHomeTrade/user/loginUser',that.loginForm).then(function (res) {
-                that.$refs[loginForm].resetFields();
+                
+              
                 console.log(res)
                 if(res.data.message=='登录成功'){
                   that.$set(that.$store.state, 'islogin',true)
                   that.$store.commit('setToken',res.data.data.user.status)
                   that.$store.commit('getUser',res.data.data.user.loginName)
+                  that.$message({
+                  showClose: true,
+                  message:res.data.message,
+                  type: 'success'
+                });
+                }else{
+                   that.$message.error(res.data.message);
                 }
-
-                that.$message.error(res.data.message);
+                if(res.data.message=="验证码错误"){
+                  that.loginForm.code=''
+                   that.getImg()
+                }if(res.data.message=="用户名或密码错误"){
+                    that.$refs[loginForm].resetFields();
+                }              
                 if(res.data.data.user.userLevel==1){
                   that.$router.push('/garden/gardenManagement')
                 }else if(res.data.data.user.userLevel==2){
@@ -119,8 +132,7 @@
                 }
                 that.$set(that.$store.state.userInfo, 'userLevel',res.data.data.user.userLevel)
                 that.$set(that.$store.state.userInfo, 'status',res.data.data.user.status)
-
-
+                 that.$set(that.$store.state.userInfo, 'tel',res.data.data.user.userMobile)
               })
             } else {
               console.log('error submit!!');
@@ -150,7 +162,7 @@
     width:4.6rem;
     height:325px;
     background: #d6eefe;
-    marign:100px auto;
+    /*margin:100px auto;*/
     display: inline-block;
     border:10px solid #3781bb;
   }
@@ -171,7 +183,7 @@
   }
   .check{
     width:30%;
-    float: left;
+  
   }
   .check img{
     height:40px;

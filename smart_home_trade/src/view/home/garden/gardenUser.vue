@@ -17,7 +17,7 @@
       </el-form>
     </div>
     <div class="nav-middle">
-      <ul>
+      <ul >
         <li class="l" @click="add = true"><i class="iconfont">&#xe612;</i>添加</li>
         <el-dialog
           title="添加账户"
@@ -222,7 +222,7 @@
         formLabelWidth: '100px',
         loading: true,
         changeformValidate:{
-          id:'',
+          uuid:'',
           name: '',
           userMobile: ''
         },
@@ -354,7 +354,7 @@
               userMobile:that.addformValidate.userMobile,
               userEmail:that.addformValidate.userEmail,
               userLevel:that.userLevelv,
-              userDeviceAuth:'that.addformValidate.resource,'
+              userDeviceAuth:that.addformValidate.resource,
 
             }
             axios.post("/SmartHomeTrade/user/registAdUser",param).then(function (res) {
@@ -396,7 +396,7 @@
           console.log(this.multipleSelection[0].name)
           this.changeformValidate.name=this.multipleSelection[0].name;
           this.changeformValidate.userMobile=this.multipleSelection[0].userMobile;
-          this.changeformValidate.id=this.multipleSelection[0].id
+          this.changeformValidate.uuid=this.multipleSelection[0].id
         }
       },
       change_User(changeformValidate){
@@ -419,7 +419,6 @@
         });
       },
 
-
       //  删除
       deleted() {
         if(this.multipleSelection!=''){
@@ -431,7 +430,7 @@
           }).then(() => {
             //发送ajax
             axios.post('/SmartHomeTrade/user/deleteAdmin',{
-              id:that.multipleSelection[0].id
+              uuid:that.multipleSelection[0].id
             }).then(function (res) {
               that.$message({
                 type: 'success',
@@ -467,10 +466,11 @@
             this.$router.push("/park/setAccess")
           }
         },
-
-
-
-
+    // 设置管辖范围
+    setScope(row){
+      console.log(row)
+      this.$router.push("/garden/setScope")
+    }
     },
   }
 </script>

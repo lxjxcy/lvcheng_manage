@@ -4,8 +4,6 @@ import login from '@/view/login/login'
 
 
 
-
-
 //楼层管理员相关页面
 import floor from '@/view/home/floor/floor'
 import myFloor from '@/view/home/floor/myFloor'
@@ -55,71 +53,304 @@ import buildingList from '@/view/home/goList/buildingList'
 import floorList from '@/view/home/goList/floorList'
 import roomList from '@/view/home/goList/roomList'
 
+// 设置管辖范围
+import setScope from '@/view/home/garden/setScope'
+
 Vue.use(Router)
 
 export default new Router({
-  routes: [
-    //登陆
-    {path: '/', name: 'login', component: login},
-    //大楼管理
-    {path: '/building', redirect: '/building/MyBuilding', name: 'building', component: building,
-      children: [
-        {path: '/building/MyBuilding', name: 'MyBuilding', meta: {Auth: true,}, component: MyBuilding},
-        {path: '/building/floorManagment', name: 'floorManagement',meta: {Auth: true, }, component: floorManagement},
-        {path: '/building/buildingUser',name: 'buildingUser',meta: {Auth: true,}, component: buildingUser },
-        {path: '/building/buildingAppuser',name: 'buildingAppuser', meta: {Auth: true, },component: buildingAppuser },
-        {path: '/building/buildingLog',name: 'buildingLog',meta: {Auth: true, },component: buildingLog },
-        { path: '/building/roomList', name: 'roomList',meta: {Auth: true, }, component: roomList }
-      ]
-    },
-    //系统管理
-    {path: '/garden',redirect: '/garden/gardenManagement', name: 'garden', component: garden,
-      children: [
-        {path: '/garden/gardenManagement',name: 'gardenManagement', meta: { Auth: true, },component: gardenManagement },
-        {path: '/garden/masterplate', name: 'masterplate',meta: { Auth: true, }, component: masterplate},
-        { path: '/garden/gardenUser',name: 'gardenUser',meta: {Auth: true, },component: gardenUser},
-        {path: '/garden/gardenAppuser', name: 'gardenAppuser',meta: {Auth: true, },component: gardenAppuser },
-        {path: '/garden/gardenLog',name: 'gardenLog', meta: {Auth: true,},component: gardenLog},
-        { path: '/garden/buildingList',name: 'buildingList',meta: {Auth: true,}, component: buildingList },
-        {path: '/garden/floorList', name: 'floorList',meta: { Auth: true,},component: floorList },
-        {path: '/garden/roomList', name: 'roomList',meta: { Auth: true,},component: roomList }
-      ]
-    },
-    //园区管理
-    {path: '/park',redirect: '/park/MyPark', name: 'park',component: park,
-      children: [
-        {path: '/park/MyPark', name: 'MyPark',meta: {Auth: true,},component: MyPark},
-        { path: '/park/buildingManagement',name: 'buildingManagement', meta: {Auth: true, },component: buildingManagement},
-        {path: '/park/parkUser', name: 'parkUser', meta: {Auth: true, },component: parkUser},
-        {path: '/park/HostListing',name: 'HostListing',meta: {Auth: true,},component: HostListing },
-        {path: '/park/parkAppuser',name: 'parkAppuser', meta: {Auth: true,},component: parkAppuser },
-        {path: '/park/setAccess',name: 'setAccess',meta: {Auth: true,},component: setAccess },
-        {path: '/park/parkLog',name: 'parkLog',meta: {Auth: true, }, component: parkLog },
-        {path: '/park/floorList',name: 'floorList',meta: {Auth: true,},component: floorList },
-        { path: '/park/roomList',name: 'roomList', meta: { Auth: true, },component: roomList}
-      ]
-    },
-    //房间管理
-    {path: '/room', redirect: '/room/myRoom',name: 'room',component: room,
-      children: [
-        {path: '/room/myRoom',name: 'myRoom',meta: { Auth: true, }, component: myRoom },
-        {path: '/room/equipment', name: 'equipment',meta: {Auth: true,},component: equipment },
-        {path: '/room/authorization',name: 'authorization',meta: { Auth: true, },component: authorization },
-        { path: '/room/roomAppuser', name: 'roomAppuser',meta: { Auth: true, },component: roomAppuser},
-        {path: '/room/roomLog',name: 'roomLog',meta: {Auth: true,},component: roomLog},
-        {path: '/room/EquipmentAuthorization',name: 'EquipmentAuthorization', meta: { Auth: true, },component: EquipmentAuthorization }
-      ]
-    },
-    //楼层管理
-    {path: '/floor',redirect: '/floor/myFloor',name: 'floor',component: floor,
-      children: [
-        { path: '/floor/myFloor',name: 'myFloor', meta: {Auth: true, },component: myFloor },
-        {path: '/floor/floorUser',name: 'floorUser', meta: {Auth: true, }, component: floorUser },
-        {path: '/floor/roomManagement',name: 'roomManagement',meta: {Auth: true, }, component: roomManagement},
-        {path: '/floor/floorAppuser',name: 'floorAppuser',meta: { Auth: true, },component: floorAppuser },
-        { path: '/floor/floorLog', name: 'floorLog',meta: { Auth: true, },component: floorLog },
-      ]
-    }
-  ]
-})
+    routes: [
+        //登陆
+        {
+            path: '/',
+            name: 'login',
+            component: login
+        },
+        //大楼管理
+        {
+            path: '/building',
+            redirect: '/building/MyBuilding',
+            name: 'building',
+            component: building,
+            children: [{
+                path: '/building/MyBuilding',
+                name: 'MyBuilding',
+                meta: {
+                    Auth: true,
+                },
+                component: MyBuilding
+            }, {
+                path: '/building/floorManagment',
+                name: 'floorManagement',
+                meta: {
+                    Auth: true,
+                },
+                component: floorManagement
+            }, {
+                path: '/building/buildingUser',
+                name: 'buildingUser',
+                meta: {
+                    Auth: true,
+                },
+                component: buildingUser
+            }, {
+                path: '/building/buildingAppuser',
+                name: 'buildingAppuser',
+                meta: {
+                    Auth: true,
+                },
+                component: buildingAppuser
+            }, {
+                path: '/building/buildingLog',
+                name: 'buildingLog',
+                meta: {
+                    Auth: true,
+                },
+                component: buildingLog
+            }, {
+                path: '/building/roomList',
+                name: 'roomList',
+                meta: {
+                    Auth: true,
+                },
+                component: roomList
+            }]
+        },
+        //系统管理
+        {
+            path: '/garden',
+            redirect: '/garden/gardenManagement',
+            name: 'garden',
+            component: garden,
+            children: [{
+                path: '/garden/gardenManagement',
+                name: 'gardenManagement',
+                meta: {
+                    Auth: true,
+                },
+                component: gardenManagement
+            }, {
+                path: '/garden/masterplate',
+                name: 'masterplate',
+                meta: {
+                    Auth: true,
+                },
+                component: masterplate
+            }, {
+                path: '/garden/gardenUser',
+                name: 'gardenUser',
+                meta: {
+                    Auth: true,
+                },
+                component: gardenUser
+            }, {
+                path: '/garden/gardenAppuser',
+                name: 'gardenAppuser',
+                meta: {
+                    Auth: true,
+                },
+                component: gardenAppuser
+            }, {
+                path: '/garden/gardenLog',
+                name: 'gardenLog',
+                meta: {
+                    Auth: true,
+                },
+                component: gardenLog
+            }, {
+                path: '/garden/buildingList',
+                name: 'buildingList',
+                meta: {
+                    Auth: true,
+                },
+                component: buildingList
+            }, {
+                path: '/garden/floorList',
+                name: 'floorList',
+                meta: {
+                    Auth: true,
+                },
+                component: floorList
+            }, {
+                path: '/garden/roomList',
+                name: 'roomList',
+                meta: {
+                    Auth: true,
+                },
+                component: roomList
+            }, {
+                path: '/garden/setScope',
+                name: 'setScope',
+                meta: {
+                    Auth: true,
+                },
+                component: setScope
+            }]
+        },
+        //园区管理
+        {
+            path: '/park',
+            redirect: '/park/MyPark',
+            name: 'park',
+            component: park,
 
+            children: [{
+                path: '/park/MyPark',
+                name: 'MyPark',
+                meta: {
+                    Auth: true,
+                },
+                component: MyPark
+            }, {
+                path: '/park/buildingManagement',
+                name: 'buildingManagement',
+                meta: {
+                    Auth: true,
+                },
+                component: buildingManagement
+            }, {
+                path: '/park/parkUser',
+                name: 'parkUser',
+                meta: {
+                    Auth: true,
+                },
+                component: parkUser
+            }, {
+                path: '/park/HostListing',
+                name: 'HostListing',
+                meta: {
+                    Auth: true,
+                },
+                component: HostListing
+            }, {
+                path: '/park/parkAppuser',
+                name: 'parkAppuser',
+                meta: {
+                    Auth: true,
+                },
+                component: parkAppuser
+            }, {
+                path: '/park/setAccess',
+                name: 'setAccess',
+                meta: {
+                    Auth: true,
+                },
+                component: setAccess
+            }, {
+                path: '/park/parkLog',
+                name: 'parkLog',
+                meta: {
+                    Auth: true,
+                },
+                component: parkLog
+            }, {
+                path: '/park/floorList',
+                name: 'floorList',
+                meta: {
+                    Auth: true,
+                },
+                component: floorList
+            }, {
+                path: '/park/roomList',
+                name: 'roomList',
+                meta: {
+                    Auth: true,
+                },
+                component: roomList
+            }]
+        },
+        //房间管理
+        {
+            path: '/room',
+            redirect: '/room/myRoom',
+            name: 'room',
+            component: room,
+            children: [{
+                path: '/room/myRoom',
+                name: 'myRoom',
+                meta: {
+                    Auth: true,
+                },
+                component: myRoom
+            }, {
+                path: '/room/equipment',
+                name: 'equipment',
+                meta: {
+                    Auth: true,
+                },
+                component: equipment
+            }, {
+                path: '/room/authorization',
+                name: 'authorization',
+                meta: {
+                    Auth: true,
+                },
+                component: authorization
+            }, {
+                path: '/room/roomAppuser',
+                name: 'roomAppuser',
+                meta: {
+                    Auth: true,
+                },
+                component: roomAppuser
+            }, {
+                path: '/room/roomLog',
+                name: 'roomLog',
+                meta: {
+                    Auth: true,
+                },
+                component: roomLog
+            }, {
+                path: '/room/EquipmentAuthorization',
+                name: 'EquipmentAuthorization',
+                meta: {
+                    Auth: true,
+                },
+                component: EquipmentAuthorization
+            }]
+        },
+        //楼层管理
+        {
+            path: '/floor',
+            redirect: '/floor/myFloor',
+            name: 'floor',
+            component: floor,
+            children: [{
+                path: '/floor/myFloor',
+                name: 'myFloor',
+                meta: {
+                    Auth: true,
+                },
+                component: myFloor
+            }, {
+                path: '/floor/floorUser',
+                name: 'floorUser',
+                meta: {
+                    Auth: true,
+                },
+                component: floorUser
+            }, {
+                path: '/floor/roomManagement',
+                name: 'roomManagement',
+                meta: {
+                    Auth: true,
+                },
+                component: roomManagement
+            }, {
+                path: '/floor/floorAppuser',
+                name: 'floorAppuser',
+                meta: {
+                    Auth: true,
+                },
+                component: floorAppuser
+            }, {
+                path: '/floor/floorLog',
+                name: 'floorLog',
+                meta: {
+                    Auth: true,
+                },
+                component: floorLog
+            }, ]
+        }
+    ]
+})

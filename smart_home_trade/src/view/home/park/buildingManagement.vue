@@ -20,10 +20,9 @@
           </el-form-item>
         </el-form>
       </div>
-
       <div class="nav-middle">
         <ul>
-          <li class="l" @click="addBuilding = true"><i class="iconfont">&#xe612;</i>添加</li>
+          <li class="l" @click="addBuilding = true"><i class="iconfont">&#xe612;</i>{{add}}</li>
           <el-dialog title="添加大楼" :visible.sync="addBuilding" width="30%">
             <div class="add-buliding">
               <el-form :model="form" label-width="100px">
@@ -70,7 +69,6 @@
               width="40%"
               :before-close="handleClose"
               @open="onOpen">
-              <span class="titles">{{buildingN}}</span>
                     <el-table
                       :data="tableData2"
                       height="300"
@@ -105,14 +103,6 @@
                   <el-button type="primary" @click="administrator = false">确 定</el-button>
                 </span>
              </el-dialog>
-
-
-
-
-
-
-
-
           <li class="l" @click="host()">主机清单</li>
         </ul>
 
@@ -223,6 +213,7 @@
             park: ''
           },
           currentPage3: 1,
+          add:'',
           tableData2: [
             {
               phone: '1301799887',
@@ -336,6 +327,15 @@
 
         }
 
+      },
+      mounted(){
+        console.log(this.$store.state.set)
+        for(var i=0;i<this.$store.state.set.length;i++){
+          if(this.$store.state.set[i].id==121){
+             console.log(this.$store.state.set[i].label)
+             this.add=this.$store.state.set[i].label
+          }
+        }
       },
       methods: {
         handleSizeChange(val) {
