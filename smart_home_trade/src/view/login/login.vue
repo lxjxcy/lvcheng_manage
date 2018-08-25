@@ -27,6 +27,7 @@
 
 <script>
   import axios from 'axios';
+  import goRouter from "../../mixins/goRouter"
     export default {
         name: "login",
       data() {
@@ -75,9 +76,14 @@
           }
         };
       },
+      mixins: [goRouter],
       mounted(){
-         this.getImg()
+         this.getImg();
+         axios.post('/api/vehicle').then(function(res){
+          console.log(res)
+         })
       },
+
       methods: {
          //  获取验证码
           getImg(){
@@ -89,50 +95,50 @@
             })
           },
 
-       
+       // 登录
         submitForm(loginForm) {
-
           var that=this;
-
+          axios.post("https://easy-mock.com/mock/5adfe7967f1c4564cd3dfbe0/example/set").then(function(res){
+            // console.log(res.data.data)
+             that.$store.commit('setStroge',res.data.data)
+          });         
           console.log(that.loginForm)
           that.$refs[loginForm].validate((valid) => {
             if (valid) {
-              axios.post('/SmartHomeTrade/user/loginUser',that.loginForm).then(function (res) {
-                
-              
-                console.log(res)
-                if(res.data.message=='登录成功'){
-                  that.$set(that.$store.state, 'islogin',true)
-                  that.$store.commit('setToken',res.data.data.user.status)
-                  that.$store.commit('getUser',res.data.data.user.loginName)
-                  that.$message({
-                  showClose: true,
-                  message:res.data.message,
-                  type: 'success'
-                });
+              axios.post('/SmartHomeTrade/user/loginUser',that.loginForm).then(function (res) {              
+                if(res.data.code==0){
+                  // that.$set(that.$store.state, 'islogin',true)
+                 console.log(res.data.data.user)
+                  
+                   that.$store.commit('saveUserinfo',res.data.data.user)
+                   that.$store.commit('setToken',res.data.data.user.status)
+                   that.$message.success(res.data.message);
+                   that.goRouter(res.data.data.user.userLevel)
+                    // if(res.data.data.user.userLevel==1){
+                    //    that.$router.push('/garden/gardenManagement')
+                    // }else if(res.data.data.user.userLevel==2){
+                    //   that.$router.push('/park/MyPark')
+                    // }else if(res.data.data.user.userLevel==3){
+                    //   that.$router.push('/building/MyBuilding')
+                    // }else if(res.data.data.user.userLevel==4){
+                    //   that.$router.push('/floor/myFloor')
+                    // }else{
+                    //   that.$router.push( '/room/myRoom')
+                    // }
+
+
+
                 }else{
                    that.$message.error(res.data.message);
+                    if(res.data.message=="验证码错误"){
+                      that.loginForm.code=''
+                       that.getImg()
+                    }if(res.data.message=="用户名或密码错误"){
+                        that.$refs[loginForm].resetFields();
+                    }  
                 }
-                if(res.data.message=="验证码错误"){
-                  that.loginForm.code=''
-                   that.getImg()
-                }if(res.data.message=="用户名或密码错误"){
-                    that.$refs[loginForm].resetFields();
-                }              
-                if(res.data.data.user.userLevel==1){
-                  that.$router.push('/garden/gardenManagement')
-                }else if(res.data.data.user.userLevel==2){
-                  that.$router.push('/park/MyPark')
-                }else if(res.data.data.user.userLevel==3){
-                  that.$router.push('/building/MyBuilding')
-                }else if(res.data.data.user.userLevel==4){
-                  that.$router.push('/floor/myFloor')
-                }else{
-                  that.$router.push( '/room/myRoom')
-                }
-                that.$set(that.$store.state.userInfo, 'userLevel',res.data.data.user.userLevel)
-                that.$set(that.$store.state.userInfo, 'status',res.data.data.user.status)
-                 that.$set(that.$store.state.userInfo, 'tel',res.data.data.user.userMobile)
+                           
+                
               })
             } else {
               console.log('error submit!!');

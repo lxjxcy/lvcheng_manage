@@ -1,33 +1,34 @@
 <template>
   <div class="roomManagement">
+      <gobackroom></gobackroom>
     <div class="top-nav">
-      <el-form :inline="true" :model="formInline" class="demo-form-inline">
-        <el-form-item label="名称">
-          <el-input v-model="formInline.roomId" placeholder=""></el-input>
+    
+      <el-form :inline="true" :model="formSearch" class="demo-form-inline">
+        <el-form-item label="名称" prop='name'>
+          <el-input v-model="formSearch.name" placeholder=""></el-input>
         </el-form-item>
-        <el-form-item label="编号">
-          <el-input v-model="formInline.roomName" placeholder=""></el-input>
+        <el-form-item label="编号" prop='userName'>
+          <el-input v-model="formSearch.roomNum" placeholder=""></el-input>
         </el-form-item>
-        <el-form-item label="管理员">
-          <el-input v-model="formInline.management" placeholder=""></el-input>
-        </el-form-item>
-        <el-form-item label="位置">
-          <el-select v-model="formInline.address" placeholder="">
-            <el-option label="区域一" value="shanghai"></el-option>
-            <el-option label="区域二" value="beijing"></el-option>
-          </el-select>
+        <el-form-item label="管理员" prop='userName'>
+          <el-input v-model="formSearch.userName" placeholder=""></el-input>
         </el-form-item>
         <el-form-item>
           <el-button type="primary" @click="onSubmit">查询</el-button>
         </el-form-item>
+        <el-form-item>
+          <el-button @click="resetForm('formSearch')">重置</el-button>
+        </el-form-item>
       </el-form>
     </div>
-
     <div class="nav-middle">
-      <ul>
+       <div class="l" style="font-size: 20px;font-weight: 400" v-if="this.$store.state.userinfo.userLevel==2||this.$store.state.userinfo.userLevel==3">
+        <span>{{this.$store.state.parame.floor_roomName}}</span>
+        ---房间列表
+      </div>
+      <ul  v-bind:class="classObject">
         <li class="l"><i class="iconfont">&#xe612;</i>添加</li>
         <li class="l"><i class="iconfont">&#xe645;</i>修改</li>
-        <li class="l"><i class="iconfont">&#xe504;</i>删除</li>
         <li class="l">设置管理员</li>
       </ul>
 
@@ -35,58 +36,60 @@
     <div class="main-table">
 
       <el-table
-        :data="tableData3"
+        :data="roomList"
         ref="multipleTable"
         v-loading="loading"
         style="width: 100%"
         @selection-change="handleSelectionChange"
         tooltip-effect="dark"
-        height="430"
+        height="380"
         border>
         <el-table-column
           type="selection"
           width="50">
         </el-table-column>
         <el-table-column
-          type="index"
+          prop="roomNum"
           label="房间编号"
           width="100">
         </el-table-column>
         <el-table-column
-          prop="roomName"
+          prop="name"
           label="房间名称"
           width="120">
+         <template slot-scope="scope">
+          <el-button @click="goEquimentlist(scope.row.name,scope.row.id,scope.row.addressId)" type="text" size="small">{{scope.row.name}}</el-button>
+        </template>
         </el-table-column>
         <el-table-column
-          prop="equipmentNumber"
+          prop="deviceNum"
           label="设备数量"
           width="180">
         </el-table-column>
         <el-table-column
-          prop="address"
+          prop="inAddress"
           label="所在位置"
           width="200">
         </el-table-column>
         <el-table-column
-          prop="management"
+          prop="userName"
           label="管理员"
           width="180">
         </el-table-column>
         <el-table-column
-          prop="tel"
+          prop="userMobile"
           label="联系电话"
-          width="180">
+         >
         </el-table-column>
       </el-table>
       <div class="block">
         <el-pagination
           @size-change="handleSizeChange"
           @current-change="handleCurrentChange"
-          :current-page="currentPage3"
-          :page-sizes="[100, 200, 300, 400]"
+          :page-sizes="[10, 20, 30, 40]"
           :page-size="100"
           layout="total, sizes, prev, pager, next, jumper"
-          :total="1000">
+          :total="total">
         </el-pagination>
       </div>
 
@@ -97,97 +100,146 @@
 </template>
 
 <script>
+import axios from "axios"
     export default {
         name: "roomManagement",
-      multipleSelection: [],
+    
       data() {
         return {
-          formInline: {
-            roomId: '',
-            roomName:"",
-            management:"",
-            address: ''
+          total:0,
+          loading:true,
+            multipleSelection: [],
+           classObject:{
+              'r': false,
           },
-          currentPage3: 1,
-          tableData3: [{
-            // roomId: '1',
-            roomName: '8号房',
-            equipmentNumber:"23",
-            address: '杭州市滨江区锦绣国际202',
-            management:'卢雪姣',
-            tel:"13017082869"
-          }, {
-            // roomId: '1',
-            roomName: '8号房',
-            equipmentNumber:"23",
-            address: '杭州市滨江区锦绣国际202',
-            management:'卢雪姣',
-            tel:"13017082869"
+          paramRoom:{
+            pageSize:10,
+            currentPage:1,
+            action:2,
+            addressIdList:[],
+
           },
-            {
-              // roomId: '1',
-              roomName: '8号房',
-              equipmentNumber:"23",
-              address: '杭州市滨江区锦绣国际202',
-              management:'卢雪姣',
-              tel:"13017082869"
-            },
-            {
-              // roomId: '1',
-              roomName: '8号房',
-              equipmentNumber:"23",
-              address: '杭州市滨江区锦绣国际202',
-              management:'卢雪姣',
-              tel:"13017082869"
-            },
-            {
-              // roomId: '1',
-              roomName: '8号房',
-              equipmentNumber:"23",
-              address: '杭州市滨江区锦绣国际202',
-              management:'卢雪姣',
-              tel:"13017082869"
-            },
-            {
-              // roomId: '1',
-              roomName: '8号房',
-              equipmentNumber:"23",
-              address: '杭州市滨江区锦绣国际202',
-              management:'卢雪姣',
-              tel:"13017082869"
-            },
-            {
-              // roomId: '1',
-              roomName: '8号房',
-              equipmentNumber:"23",
-              address: '杭州市滨江区锦绣国际202',
-              management:'卢雪姣',
-              tel:"13017082869"
-            },
-            {
-              // roomId: '1',
-              roomName: '8号房',
-              equipmentNumber:"23",
-              address: '杭州市滨江区锦绣国际202',
-              management:'卢雪姣',
-              tel:"13017082869"
-            },]
+          formSearch: {
+            name: null,
+            roomNum:null,
+            userName:null,
+            action:2,
+            addressIdList:[]
+            // address: ''
+          },
+          roomList: []
         }
       },
+      mounted(){
+        var that=this;
+        if(that.$store.state.userinfo.userLevel==2||that.$store.state.userinfo.userLevel==3){
+          that.classObject.r=true;
+          var obj=[]
+          var obj1= {
+            id:that.$store.state.parame.floor_roomId,
+            addressId:that.$store.state.parame.addressId
+          };
+          obj.push(obj1)
+          that.paramRoom.addressIdList=obj
+          that.formSearch.addressIdList=obj
+        }else{
+            var list2=that.$store.state.userinfo.addrList;
+            var list1=that.$store.state.userinfo.manageScopeIdList;
+            var obj=[]
+            for(var i=0;i<list1.length;i++){
+                var obj2={
+                  id:list1[i],
+                  addressId:list2[i]
+                }
+                console.log(obj2)
+                obj.push(obj2)
+            }
+             that.paramRoom.addressIdList=obj;
+             that.formSearch.addressIdList=obj;  
+                     
+        }
+        that.getroomlist()        
+      },
       methods: {
-        handleSizeChange(val) {
-          console.log(`每页 ${val} 条`);
+        getroomlist(){
+          // alert("111")
+          var that=this;
+          axios.post("/SmartHomeTrade/room/selectRoomCount",that.paramRoom).then(function(res){
+            if(res.data.code==0){
+              that.loading=false;
+              that.roomList=res.data.data.roomList;
+              that.total=res.data.data.count
+            }
+
+          })
         },
-        handleCurrentChange(val) {
-          console.log(`当前页: ${val}`);
-        },
+
+            //每页显示多少条
+      handleSizeChange(val) {
+        var that=this;
+        that.paramRoom.pageSize=val;
+        that.paramRoom.currentPage=1;
+         that.getBuildlist()
+      },
+      //当前页
+      handleCurrentChange(val) {
+        var that=this;
+        that.paramRoom.currentPage=val;
+        that.getroomlist()
+      },
         handleSelectionChange(val) {
           this.multipleSelection = val;
           console.log(val)
         },
+        // 搜索
         onSubmit() {
-          console.log('submit!');
+          var that=this;
+          that.loading=true
+          axios.post("/SmartHomeTrade/room/selectRoomCount",that.formSearch).then(function(res){
+            if(res.data.code==0){
+              that.loading=false;
+              that.roomList=res.data.data.roomList;
+               that.$message.success(res.data.message)
+              
+            }else{
+              that.$message.error(res.data.message)
+            }
+          })
+        },
+           //清空查询
+      resetForm(formSearch) {
+        var that=this;
+            that.formSearch.name= null,
+            that.formSearch.roomNum=null,
+            that.formSearch.userName=null,
+        this.getroomlist()
+      },
+
+    // 跳转到指定房间的设备列表页
+       goEquimentlist(roomName,roomId,roomaddressId){
+      // alert(this.$store.state.parame.garden_buildNmae)
+        var param={
+          build_floorName:this.$store.state.parame.build_floorName,
+          build_floorId:this.$store.state.parame.build_floorId,
+          floor_roomId:this.$store.state.parame.floor_roomId,
+          floor_roomName:this.$store.state.parame.floor_roomName,
+          room_equimentName:this.$store.state.parame.floor_roomName+roomName,
+          room_equimentId:roomId,
+          addressId:this.$store.state.parame.addressId,
+          roomaddressId:roomaddressId
         }
+        this.$store.commit('setRouterid',param)
+        if(this.$store.state.userinfo.userLevel==2){
+          this.$router.push('/park/floorList/roomList/equimentList')
+        }
+         if(this.$store.state.userinfo.userLevel==3){
+          this.$router.push('/building/roomList/equimentList')
+        }
+         if(this.$store.state.userinfo.userLevel==4){
+          this.$router.push('/floor/equimentList')
+        }
+        
+      },
       },
     }
 </script>

@@ -8,19 +8,26 @@ import ElementUI from 'element-ui';
 import 'element-ui/lib/theme-chalk/index.css';
 import myHeader from './view/home/myHeader';
 import myFooter from './view/home/myFooter';
+import goback from './view/home/goback/goback'
+import gobackroom from './view/home/goback/gobackroom'
 import iView from 'iview';
 import 'iview/dist/styles/iview.css';
+import Mock from './mock/mock'
 
+import axios from 'axios'
+
+axios.defaults.withCredentials = true;
 // Vue.prototype.$axios = axios;
 Vue.use(iView);
 Vue.use(ElementUI);
 Vue.config.productionTip = false
 Vue.component(myHeader.name, myHeader)
 Vue.component(myFooter.name, myFooter)
+Vue.component(goback.name, goback)
+Vue.component(gobackroom.name, gobackroom)
 
 router.beforeEach((to, from, next) => {
   if (to.meta.Auth) {
-
     if (store.state.token != null) {
       next();
     } else {
@@ -37,9 +44,19 @@ router.beforeEach((to, from, next) => {
 if (window.sessionStorage.getItem('token')) {
   store.commit('setToken', window.sessionStorage.getItem('token'))
 }
-if (window.sessionStorage.getItem('loginName')) {
-  store.commit('getUser', window.sessionStorage.getItem('loginName'))
+if (JSON.parse(window.localStorage.getItem('setD'))) {
+  store.commit('setStroge', JSON.parse(window.localStorage.getItem('setD')))
 }
+if (JSON.parse(window.sessionStorage.getItem('userinfo'))) {
+  store.commit('saveUserinfo', JSON.parse(window.sessionStorage.getItem('userinfo')))
+}
+if (JSON.parse(window.sessionStorage.getItem('Routerid'))) {
+  store.commit('setRouterid', JSON.parse(window.sessionStorage.getItem('Routerid')))
+}
+
+// this.queryParams = JSON.parse(sessionStorage.getItem('queryParam'));
+
+
 /* eslint-disable no-new */
 new Vue({
   el: '#app',

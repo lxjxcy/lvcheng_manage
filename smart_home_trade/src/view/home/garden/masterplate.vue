@@ -362,7 +362,7 @@
               }
             }
               that.addparam.templateName=that.adddynamicValidateForm.masterplateName;
-            that.addparam.createUser=that.$store.state.userInfo.loginName;
+            that.addparam.createUser=that.$store.state.userinfo.loginName;
             axios.post("/SmartHomeTrade/template/insertTemplate",that.addparam).then(function (res) {
               console.log(res)
               that.$message({
@@ -484,6 +484,8 @@
         }
 
       },
+
+      
       addremoveDomain(item) {
         var index = this.adddynamicValidateForm.domains.indexOf(item)
         if (index !== -1) {

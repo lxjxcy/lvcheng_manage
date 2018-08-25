@@ -21,6 +21,10 @@
         height="435"
         border
         style="width: 100%">
+         <el-table-column
+          type="selection"
+          width="50">
+        </el-table-column>
         <el-table-column
           type="index"
           label="园区编号"

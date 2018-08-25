@@ -21,7 +21,11 @@
     </div>
 
     <div class="nav-middle">
-      <ul>
+       <div class="l" style="font-size: 20px;font-weight: 400" v-if="this.$store.state.userinfo.userLevel==2||this.$store.state.userinfo.userLevel==3||this.$store.state.userinfo.userLevel==4">
+        <span>{{this.$store.state.parame.room_equimentName}}</span>
+        ---设备列表
+      </div>
+      <ul v-bind:class="classObject">
         <li class="l" @click="move = true"><i class="iconfont">&#xe612;</i>迁移设备</li>
         <el-dialog
           title="设备迁移"
@@ -57,24 +61,24 @@
         style="width: 100%"
         @selection-change="handleSelectionChange"
         tooltip-effect="dark"
-        height="400"
+        height="380"
         border>
         <el-table-column
           type="selection"
           width="50">
         </el-table-column>
         <el-table-column
-          type="index"
+          prop="deviceNum"
           label="设备编号"
           width="100">
         </el-table-column>
         <el-table-column
-          prop="equipmentName"
+          prop="name"
           label="设备名称"
           width="120">
         </el-table-column>
         <el-table-column
-          prop="equipmentType"
+          prop="type"
           label="设备类型"
           width="180">
         </el-table-column>
@@ -84,7 +88,7 @@
           width="180" :formatter="equipmentState">
         </el-table-column>
         <el-table-column
-          prop="address"
+          prop="inAddress"
           label="所在位置"
           width="200">
         </el-table-column>
@@ -149,11 +153,21 @@
 </template>
 
 <script>
+import axios from "axios"
   export default {
     name: "equipment",
 
     data() {
       return {
+        equipmentParam:{
+          pageSize:10,
+          currentPage:1,
+          addressIdList:[],
+        },
+         classObject:{
+              'r': false,
+          },
+        loading:true,
         move:false,
         multipleSelection: [],
         getLnformation:false,
@@ -312,52 +326,12 @@
         },
         currentPage3: 1,
         tableData3: [{
-          equipmentName: '8号',
-          equipmentType:"23",
+          deviceNum:"1",
+          name: '8号',
+          type:"23",
           equipmentState:"1",
-          address: '杭州市滨江区锦绣国际202',
-        }, {
-          equipmentName: '8号',
-          equipmentType:"23",
-          equipmentState:"1",
-          address: '杭州市滨江区锦绣国际202',
-        },
-          {
-            equipmentName: '8号',
-            equipmentType:"23",
-            equipmentState:"1",
-            address: '杭州市滨江区锦绣国际202',
-          },
-          {
-            equipmentName: '8号',
-            equipmentType:"23",
-            equipmentState:"0",
-            address: '杭州市滨江区锦绣国际202',
-          },
-          {
-            equipmentName: '8号',
-            equipmentType:"23",
-            equipmentState:"1",
-            address: '杭州市滨江区锦绣国际202',
-          },
-          {
-            equipmentName: '8号',
-            equipmentType:"23",
-            equipmentState:"1",
-            address: '杭州市滨江区锦绣国际202',
-          },
-          {
-            equipmentName: '8号',
-            equipmentType:"23",
-            equipmentState:"0",
-            address: '杭州市滨江区锦绣国际202',
-          },
-          {
-            equipmentName: '8号',
-            equipmentType:"23",
-            equipmentState:"1",
-            address: '杭州市滨江区锦绣国际202',
-          },],
+          inAddress: '杭州市滨江区锦绣国际202',
+        }],
         formation:{
           equipmentid:"SB002",
 
@@ -375,7 +349,49 @@
         return val == 1? '高级': '';
       },
     },
+    mounted(){
+        var that=this;
+        if(that.$store.state.userinfo.userLevel==2||that.$store.state.userinfo.userLevel==3||that.$store.state.userinfo.userLevel==4){
+          that.classObject.r=true;
+          var obj=[]
+          var obj1= {
+            id:that.$store.state.parame.room_equimentId,
+            addressId:that.$store.state.parame.roomaddressId
+          };
+          obj.push(obj1)
+          that.equipmentParam.addressIdList=obj
+          // that.formSearch.addressIdList=obj
+        }else{
+            var list2=that.$store.state.userinfo.addrList;
+            var list1=that.$store.state.userinfo.manageScopeIdList;
+            var obj=[]
+            for(var i=0;i<list1.length;i++){
+                var obj2={
+                  id:list1[i],
+                  addressId:list2[i]
+                }
+                console.log(obj2)
+                obj.push(obj2)
+            }
+             that.equipmentParam.addressIdList=obj;
+             // that.formSearch.addressIdList=obj;  
+                     
+        }
+        that.getequipmentlist()        
+      },
     methods: {
+      // 获取设备列表
+      getequipmentlist(){
+        var that=this;
+        axios.post("/SmartHomeTrade/device/getDeviceList",that.equipmentParam).then(function(res){
+          if(res.data.code==0){
+            that.loading=false;
+          }
+
+        })
+
+
+      },
       handleSizeChange(val) {
         console.log(`每页 ${val} 条`);
       },

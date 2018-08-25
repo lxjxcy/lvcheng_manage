@@ -137,7 +137,35 @@
           adminName:null,
         },
 
-        listBlockCount: [],
+        listBlockCount: [
+          {
+            blockId:"12",
+            blockName:'1号大楼',
+            blockCcuName:'999',
+            floorCount:'334',
+            dcCount:'222',
+            adminName:"333",
+            adminMobile:"211"
+          },
+           {
+            blockId:"12",
+            blockName:'1号大楼',
+            blockCcuName:'999',
+            floorCount:'334',
+            dcCount:'222',
+            adminName:"333",
+            adminMobile:"211"
+          },
+           {
+            blockId:"12",
+            blockName:'1号大楼',
+            blockCcuName:'999',
+            floorCount:'334',
+            dcCount:'222',
+            adminName:"333",
+            adminMobile:"211"
+          }
+        ],
         paramed:"",
 
       }
@@ -147,22 +175,33 @@
     mounted(){
       console.log(this.$store.state.parame)
       console.log("1111")
-      this.paramed=this.$store.state.parame.garden_buildId
-      console.log(this.$route.params.parkid)
-      this.searchlist.gardenId=this.$store.state.parame.garden_buildId
+      // this.paramed=this.$store.state.parame.garden_buildId
+      // console.log(this.$route.params.parkid)
+      // this.searchlist.gardenId=this.$store.state.parame.garden_buildId
       this.builparams.gardenId=this.$store.state.parame.garden_buildId
       this.getbuildList()
       this.url=`/garden/gardenManagement`
     },
     methods: {
+       // 跳转到指定大楼的楼层列表页
+       goFloorlist(blockName,blockId){
+      // alert(this.$store.state.parame.garden_buildNmae)
+      this.$set(this.$store.state.parame,'build_floorName',this.$store.state.parame.garden_buildNmae+blockName)
+      this.$set(this.$store.state.parame,'build_floorId',blockId)
+      this.$router.push({name:'floorList'})
+    },
       //获取大楼列表
       getbuildList(){
         console.log("ssss")
         var that=this;
         axios.post('/garden/selectBlockCount',that.builparams).then(function (res) {
-          that.listBlockCount=res.data.data.listBlockCount;
-            that.total=res.data.data.Count
-             that.loading=false;
+
+          if(res.data.code==0){
+            that.loading=false;
+          }
+          // that.listBlockCount=res.data.data.listBlockCount;
+          //   that.total=res.data.data.Count
+          //    that.loading=false;
         })
       },
       //每页显示几条
@@ -207,12 +246,13 @@
       //  设置管理员
 
       // 跳转到指定大楼的楼层列表页
-    goFloorlist(blockName,blockId){
-      alert("1111")
-      this.$set(this.$store.state.parame,'build_floorName',blockName+this.$store.state.parame.garden_buildName)
-      this.$set(this.$store.state.parame,'build_floorId',blockId)
-      this.$router.push({name:'floorList'})
-    },
+    // goFloorlist(blockName,blockId){
+
+    //   alert("1111")
+    //   this.$set(this.$store.state.parame,'build_floorName',blockName+this.$store.state.parame.garden_buildName)
+    //   this.$set(this.$store.state.parame,'build_floorId',blockId)
+    //   this.$router.push({name:'floorList'})
+    // },
   }
 </script>
 

@@ -304,7 +304,7 @@
       handleCurrentChange(val) {
         var that=this;
         that.userParams.currentPage=val;
-        that. getUserlist()
+        that.getUserlist()
       },
       handleSelectionChange(val) {
         this.multipleSelection = val;
@@ -313,7 +313,19 @@
       //关闭弹框
       handleClose(done) {
         done();
+        this.resetaddUser("addformValidate")
+
+
       },
+
+      // 关闭添加弹框清空
+       resetaddUser(addformValidate) {
+        this.$refs[addformValidate].resetFields();
+      },
+
+
+
+
       //查询
       onSubmit() {
         var that=this;
@@ -355,6 +367,7 @@
               userEmail:that.addformValidate.userEmail,
               userLevel:that.userLevelv,
               userDeviceAuth:that.addformValidate.resource,
+              createUser:that.$store.state.userinfo.userMobile
 
             }
             axios.post("/SmartHomeTrade/user/registAdUser",param).then(function (res) {

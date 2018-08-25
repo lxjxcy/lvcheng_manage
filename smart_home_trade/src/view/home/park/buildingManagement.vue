@@ -1,28 +1,30 @@
 <template>
     <div class="buildingManagement">
-
       <div class="top-nav">
-        <el-form :inline="true" :model="formInline" class="demo-form-inline">
-          <el-form-item label="名称">
-            <el-input v-model="formInline.roomId" placeholder=""></el-input>
+        <el-form :inline="true" :model="formSearch"  ref="formSearch" class="demo-form-inline">
+          <el-form-item label="大楼名称"  prop="yardName">
+            <el-input v-model="formSearch.buildingName" placeholder=""></el-input>
           </el-form-item>
-          <el-form-item label="编号">
-            <el-input v-model="formInline.roomName" placeholder=""></el-input>
+          <el-form-item label="大楼编号"  prop="yardNblockNumame">
+            <el-input v-model="formSearch.blockNum" placeholder=""></el-input>
           </el-form-item>
-          <el-form-item label="管理员">
-            <el-input v-model="formInline.management" placeholder=""></el-input>
+          <el-form-item label="管理员"  prop="userName">
+            <el-input v-model="formSearch.userName" placeholder=""></el-input>
           </el-form-item>
-          <el-form-item label="园区">
-            <el-input v-model="formInline.park" placeholder=""></el-input>
+          <el-form-item label="园区名称" prop="yardName">
+            <el-input v-model="formSearch.yardName" placeholder=""></el-input>
           </el-form-item>
           <el-form-item>
             <el-button type="primary" @click="onSubmit">查询</el-button>
           </el-form-item>
+          <el-form-item>
+          <el-button @click="resetForm('formSearch')">重置</el-button>
+        </el-form-item>
         </el-form>
       </div>
       <div class="nav-middle">
         <ul>
-          <li class="l" @click="addBuilding = true"><i class="iconfont">&#xe612;</i>{{add}}</li>
+          <li class="l" @click="addBuilding = true"><i class="iconfont">&#xe612;</i>添加</li>
           <el-dialog title="添加大楼" :visible.sync="addBuilding" width="30%">
             <div class="add-buliding">
               <el-form :model="form" label-width="100px">
@@ -49,18 +51,17 @@
           <li class="l" @click="change()"><i class="iconfont" >&#xe645;</i>修改</li>
               <el-dialog title="修改大楼" :visible.sync="changeBuilding" width="30%">
                 <div class="add-buliding">
-                  <el-form :model="form"  label-width="100px">
-                    <el-form-item label="大楼名称">
-                      <el-input v-model="form.buildingname" auto-complete="off" label-width="100px"></el-input>
+                  <el-form :model="changeform"  label-width="100px" :rules="rules">
+                    <el-form-item label="大楼名称" prop="buildingName">
+                      <el-input v-model="changeform.buildingName" auto-complete="off" label-width="100px"></el-input>
                     </el-form-item>
                   </el-form>
                 </div>
                 <div slot="footer" class="dialog-footer">
-                  <el-button type="primary" @click="changeBuilding = false">确 定</el-button>
+                  <el-button type="primary" @click="senChanginfo()">确 定</el-button>
                 </div>
               </el-dialog>
-
-          <li class="l" @click="deleted()"><i class="iconfont">&#xe504;</i>删除</li>
+        <!--   <li class="l" @click="deleted()"><i class="iconfont">&#xe504;</i>删除</li> -->
           <li class="l" @click=" administratored()">设置管理员</li>
 
             <el-dialog
@@ -110,8 +111,9 @@
       <div class="main-table">
 
         <el-table
-          :data="tableData3"
+          :data="blockList"
           ref="multipleTable"
+           v-loading="loading"
           style="width: 100%"
           @selection-change="handleSelectionChange"
           tooltip-effect="dark"
@@ -122,56 +124,57 @@
             width="50">
           </el-table-column>
           <el-table-column
-
-            type="index"
+            prop="buildingId"
             label="大楼编号"
-            width="100">
+            width="270">
           </el-table-column>
           <el-table-column
             prop="buildingName"
             label="大楼名称"
-            width="100">
+            width="150">
+         <template slot-scope="scope">
+            <el-button @click="goFloorlist(scope.row.buildingName,scope.row.buildingId)" type="text" size="small">{{scope.row.buildingName}}</el-button>
+          </template>
+
           </el-table-column>
           <el-table-column
-            prop="computer"
+            prop="hostName"
             label="主机"
             width="100">
           </el-table-column>
           <el-table-column
-            prop="floorNumber"
+            prop="roomNum"
             label="楼层数量"
-            width="180">
+            width="100">
           </el-table-column>
           <el-table-column
-            prop="equipmentNumber"
+            prop="dcNum"
             label="设备数量"
-            width="180">
+            width="100">
           </el-table-column>
           <el-table-column
-            prop="address"
+            prop="yardName"
             label="所在园区"
-            width="210">
+            width="100">
           </el-table-column>
           <el-table-column
-            prop="management"
+            prop="userName"
             label="管理员"
-            width="180">
+            width="100">
           </el-table-column>
           <el-table-column
-            prop="tel"
-            label="联系电话"
-            width="180">
+            prop="userMobile"
+            label="联系电话">
           </el-table-column>
         </el-table>
         <div class="block">
           <el-pagination
             @size-change="handleSizeChange"
             @current-change="handleCurrentChange"
-            :current-page="currentPage3"
-            :page-sizes="[100, 200, 300, 400]"
+            :page-sizes="[10, 20, 30, 40]"
             :page-size="100"
             layout="total, sizes, prev, pager, next, jumper"
-            :total="1000">
+            :total="total">
           </el-pagination>
         </div>
 
@@ -182,14 +185,24 @@
 </template>
 
 <script>
+   import axios from 'axios'   
     export default {
         name: "buildingManagement",
 
       data() {
         return {
+          buildParams:{
+            pageSize:10,
+            currentPage:1,
+            yardIdList:[],
+            action:1,
+          },
+          total:0,
+
           form: {
             name: '',
             region: '',
+           
             buildingId:'',
             date1: '',
             date2: '',
@@ -199,6 +212,21 @@
             buildingname:"",
             desc: '',
           },
+          changeform:{
+            yardId:'',
+            yardName:'',
+            buildingId:'',
+            buildingName:''
+          },
+          rules:{
+            buildingName: [
+            {  required: true,message: '大楼名称不能为空'}
+          ],
+
+
+          },
+
+          loading:true,
           buildingN:'222',
           multipleSelection: [],
           multipleSelection2:[],
@@ -206,11 +234,13 @@
           addBuilding:false,
           changeBuilding:false,
           administrator:false,
-          formInline: {
-            roomId: '',
-            roomName:"",
-            management:"",
-            park: ''
+          formSearch: {
+            buildingName: null,
+            yardName:null,
+            blockNum:null,
+            userName:null,
+            yardIdList:[],
+             action:1,
           },
           currentPage3: 1,
           add:'',
@@ -245,105 +275,43 @@
               admintype: '大楼管理员'
             }
           ],
-          tableData3: [{
-            // buildingId: '1',
-            buildingName: '逸夫楼',
-            computer:"2号主机",
-            floorNumber:"34",
-            equipmentNumber:"23",
-            address: '杭州市滨江区锦绣国际202',
-            management:'卢雪姣',
-            tel:"13017082869"
-          }, {
-            // buildingId: '1',
-            buildingName: '逸夫楼',
-            computer:"2号主机",
-            floorNumber:"34",
-            equipmentNumber:"23",
-            address: '杭州市滨江区锦绣国际202',
-            management:'卢雪姣',
-            tel:"13017082869"
-          },
-            {
-              // buildingId: '1',
-              buildingName: '逸夫楼',
-              computer:"2号主机",
-              floorNumber:"34",
-              equipmentNumber:"23",
-              address: '杭州市滨江区锦绣国际202',
-              management:'卢雪姣',
-              tel:"13017082869"
-            },
-            {
-              // buildingId: '1',
-              buildingName: '逸夫楼',
-              computer:"2号主机",
-              floorNumber:"34",
-              equipmentNumber:"23",
-              address: '杭州市滨江区锦绣国际202',
-              management:'卢雪姣',
-              tel:"13017082869"
-            },
-            {
-              // buildingId: '1',
-              buildingName: '逸夫楼',
-              computer:"2号主机",
-              floorNumber:"34",
-              equipmentNumber:"23",
-              address: '杭州市滨江区锦绣国际202',
-              management:'卢雪姣',
-              tel:"13017082869"
-            },
-            {
-              // buildingId: '1',
-              buildingName: '逸夫楼',
-              computer:"2号主机",
-              floorNumber:"34",
-              equipmentNumber:"23",
-              address: '杭州市滨江区锦绣国际202',
-              management:'卢雪姣',
-              tel:"13017082869"
-            },
-            {
-              // buildingId: '1',
-              buildingName: '逸夫楼',
-              computer:"2号主机",
-              floorNumber:"34",
-              equipmentNumber:"23",
-              address: '杭州市滨江区锦绣国际202',
-              management:'卢雪姣',
-              tel:"13017082869"
-            },
-            {
-              // buildingId: '1',
-              buildingName: '逸夫楼',
-              computer:"2号主机",
-              floorNumber:"34",
-              equipmentNumber:"23",
-              address: '杭州市滨江区锦绣国际202',
-              management:'卢雪姣',
-              tel:"13017082869"
-            },],
-
+          blockList: [],
         }
 
       },
       mounted(){
-        console.log(this.$store.state.set)
-        for(var i=0;i<this.$store.state.set.length;i++){
-          if(this.$store.state.set[i].id==121){
-             console.log(this.$store.state.set[i].label)
-             this.add=this.$store.state.set[i].label
-          }
-        }
+      var that=this;
+      that.formSearch.yardIdList=this.$store.state.userinfo.manageScopeIdList;
+      that.buildParams.yardIdList=this.$store.state.userinfo.manageScopeIdList;
+      that.getBuildlist()
+
       },
       methods: {
-        handleSizeChange(val) {
-          console.log(`每页 ${val} 条`);
-        },
-        handleCurrentChange(val) {
-          console.log(`当前页: ${val}`);
-        },
+        // 获取大楼列表
+        getBuildlist(){
+          var that=this;
+          axios.post('/SmartHomeTrade/block/selectBlockCount',that.buildParams).then(function(res){
+              if(res.data.code==0){
+                that.loading=false;
+                that.blockList=res.data.data.blockList;
+                that.total=res.data.data.count;
+                console.log()
+              }
+          })
+      },
+         //每页显示多少条
+      handleSizeChange(val) {
+        var that=this;
+        that.buildParams.pageSize=val;
+        that.buildParams.currentPage=1;
+        that.getBuildlist()
+      },
+      //当前页
+      handleCurrentChange(val) {
+        var that=this;
+        that.buildParams.currentPage=val;
+        that.getBuildlist()
+      },
         //选中
         handleSelectionChange(val) {
           this.multipleSelection = val;
@@ -354,25 +322,78 @@
           console.log(val)
         },
         onSubmit() {
-          console.log('submit!');
+          var that=this;
+           that.loading=false;
+          if(that.formSearch.buildingName==null&&that.formSearch.yardName==null&&that.formSearch.blockNum==null&&that.formSearch.userName==null){
+            return;
+          }
+          axios.post("/SmartHomeTrade/block/selectBlockCount",that.formSearch).then(function(res){
+            console.log(res)            
+            if(res.data.code==0){
+              that.loading=false;
+              that.blockList=res.data.data.blockList;
+               that.total=res.data.count
+               that.$message.success(res.data.message);
+            }else{
+               that.$message.error(res.data.message);
+            }
+          })
         },
+    //清空查询
+      resetForm() {
+        var that=this;
+            that.formSearch.buildingName= null,
+            that.formSearch.yardName=null,
+            that.formSearch.blockNum=null,
+            that.formSearch.userName=null,
+        that.getBuildlist()
+      },
+
         handleClose(done) {
             done()
         },
         //修改
         change(){
-
-              if(this.multipleSelection==''){
-                this.$message({
-                  type: 'info',
-                  message: '请选择要修改的大楼删除'
-                });
-              }else {
-                this.changeBuilding=true;
-                console.log(this.multipleSelection[0].buildingName)
-                this.form.buildingname=this.multipleSelection[0].buildingName;
-              }
+            if(this.multipleSelection==''){
+              this.$message({
+                type: 'info',
+                message: '请选择要修改的大楼删除'
+              });
+            }else {
+              this.changeBuilding=true;
+              console.log(this.multipleSelection[0].buildingName)
+              this.changeform.buildingName=this.multipleSelection[0].buildingName;
+              this.changeform.yardId=this.multipleSelection[0].yardId;
+              this.changeform.yardName=this.multipleSelection[0].yardName;
+              this.changeform.buildingId=this.multipleSelection[0].buildingId;
+            }
         },
+        // 提交修改大楼信息
+        senChanginfo(){
+          var that=this;
+          axios.post("/SmartHomeTrade/block/updateBlock",that.changeform).then(function(res){
+                if(res.data.code==0){
+                  that.changeBuilding=false;
+                    that.$message.success(res.data.message);
+                   that.getBuildlist()
+
+                }else{
+                  that.$message.error(res.data.message);
+                }
+          })
+
+        },
+
+  // 跳转到指定大楼的楼层列表页
+       goFloorlist(buildingName,buildingId){
+      // alert(this.$store.state.parame.garden_buildNmae)
+        var param={
+          build_floorName:buildingName,
+          build_floorId:buildingId
+        }
+        this.$store.commit('setRouterid',param)
+        this.$router.push('/park/floorList')
+      },
       //  设置管理员
         administratored(){
           if(this.multipleSelection==''){
@@ -404,39 +425,41 @@
 
     //  跳转到主机清单页面
         host(){
-          this.$router.push("/park/HostListing")
-        },
+                
+                this.$router.push("/park/HostListing")                
+      }
+            
 
 
 
 
     //  删除
-        deleted() {
-          if(this.multipleSelection!=''){
-            this.$confirm('此操作将永久删除, 是否继续?', '提示', {
-              confirmButtonText: '确定',
-              cancelButtonText: '取消',
-              type: 'warning'
-            }).then(() => {
-              //发送ajax
-              this.$message({
-                type: 'success',
-                message: '删除成功!'
-              });
-            }).catch(() => {
-              this.$message({
-                type: 'info',
-                message: '已取消删除'
-              });
-            });
-          }else {
-            this.$message({
-              type: 'info',
-              message: '请选择要删除的大楼删除'
-            });
-          }
+        // deleted() {
+        //   if(this.multipleSelection!=''){
+        //     this.$confirm('此操作将永久删除, 是否继续?', '提示', {
+        //       confirmButtonText: '确定',
+        //       cancelButtonText: '取消',
+        //       type: 'warning'
+        //     }).then(() => {
+        //       //发送ajax
+        //       this.$message({
+        //         type: 'success',
+        //         message: '删除成功!'
+        //       });
+        //     }).catch(() => {
+        //       this.$message({
+        //         type: 'info',
+        //         message: '已取消删除'
+        //       });
+        //     });
+        //   }else {
+        //     this.$message({
+        //       type: 'info',
+        //       message: '请选择要删除的大楼删除'
+        //     });
+        //   }
 
-        }
+        // }
       },
 
     }

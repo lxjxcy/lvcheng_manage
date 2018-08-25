@@ -20,7 +20,7 @@
     </div>
     <div class="right r">
         <ul>
-          <li class="l"><i class="iconfont">&#xe636;</i>当前用户：{{this.$store.state.userInfo.loginName}}</li>
+          <li class="l"><i class="iconfont">&#xe636;</i>当前用户：{{this.$store.state.userinfo.loginName}}</li>
           <li class="l list-1" @click="changepass()"><i class="iconfont">&#xe611;</i>修改密码</li>
           <!--修改密码-->
             <el-dialog
@@ -110,7 +110,7 @@
           }
       },
       mounted(){
-          console.log(this.$store.state.userInfo.loginName)
+          // console.log(this.$store.state.userInfo.loginName)
       },
       methods:{
         handleCommand(command) {
@@ -146,7 +146,7 @@
           // var status=Number(that.$store.state.userInfo.status)
           axios.post('/SmartHomeTrade/user/exitUser',{
             status:1,
-            loginName:that.$store.state.userInfo.loginName
+            loginName:that.$store.state.userinfo.loginName
           }).then(function (res) {
             console.log(res)
             that.$message({

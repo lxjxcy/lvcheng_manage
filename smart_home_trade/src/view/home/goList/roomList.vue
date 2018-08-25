@@ -5,8 +5,8 @@
       <Breadcrumb separator=">">
         <span>当前位置：</span>
         <BreadcrumbItem to="/garden/gardenManagement">园区管理</BreadcrumbItem>
-        <BreadcrumbItem to="/garden/buildingList">大楼列表</BreadcrumbItem>
-        <BreadcrumbItem to="/garden/floorList">楼层列表</BreadcrumbItem>
+        <BreadcrumbItem to="/park/buildingList">大楼列表</BreadcrumbItem>
+        <BreadcrumbItem to="/building/floorList">楼层列表</BreadcrumbItem>
         <BreadcrumbItem>房间列表</BreadcrumbItem>
       </Breadcrumb>
     </div>
@@ -49,7 +49,7 @@
     </div>
 
     <div class="nav-middle">
-      <div class="l" style="font-size: 20px;font-weight: 400"><span v-model="paramed">{{this.$route.params.goName}}</span>---房间列表</div>
+      <div class="l" style="font-size: 20px;font-weight: 400"><span v-model="paramed">{{this.$store.state.parame.floor_roomName}}</span>---房间列表</div>
       <ul class="r">
         <li class="l"><i class="iconfont">&#xe612;</i>添加</li>
         <li class="l"><i class="iconfont">&#xe645;</i>修改</li>
@@ -122,7 +122,7 @@
     multipleSelection: [],
     data() {
       return {
-        headuserLevel:3,
+        headuserLevel:1,
 
         formInline: {
           roomId: '',
@@ -188,6 +188,7 @@
           },]
       }
     },
+
     methods: {
       handleSizeChange(val) {
         console.log(`每页 ${val} 条`);

@@ -12,48 +12,37 @@
                 <li ><i class="iconfont" style="font-size: 45px;color:#13cc96">&#xe636;</i></li>
               </ul>
               <ul class="l">
-                <li style="color:#fff">{{this.$store.state.userInfo.loginName}}</li>
+                <li style="color:#fff">{{this.$store.state.userinfo.loginName}}</li>
                 <li style="color:#fff;font-size: 14px;">大楼管理员</li>
               </ul>
             </div>
             <el-menu
-              default-active="1"
+              router 
+              :default-active="$route.path"
               class="el-menu-vertical-demo"
-              @open="handleOpen"
-              @close="handleClose"
               background-color="#545c64"
               text-color="#fff"
               active-text-color="#ffd04b">
-              <router-link to="/building/myBuilding">
-                <el-menu-item index="1">
+                <el-menu-item index="/building/MyBuilding">
                   <i class="iconfont">&#xe605;</i>
                   <span slot="title">我的大楼</span>
                 </el-menu-item>
-              </router-link>
-              <router-link to="/building/floorManagment">
-                <el-menu-item index="2">
+                <el-menu-item index="/building/floorManagment">
                   <i class="iconfont">&#xe607;</i>
                   <span slot="title">楼层管理</span>
                 </el-menu-item>
-              </router-link>
-              <router-link to="/building/buildingUser">
-                <el-menu-item index="3">
+                <el-menu-item index="/building/buildingUser">
                   <i class="iconfont">&#xe60e;</i>
                   <span slot="title">账户管理</span>
                 </el-menu-item>
-              </router-link>
-              <router-link to="/building/buildingAppuser">
-                <el-menu-item index="4">
+                <el-menu-item index="/building/buildingAppuser">
                   <i class="iconfont">&#xe60e;</i>
                   <span slot="title">App用户管理</span>
                 </el-menu-item>
-              </router-link>
-              <router-link to="/building/buildingLog">
-                <el-menu-item index="5">
+                <el-menu-item index="/building/buildingLog">
                   <i class="iconfont">&#xe60e;</i>
                   <span slot="title">日志管理</span>
                 </el-menu-item>
-              </router-link>
             </el-menu>
           </el-col>
         </el-row>

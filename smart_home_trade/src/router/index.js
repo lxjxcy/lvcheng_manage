@@ -56,6 +56,9 @@ import roomList from '@/view/home/goList/roomList'
 // 设置管辖范围
 import setScope from '@/view/home/garden/setScope'
 
+// 返回
+import goback from '@/view/home/goback/goback'
+
 Vue.use(Router)
 
 export default new Router({
@@ -109,12 +112,19 @@ export default new Router({
                 component: buildingLog
             }, {
                 path: '/building/roomList',
-                name: 'roomList',
+                name: 'roomManagement',
                 meta: {
                     Auth: true,
                 },
-                component: roomList
-            }]
+                component: roomManagement
+            }, {
+                path: '/building/roomList/equimentList',
+                name: 'equipment',
+                meta: {
+                    Auth: true,
+                },
+                component: equipment
+            }, ]
         },
         //系统管理
         {
@@ -157,27 +167,6 @@ export default new Router({
                     Auth: true,
                 },
                 component: gardenLog
-            }, {
-                path: '/garden/buildingList',
-                name: 'buildingList',
-                meta: {
-                    Auth: true,
-                },
-                component: buildingList
-            }, {
-                path: '/garden/floorList',
-                name: 'floorList',
-                meta: {
-                    Auth: true,
-                },
-                component: floorList
-            }, {
-                path: '/garden/roomList',
-                name: 'roomList',
-                meta: {
-                    Auth: true,
-                },
-                component: roomList
             }, {
                 path: '/garden/setScope',
                 name: 'setScope',
@@ -245,18 +234,25 @@ export default new Router({
                 component: parkLog
             }, {
                 path: '/park/floorList',
-                name: 'floorList',
+                name: 'floorManagement',
                 meta: {
                     Auth: true,
                 },
-                component: floorList
+                component: floorManagement
             }, {
-                path: '/park/roomList',
-                name: 'roomList',
+                path: '/park/floorList/roomList',
+                name: 'roomManagement',
                 meta: {
                     Auth: true,
                 },
-                component: roomList
+                component: roomManagement
+            }, {
+                path: '/park/floorList/roomList/equimentList',
+                name: 'equipment',
+                meta: {
+                    Auth: true,
+                },
+                component: equipment
             }]
         },
         //房间管理
@@ -316,41 +312,51 @@ export default new Router({
             name: 'floor',
             component: floor,
             children: [{
-                path: '/floor/myFloor',
-                name: 'myFloor',
-                meta: {
-                    Auth: true,
-                },
-                component: myFloor
-            }, {
-                path: '/floor/floorUser',
-                name: 'floorUser',
-                meta: {
-                    Auth: true,
-                },
-                component: floorUser
-            }, {
-                path: '/floor/roomManagement',
-                name: 'roomManagement',
-                meta: {
-                    Auth: true,
-                },
-                component: roomManagement
-            }, {
-                path: '/floor/floorAppuser',
-                name: 'floorAppuser',
-                meta: {
-                    Auth: true,
-                },
-                component: floorAppuser
-            }, {
-                path: '/floor/floorLog',
-                name: 'floorLog',
-                meta: {
-                    Auth: true,
-                },
-                component: floorLog
-            }, ]
+                    path: '/floor/myFloor',
+                    name: 'myFloor',
+                    meta: {
+                        Auth: true,
+                    },
+                    component: myFloor
+                }, {
+                    path: '/floor/floorUser',
+                    name: 'floorUser',
+                    meta: {
+                        Auth: true,
+                    },
+                    component: floorUser
+                }, {
+                    path: '/floor/roomManagement',
+                    name: 'roomManagement',
+                    meta: {
+                        Auth: true,
+                    },
+                    component: roomManagement
+                }, {
+                    path: '/floor/floorAppuser',
+                    name: 'floorAppuser',
+                    meta: {
+                        Auth: true,
+                    },
+                    component: floorAppuser
+                }, {
+                    path: '/floor/floorLog',
+                    name: 'floorLog',
+                    meta: {
+                        Auth: true,
+                    },
+                    component: floorLog
+                }, {
+                    path: '/floor/equimentList',
+                    name: 'equipment',
+                    meta: {
+                        Auth: true,
+                    },
+                    component: equipment
+                }
+
+
+            ]
         }
     ]
 })

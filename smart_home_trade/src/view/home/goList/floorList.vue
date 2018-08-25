@@ -1,22 +1,22 @@
 <template>
   <div class="floorList">
     <!--系统管理员-->
-    <div class="goback" v-if="headuserLevel==1">
+   <!--  <div class="goback" v-if="headuserLevel==1">
       <Breadcrumb separator=">">
         <span>当前位置：</span>
         <BreadcrumbItem to="/garden/gardenManagement">园区管理</BreadcrumbItem>
-        <BreadcrumbItem to="/garden/buildingList">大楼列表</BreadcrumbItem>
+        <BreadcrumbItem to="/park/buildingList">大楼列表</BreadcrumbItem>
         <BreadcrumbItem>楼层列表</BreadcrumbItem>
       </Breadcrumb>
-    </div>
+      </div> -->
     <!--园区管理员-->
-    <div class="goback" v-if="headuserLevel==2">
+   <!--  <div class="goback" v-if="headuserLevel==2">
       <Breadcrumb separator=">">
         <span>当前位置：</span>
         <BreadcrumbItem to="/park/buildingManagement">大楼管理</BreadcrumbItem>
         <BreadcrumbItem>楼层列表</BreadcrumbItem>
       </Breadcrumb>
-    </div>
+    </div> -->
     <div class="top-nav">
       <el-form :inline="true" :model="formInline" class="demo-form-inline">
         <el-form-item label="名称">
@@ -122,55 +122,55 @@
         currentPage3: 1,
         tableData3: [{
           // roomId: '1',
-          floorName: '8号房',
+          floorName: '1层',
           roomNumber:"23",
           management:'卢雪姣',
           tel:"13017082869"
         }, {
           // roomId: '1',
-          floorName: '8号房',
+          floorName: '1层',
           roomNumber:"23",
           management:'卢雪姣',
           tel:"13017082869"
         },
           {
             // roomId: '1',
-            floorName: '8号房',
+           floorName: '1层',
             roomNumber:"23",
             management:'卢雪姣',
             tel:"13017082869"
           },
           {
             // roomId: '1',
-            floorName: '8号楼',
+            floorName: '1层',
             roomNumber:"23",
             management:'卢雪姣',
             tel:"13017082869"
           },
           {
             // roomId: '1',
-            floorName: '8号房',
+            floorName: '1层',
             roomNumber:"23",
             management:'卢雪姣',
             tel:"13017082869"
           },
           {
             // roomId: '1',
-            floorName: '8号房',
+            floorName: '1层',
             roomNumber:"23",
             management:'卢雪姣',
             tel:"13017082869"
           },
           {
             // roomId: '1',
-            floorName: '8号房',
+            floorName: '1层',
             roomNumber:"23",
             management:'卢雪姣',
             tel:"13017082869"
           },
           {
             // roomId: '1',
-            floorName: '8号楼',
+            floorName: '1层',
             roomNumber:"23",
             management:'卢雪姣',
             tel:"13017082869"
@@ -193,11 +193,14 @@
       },
       // 跳转到指定楼层的房间列表页
       goRoomlist(floorName){
-        console.log("111")
-        this.$router.push({name:'roomList',params:{
-            goName:this.paramed+floorName,
-            floorName:"123",
-          }})
+      this.$set(this.$store.state.parame,'floor_roomName',this.$store.state.parame.build_floorName+floorName)
+      // this.$set(this.$store.state.parame,'build_floorId',blockId)
+      this.$router.push({name:'roomList'})
+
+        // this.$router.push({name:'roomList',params:{
+        //     goName:this.paramed+floorName,
+        //     floorName:"123",
+        //   }})
       },
       onSubmit() {
         console.log('submit!');

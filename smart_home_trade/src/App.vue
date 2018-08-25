@@ -1,3 +1,4 @@
+
 <template>
   <div id="app">
     <router-view/>
@@ -6,7 +7,15 @@
 
 <script>
 export default {
-  name: 'App'
+  name: 'App',
+  data(){
+    return{
+      iflook:"",
+    }
+  },
+  methods:{
+
+  }
 }
 </script>
 
@@ -280,5 +289,11 @@ padding:8px 26px;
   .el-form-item__content{
     line-height: 40px;
   }
+
+/*404*/
+.ifshow4{
+  font-size: 100px;
+}
+
 
 </style>

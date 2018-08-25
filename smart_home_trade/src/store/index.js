@@ -9,13 +9,11 @@ export default new Vuex.Store({
       garden_buildId: '',
       build_floorName: '',
       build_floorId: '',
+      floor_roomName: '',
+      floor_roomId: '',
     },
-    userInfo: {
-      loginName: '',
-      userLevel: '',
-      status: '',
-      tel: '',
-    },
+    userinfo: {},
+    setDAta: [],
     set: [{
       id: 121,
       label: '添加'
@@ -29,7 +27,7 @@ export default new Vuex.Store({
       id: 124,
       label: '主机清单'
     }],
-    islogin: false,
+    // islogin: false,
     token: null
   },
   mutations: {
@@ -37,16 +35,30 @@ export default new Vuex.Store({
       state.token = token;
       sessionStorage.setItem('token', token)
     },
-    getUser(state, loginname) {
-      state.userInfo.loginName = loginname;
-      sessionStorage.setItem('loginName', loginname)
-    },
     exitUser(state) {
       state.token = null;
       sessionStorage.removeItem('token')
-    }
-  },
+    },
+    setStroge(state, stedate) {
+      state.setDAta = stedate;
+      localStorage.setItem('setD', JSON.stringify(stedate))
+      // sessionStorage.setItem('setD', stedate)
+    },
+    setRouterid(state, Routerid) {
+      state.parame = Routerid;
+      sessionStorage.setItem('Routerid', JSON.stringify(Routerid))
+    },
 
+
+    //用户信息
+    saveUserinfo(state, userinfo) {
+      state.userinfo = userinfo;
+      sessionStorage.setItem('userinfo', JSON.stringify(userinfo))
+
+    }
+
+
+  },
   actions: {
     // increment(
     //             commit
