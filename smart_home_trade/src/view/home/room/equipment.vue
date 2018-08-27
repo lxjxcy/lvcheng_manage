@@ -1,22 +1,23 @@
 <template>
   <div class="equipment">
+    <gobackequim></gobackequim>
     <div class="top-nav">
-      <el-form-item label="编号">
-        <el-input v-model="formInline.equipmentId" placeholder=""></el-input>
-      </el-form-item>
-      <el-form :inline="true" :model="formInline" class="demo-form-inline">
+       <el-form :inline="true" :model="formSearch" class="demo-form-inline">
         <el-form-item label="名称">
-          <el-input v-model="formInline.equipmentName" placeholder=""></el-input>
+          <el-input v-model="formSearch.name" placeholder=""></el-input>
         </el-form-item>
-        <el-form-item label="位置">
-          <el-select v-model="formInline.address" placeholder="">
-            <el-option label="区域一" value="shanghai"></el-option>
-            <el-option label="区域二" value="beijing"></el-option>
-          </el-select>
+        <el-form-item label="编号">
+          <el-input v-model="formSearch.deviceNum" placeholder=""></el-input>
+        </el-form-item>
+         <el-form-item label="设备类型">
+          <el-input v-model="formSearch.typeName" placeholder=""></el-input>
         </el-form-item>
         <el-form-item>
           <el-button type="primary" @click="onSubmit">查询</el-button>
         </el-form-item>
+         <el-form-item>
+           <el-button @click="resetForm('formSearch')">重置</el-button>
+          </el-form-item>
       </el-form>
     </div>
 
@@ -55,7 +56,7 @@
     <div class="main-table">
 
       <el-table
-        :data="tableData3"
+        :data="deviceList"
         ref="multipleTable"
         v-loading="loading"
         style="width: 100%"
@@ -83,9 +84,9 @@
           width="180">
         </el-table-column>
         <el-table-column
-          prop="equipmentState"
+          prop="mainStatus"
           label="设备状态"
-          width="180" :formatter="equipmentState">
+          width="180" :formatter="mainStatus">
         </el-table-column>
         <el-table-column
           prop="inAddress"
@@ -97,12 +98,12 @@
           <template slot-scope="scope">
 
             <el-button size="small" type="text" @click="handleEdit(scope.$index, scope.row)">
-              {{scope.row.equipmentState | equipmentStop}}
+              {{scope.row.mainStatus | equipmentStop}}
             </el-button>
 
             <el-button @click="handleget(scope.row)" type="text" size="small"> 查看</el-button>
             <el-button @click="handleClick(scope.row)" type="text" size="small">
-              {{scope.row.equipmentState | equipmentHight}}
+              {{scope.row.mainStatus | equipmentHight}}
             </el-button>
           </template>
         </el-table-column>
@@ -112,11 +113,10 @@
         <el-pagination
           @size-change="handleSizeChange"
           @current-change="handleCurrentChange"
-          :current-page="currentPage3"
-          :page-sizes="[100, 200, 300, 400]"
-          :page-size="100"
+          :page-sizes="[10, 20, 30, 40]"
+          :page-size="10"
           layout="total, sizes, prev, pager, next, jumper"
-          :total="1000">
+          :total="total">
         </el-pagination>
       </div>
 
@@ -140,8 +140,6 @@
             <li>所属主机：主机202</li>
             <li>设备地址：锦绣国际</li>
           </ul>
-
-
         </div>
       <span slot="footer" class="dialog-footer">
     <el-button type="primary" @click="getLnformation = false">确定</el-button>
@@ -159,23 +157,26 @@ import axios from "axios"
 
     data() {
       return {
+        total:0,
+        loading:true,
         equipmentParam:{
           pageSize:10,
           currentPage:1,
           addressIdList:[],
         },
+        formSearch:{
+          deviceNum:null,
+          name:null,
+          typeName:null,
+          addressIdList:[],
+
+        },
          classObject:{
               'r': false,
           },
-        loading:true,
         move:false,
         multipleSelection: [],
         getLnformation:false,
-        formInline: {
-          equipmentId: '',
-          equipmentName:"",
-          address: ''
-        },
         data2: [{
           id: 1,
           label: '高科技产业园1',
@@ -324,14 +325,7 @@ import axios from "axios"
           children: 'children',
           label: 'label'
         },
-        currentPage3: 1,
-        tableData3: [{
-          deviceNum:"1",
-          name: '8号',
-          type:"23",
-          equipmentState:"1",
-          inAddress: '杭州市滨江区锦绣国际202',
-        }],
+        deviceList: [],
         formation:{
           equipmentid:"SB002",
 
@@ -342,11 +336,11 @@ import axios from "axios"
       equipmentStop: function (val) {
         console.log(val)
 
-        return val == 1? '关闭' : val == 0 ? '开启' : '';
+        return val == 1? '开' : val == 2 ? '关' : val == 3 ? '停': '';
       },
       equipmentHight: function (val) {
         console.log(val)
-        return val == 1? '高级': '';
+        return val == 2? '高级': '';
       },
     },
     mounted(){
@@ -360,7 +354,7 @@ import axios from "axios"
           };
           obj.push(obj1)
           that.equipmentParam.addressIdList=obj
-          // that.formSearch.addressIdList=obj
+          that.formSearch.addressIdList=obj
         }else{
             var list2=that.$store.state.userinfo.addrList;
             var list1=that.$store.state.userinfo.manageScopeIdList;
@@ -374,7 +368,7 @@ import axios from "axios"
                 obj.push(obj2)
             }
              that.equipmentParam.addressIdList=obj;
-             // that.formSearch.addressIdList=obj;  
+             that.formSearch.addressIdList=obj;  
                      
         }
         that.getequipmentlist()        
@@ -385,19 +379,60 @@ import axios from "axios"
         var that=this;
         axios.post("/SmartHomeTrade/device/getDeviceList",that.equipmentParam).then(function(res){
           if(res.data.code==0){
+            that.deviceList=res.data.data.deviceList
             that.loading=false;
+             that.total=res.data.data.count;     
           }
 
         })
 
 
       },
-      handleSizeChange(val) {
-        console.log(`每页 ${val} 条`);
+     // 每页几条
+        handleSizeChange(val) {
+        var that=this;
+        that.equipmentParam.pageSize=val;
+        that.equipmentParam.currentPage=1;
+        that.getequipmentlist()
       },
+      //当前页
       handleCurrentChange(val) {
-        console.log(`当前页: ${val}`);
+        var that=this;
+        that.equipmentParam.currentPage=val;
+        that.getequipmentlist()
       },
+        //查询
+        onSubmit() {
+          var that=this;
+          if(that.formSearch.deviceNum==null&&that.formSearch.name==null&&that.formSearch.typeName==null){
+            return;
+          }
+           that.loading=true;             
+          axios.post("/SmartHomeTrade/device/getDeviceList",that.formSearch).then(function(res){
+              if(res.data.code==0){
+              that.deviceList=res.data.data.deviceList;
+                that.loading=false;  
+                      
+            }
+          })
+        },
+        // 清空查询
+        resetForm() {
+        var that=this;
+            that.formSearch.deviceNum= null,
+            that.formSearch.name=null,
+             that.formSearch.typeName=null,                    
+            that.getequipmentlist()
+        },
+
+
+
+
+
+
+
+
+
       handleSelectionChange(val) {
         this.multipleSelection = val;
         console.log(val)
@@ -406,13 +441,10 @@ import axios from "axios"
       handleClose(done) {
             done();
       },
-      //搜索
-      onSubmit() {
-        console.log('submit!');
-      },
+    
       //  转换状态
-      equipmentState: function (row, column) {
-        return row.equipmentState == 0 ? '关闭' : row.equipmentState == 1? '开启' :""
+      mainStatus: function (row, column) {
+        return row.mainStatus == 1? '开' : row.mainStatus == 2? '关' : row.mainStatus == 3? '停':""
       },
     //  查看设备
       handleget(row){

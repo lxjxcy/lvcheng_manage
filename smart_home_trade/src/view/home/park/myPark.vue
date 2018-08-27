@@ -2,46 +2,50 @@
   <div class="myPark">
 
     <div class="top-nav">
-      <el-form :inline="true" :model="formInline" class="demo-form-inline">
+      <el-form :inline="true" :model="formSearch" class="demo-form-inline">
         <el-form-item label="名称">
-          <el-input v-model="formInline.roomId" placeholder=""></el-input>
+          <el-input v-model="formSearch.yardName" placeholder=""></el-input>
         </el-form-item>
         <el-form-item label="编号">
-          <el-input v-model="formInline.roomName" placeholder=""></el-input>
+          <el-input v-model="formSearch.gardenNum" placeholder=""></el-input>
         </el-form-item>
         <el-form-item>
           <el-button type="primary" @click="onSubmit">查询</el-button>
         </el-form-item>
+         <el-form-item>
+           <el-button @click="resetForm('formSearch')">重置</el-button>
+          </el-form-item>
       </el-form>
     </div>
     <div class="main-table">
 
       <el-table
-        :data="tableData3"
+        :data="yardsList"
         height="435"
         border
+         v-loading="loading"
         style="width: 100%">
          <el-table-column
           type="selection"
           width="50">
         </el-table-column>
         <el-table-column
-          type="index"
+          prop="gardenNum"
           label="园区编号"
           width="180">
         </el-table-column>
         <el-table-column
-          prop="parkName"
+          prop="yardName"
           label="园区名称"
           width="180">
         </el-table-column>
         <el-table-column
-          prop="builidngNumber"
+          prop="buildingNum"
           label="大楼数量"
           width="180">
         </el-table-column>
         <el-table-column
-          prop="address"
+          prop="gardenAdrress"
           label="园区地址">
         </el-table-column>
       </el-table>
@@ -49,11 +53,10 @@
         <el-pagination
           @size-change="handleSizeChange"
           @current-change="handleCurrentChange"
-          :current-page="currentPage3"
-          :page-sizes="[100, 200, 300, 400]"
+          :page-sizes="[10, 20, 30, 40]"
           :page-size="100"
           layout="total, sizes, prev, pager, next, jumper"
-          :total="1000">
+          :total="total">
         </el-pagination>
       </div>
 
@@ -62,74 +65,82 @@
 </template>
 
 <script>
+// import axios from "axios"
     export default {
         name: "myPark",
       data() {
         return {
-          formInline: {
-            roomId: '',
-            roomName:"",
+          total:0,
+          loading:true,
+          myParkparam:{
+            pageSize:10,
+            currentPage:1,
+            action:1,
+            yardIdList:[],
           },
-          currentPage3: 1,
-          tableData3: [{
-            // parkId: '1',
-            parkName: '逸夫楼',
-            builidngNumber:"23",
-            address: '杭州市滨江区锦绣国际202'
-          }, {
-            // parkId: '1',
-            parkName: '逸夫楼',
-            builidngNumber:"23",
-            address: '杭州市滨江区锦绣国际202'
+          formSearch:{
+            yardName:null,
+            gardenNum:null,
+            action:1,
+            yardIdList:[],
           },
-            {
-              // parkId: '1',
-              parkName: '逸夫楼',
-              builidngNumber:"23",
-              address: '杭州市滨江区锦绣国际202'
-            },
-            {
-              // parkId: '1',
-              parkName: '逸夫楼',
-              builidngNumber:"23",
-              address: '杭州市滨江区锦绣国际202'
-            },
-            {
-              // parkId: '1',
-              parkName: '逸夫楼',
-              builidngNumber:"23",
-              address: '杭州市滨江区锦绣国际202'
-            },
-            {
-              // parkId: '1',
-              parkName: '逸夫楼',
-              builidngNumber:"23",
-              address: '杭州市滨江区锦绣国际202'
-            },
-            {
-              // parkId: '1',
-              parkName: '逸夫楼',
-              builidngNumber:"23",
-              address: '杭州市滨江区锦绣国际202'
-            },
-            {
-              // parkId: '1',
-              parkName: '逸夫楼',
-              builidngNumber:"23",
-              address: '杭州市滨江区锦绣国际202'
-            },]
+          yardsList: []
         }
       },
+      mounted(){
+         var that=this;
+          that.formSearch.yardIdList=that.$store.state.userinfo.manageScopeIdList;
+          that.myParkparam.yardIdList=that.$store.state.userinfo.manageScopeIdList;
+          that.getMyparklist()
+      },
       methods: {
+        getMyparklist(){
+          var that=this;
+          that.axios.post("/SmartHomeTrade/garden/selectMyYards",that.myParkparam).then(function(res){
+            if(res.data.code==0){
+              that.yardsList=res.data.data.yardsList;
+                that.loading=false;              
+                that.total=res.data.data.count;
+
+            }
+
+          })
+        },
+        // 每页几条
         handleSizeChange(val) {
-          console.log(`每页 ${val} 条`);
-        },
-        handleCurrentChange(val) {
-          console.log(`当前页: ${val}`);
-        },
+        var that=this;
+        that.myParkparam.pageSize=val;
+        that.myParkparam.currentPage=1;
+        that.getMyparklist()
+      },
+      //当前页
+      handleCurrentChange(val) {
+        var that=this;
+        that.myParkparam.currentPage=val;
+        that.getMyparklist()
+      },
+        //查询
         onSubmit() {
-          console.log('submit!');
-        }
+          var that=this;
+          if(that.formSearch.yardName==null&&that.formSearch.gardenNum==null){
+            return;
+          }
+           that.loading=true;             
+         this.axios.post("/SmartHomeTrade/garden/selectMyYards",that.formSearch).then(function(res){
+              if(res.data.code==0){
+              that.yardsList=res.data.data.yardsList;
+                that.loading=false;  
+                      
+            }
+          })
+        },
+        // 清空查询
+        resetForm() {
+        var that=this;
+            that.formSearch.yardName= null,
+            that.formSearch.gardenNum=null,           
+            that.getMyparklist()
+        },
       },
     }
 </script>

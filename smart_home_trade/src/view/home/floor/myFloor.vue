@@ -2,57 +2,61 @@
     <div class="myFloor">
 
        <div class="top-nav">
-         <el-form :inline="true" :model="formInline" class="demo-form-inline">
+         <el-form :inline="true" :model="formSearch" class="demo-form-inline">
            <el-form-item label="名称">
-             <el-input v-model="formInline.roomId" placeholder=""></el-input>
+             <el-input v-model="formSearch.name" placeholder=""></el-input>
            </el-form-item>
            <el-form-item label="编号">
-             <el-input v-model="formInline.roomName" placeholder=""></el-input>
+             <el-input v-model="formSearch.floorNum" placeholder=""></el-input>
            </el-form-item>
            <el-form-item>
              <el-button type="primary" @click="onSubmit">查询</el-button>
            </el-form-item>
+          <el-form-item>
+           <el-button @click="resetForm('formSearch')">重置</el-button>
+          </el-form-item>
          </el-form>
        </div>
       <div class="main-table">
 
         <el-table
-          :data="tableData3"
+          :data="floorList"
           height="435"
           border
+          v-loading="loading"
           style="width: 100%">
+           <el-table-column
+          type="selection"
+          width="50">
+        </el-table-column>
           <el-table-column
-
-            type="index"
+            prop="floorNum"
             label="楼层编号"
             width="180">
           </el-table-column>
           <el-table-column
-            prop="floorName"
+            prop="name"
             label="楼层名称"
             width="180">
           </el-table-column>
           <el-table-column
-            prop="roomNumber"
+            prop="roomNum"
             label="房间数"
             width="180">
           </el-table-column>
           <el-table-column
-            prop="address"
+            prop="buildingName"
             label="所在位置">
           </el-table-column>
         </el-table>
-
-
         <div class="block">
           <el-pagination
             @size-change="handleSizeChange"
             @current-change="handleCurrentChange"
-            :current-page="currentPage3"
-            :page-sizes="[100, 200, 300, 400]"
+            :page-sizes="[10, 20, 30, 40]"
             :page-size="100"
             layout="total, sizes, prev, pager, next, jumper"
-            :total="1000">
+            :total="total">
           </el-pagination>
         </div>
 
@@ -61,74 +65,85 @@
 </template>
 
 <script>
+import axios from "axios"
     export default {
         name: "myFloor",
       data() {
         return {
-          formInline: {
-            roomId: '',
-            roomName:"",
+           total:0,
+          loading:true,
+          myFloorparam:{
+            pageSize:10,
+            currentPage:1,
+            floorIdList:[],
+            buildingIdList:[],
           },
-          currentPage3: 1,
-          tableData3: [{
-            // floorId: '1',
-            floorName: '逸夫楼',
-            roomNumber:"23",
-            address: '杭州市滨江区锦绣国际202'
-          }, {
-            // floorId: '1',
-            floorName: '逸夫楼',
-            roomNumber:"23",
-            address: '杭州市滨江区锦绣国际202'
+          formSearch:{
+            name:null,
+            floorNum:null,
+            floorIdList:[],
+            buildingIdList:[],
           },
-            {
-              // floorId: '1',
-              floorName: '逸夫楼',
-              roomNumber:"23",
-              address: '杭州市滨江区锦绣国际202'
-            },
-            {
-              // floorId: '1',
-              floorName: '逸夫楼',
-              roomNumber:"23",
-              address: '杭州市滨江区锦绣国际202'
-            },
-            {
-              // floorId: '1',
-              floorName: '逸夫楼',
-              roomNumber:"23",
-              address: '杭州市滨江区锦绣国际202'
-            },
-            {
-              // floorId: '1',
-              floorName: '逸夫楼',
-              roomNumber:"23",
-              address: '杭州市滨江区锦绣国际202'
-            },
-            {
-              // floorId: '1',
-              floorName: '逸夫楼',
-              roomNumber:"23",
-              address: '杭州市滨江区锦绣国际202'
-            },
-            {
-              // floorId: '1',
-              floorName: '逸夫楼',
-              roomNumber:"23",
-              address: '杭州市滨江区锦绣国际202'
-            },]
+          floorList: []
         }
       },
+        mounted(){
+         var that=this;
+          that.formSearch.floorIdList=that.$store.state.userinfo.manageScopeIdList;
+          that.myFloorparam.floorIdList=that.$store.state.userinfo.manageScopeIdList;
+           that.formSearch.buildingIdList=that.$store.state.userinfo.addrList;
+          that.myFloorparam.buildingIdList=that.$store.state.userinfo.addrList;
+          that.getMyfloorlist()
+        },
+
+
       methods: {
+        getMyfloorlist(){
+          var that=this;
+          axios.post("/SmartHomeTrade/floor/selectMyFloor",that.myFloorparam).then(function(res){
+             if(res.data.code==0){
+              that.floorList=res.data.data.floorList;
+                that.loading=false;              
+                that.total=res.data.data.count;
+
+            }
+          })
+
+        },
         handleSizeChange(val) {
-          console.log(`每页 ${val} 条`);
-        },
-        handleCurrentChange(val) {
-          console.log(`当前页: ${val}`);
-        },
+        var that=this;
+        that.myFloorparam.pageSize=val;
+        that.myFloorparam.currentPage=1;
+        that.getMyfloorlist()
+      },
+      //当前页
+      handleCurrentChange(val) {
+        var that=this;
+        that.myFloorparam.currentPage=val;
+        that.getMyfloorlist()
+      },
+        //查询
         onSubmit() {
-          console.log('submit!');
-        }
+          var that=this;
+          if(that.formSearch.name==null&&that.formSearch.floorNum==null){
+            return;
+          }
+           that.loading=true;             
+          axios.post("/SmartHomeTrade/floor/selectMyFloor",that.formSearch).then(function(res){
+              if(res.data.code==0){
+              that.floorList=res.data.data.floorList;
+                that.loading=false;  
+
+            }
+          })
+        },
+        // 清空查询
+        resetForm() {
+        var that=this;
+            that.formSearch.name= null,
+            that.formSearch.floorNum=null,           
+            that.getMyfloorlist()
+        },
       },
 
     }

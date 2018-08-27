@@ -24,8 +24,8 @@
     <div class="nav-middle">
       <ul>
         <!--添加园区-->
-        <li class="l"  @click="addgarden()"><i class="iconfont">&#xe612;</i>添加</li>
-        <el-dialog
+        <li class="l"  @click="addpark()"><i class="iconfont">&#xe612;</i>添加</li>
+<!--         <el-dialog
           title="添加园区"
           :visible.sync="addGarden"
           width="30%"
@@ -102,27 +102,14 @@
           <span slot="footer" class="dialog-footer">
             <el-button type="primary" @click="add_build('addG')">确定</el-button>
           </span>
-        </el-dialog>
+        </el-dialog> -->
 
       <!--修改园区-->
         <li class="l" @click="change()"><i class="iconfont" >&#xe645;</i>修改</li>
-        <el-dialog
-          title="修改园区"
-          :visible.sync="changeGarden"
-          width="30%"
-          :before-close="handleClose">
-          <div class="add">
-            <el-form label-width="100px" :model="changeG" ref="changeG" :rules="changrules">
-              <el-form-item label="园区地址" prop="detailAddress">
-                <el-input v-model="changeG.detailAddress"></el-input>
-              </el-form-item>
-            </el-form>
-          </div>
-          <span slot="footer" class="dialog-footer">
-            <el-button type="primary" @click="change_Garden('changeG')">确 定</el-button>
-          </span>
-        </el-dialog>
-        <li class="l" @click=" administratored()">设置管理员</li>
+        <changePark ref="mychild" @refreshList="getlist"></changePark>
+        <addPark ref="myaddchild" @refreshList="getlist"></addPark>
+  
+        <li class="l" @click="administratored()">设置管理员</li>
 
         <el-dialog
           title="设置管理员"
@@ -222,7 +209,6 @@
         <el-pagination
           @size-change="handleSizeChange"
           @current-change="handleCurrentChange"
-          :current-page="currentPage3"
           :page-sizes="[10, 20, 30, 40]"
           :page-size="10"
           layout="total, sizes, prev, pager, next, jumper"
@@ -292,16 +278,7 @@
             {  required: true,message: '地址不能为空'}
           ]
         },
-        changeG:{
-          yardType:2,
-          detailAddress:'',
-          yardId:''
-        },
-        changrules:{
-          detailAddress: [
-            {  required: true,message: '园区地址不能为空'}
-          ],
-        },
+        
         openid:0,
         multipleSelection: [],
         multipleSelection2:[],
@@ -316,7 +293,6 @@
           yardName:null,
           userName:null,
         },
-        currentPage3: 1,
         setadmin:{
           id:'',
           userId:''
@@ -340,59 +316,64 @@
       //  获取列表
       getlist(){
         var that=this
-        axios.post('/SmartHomeTrade/garden/selectGdCount',that.params).then(function (res) {
-          // if(res.data.message=='查询园区统计成功'){
+       
+       axios.post('/SmartHomeTrade/garden/selectGdCount',that.params).then(function (res) {
             if(res.data.code==0){
                  that.loading=false
                 that.total=res.data.data.count
                 that.yardsList=res.data.data.yardsList
-
             }
          
         })
       },
-      // 园区存在时获取园区信息
-      getaddInfo(name){
-        var that=this;
-          console.log(name)
-          if(name==''){
-              return;
-          }
-          axios.post("/SmartHomeTrade/garden/selectYardsByName",{
-            yardName:name,
-            action:2
-          }).then(function(res){
-            if (res.data.code==0) {
-                  if(res.data!=null&&res.data.data.length!=0){
-                    console.log(res.data.data)
 
-                     if(res.data.data.length==1){
-                        that.addG={
-                             yardId:res.data.data[0].yardId,
-                             yardName:res.data.data[0].yardName,
-                             provinceName:res.data.data[0].provinceName,
-                            provinceId:res.data.data[0].provinceId,        
-                            cityId:res.data.data[0].cityId,        
-                            areaId:res.data.data[0].areaId,
-                            provinceName:res.data.data[0].provinceName,
-                            cityName:res.data.data[0].cityName,
-                            areaName:res.data.data[0].areaName,
-                            detailAddress:res.data.data[0].detailAddress,
-                          }
-                      }else{
-                        that.showparkinfo=true;
-                        that.getParklist=res.data.data
-                      }
-                  }
 
-            }else{
-               that.$message({
-                  type: 'error',
-                  message: res.data.message
-                });
-            }
-          })
+      // 添加园区
+      addpark(){
+         this.$refs.myaddchild.addgarden();
       },
+      // 园区存在时获取园区信息
+      // getaddInfo(name){
+      //   var that=this;
+      //     console.log(name)
+      //     if(name==''){
+      //         return;
+      //     }
+      //   axios.post("/SmartHomeTrade/garden/selectYardsByName",{
+      //       yardName:name,
+      //       action:2
+      //     }).then(function(res){
+      //       if (res.data.code==0) {
+      //             if(res.data!=null&&res.data.data.length!=0){
+      //               console.log(res.data.data)
+
+      //                if(res.data.data.length==1){
+      //                   that.addG={
+      //                        yardId:res.data.data[0].yardId,
+      //                        yardName:res.data.data[0].yardName,
+      //                        provinceName:res.data.data[0].provinceName,
+      //                       provinceId:res.data.data[0].provinceId,        
+      //                       cityId:res.data.data[0].cityId,        
+      //                       areaId:res.data.data[0].areaId,
+      //                       provinceName:res.data.data[0].provinceName,
+      //                       cityName:res.data.data[0].cityName,
+      //                       areaName:res.data.data[0].areaName,
+      //                       detailAddress:res.data.data[0].detailAddress,
+      //                     }
+      //                 }else{
+      //                   that.showparkinfo=true;
+      //                   that.getParklist=res.data.data
+      //                 }
+      //             }
+
+      //       }else{
+      //          that.$message({
+      //             type: 'error',
+      //             message: res.data.message
+      //           });
+      //       }
+      //     })
+      // },
       //每页显示多少条
       handleSizeChange(val) {
         var that=this;
@@ -419,14 +400,14 @@
 
 
       //添加园区时获取省接口
-      addgarden(){
-        var that=this;
-        that.addGarden=true;
-        axios.post("/SmartHomeTrade/garden/queryPro",{ }).then(function (res) {
-          that.provincelist=res.data.data
-          console.log(res)
-        })
-      },
+      // addgarden(){
+      //   var that=this;
+      //   that.addGarden=true;
+      //  axios.post("/SmartHomeTrade/garden/queryPro",{ }).then(function (res) {
+      //     that.provincelist=res.data.data
+      //     console.log(res)
+      //   })
+      // },
       //查询
       onSubmit() {
         var that=this;
@@ -434,7 +415,7 @@
           return;
         }
         that.loading=true
-        axios.post('/SmartHomeTrade/garden/selectGdCount',that.formSearch).then(function (res) {
+       axios.post('/SmartHomeTrade/garden/selectGdCount',that.formSearch).then(function (res) {
           that.yardsList=res.data.data.yardsList;
           that.loading=false
         })
@@ -467,144 +448,144 @@
         this.$refs.listUser.clearSelection()
         done()
       },
-      //获取市
-      getCity : function(value){
-         var that=this;
-         that.addG.provinceId=value;
-        console.log(value)
-         let obj = {};  
-        obj = this.provincelist.find((item)=>{ 
-        return item.provinceId === value;
-        });  
-        that.addG.provinceName=obj.province;
-        axios.post("/SmartHomeTrade/garden/queryPro",{
-          provinceId:value
-        }).then(function (res) {
-          that.citylist=res.data.data;
-          that.addG.cityName='';
-          that.addG.areaName='';
-           that.addG.cityId='';
-          that.addG.areaId='';       
-        })
-      },
-      // 获取区域
-      getRegion : function(value){
-        var that=this;
-         that.addG.cityId=value;
-           console.log(value)
-         let obj = {};  
-        obj = this.citylist.find((item)=>{ 
-        return item.cityId === value;
-        });  
-        that.addG.cityName=obj.city;
-        axios.post("/SmartHomeTrade/garden/queryPro",{
-          cityId:value
-        }).then(function (res) {
-          that.regionlist=res.data.data;
-            that.addG.areaName='';
-            that.addG.areaId='';    
-        })
-      },
-      // 改变新增大楼按钮
-      addbuildCahgne(){
-        console.log(this.addbuild)
-        if(this.addbuild){
-          this.$nextTick(function(){
-              this.$refs.myadd.scrollTop=150
-              })
-          // this.$refs.myadd.scrollTop=100;
-          // console.log(this.$refs.myadd.scrollTop)
+      // //获取市
+      // getCity : function(value){
+      //    var that=this;
+      //    that.addG.provinceId=value;
+      //   console.log(value)
+      //    let obj = {};  
+      //   obj = this.provincelist.find((item)=>{ 
+      //   return item.provinceId === value;
+      //   });  
+      //   that.addG.provinceName=obj.province;
+      //   axios.post("/SmartHomeTrade/garden/queryPro",{
+      //     provinceId:value
+      //   }).then(function (res) {
+      //     that.citylist=res.data.data;
+      //     that.addG.cityName='';
+      //     that.addG.areaName='';
+      //      that.addG.cityId='';
+      //     that.addG.areaId='';       
+      //   })
+      // },
+      // // 获取区域
+      // getRegion : function(value){
+      //   var that=this;
+      //    that.addG.cityId=value;
+      //      console.log(value)
+      //    let obj = {};  
+      //   obj = this.citylist.find((item)=>{ 
+      //   return item.cityId === value;
+      //   });  
+      //   that.addG.cityName=obj.city;
+      //  axios.post("/SmartHomeTrade/garden/queryPro",{
+      //     cityId:value
+      //   }).then(function (res) {
+      //     that.regionlist=res.data.data;
+      //       that.addG.areaName='';
+      //       that.addG.areaId='';    
+      //   })
+      // },
+      // // 改变新增大楼按钮
+      // addbuildCahgne(){
+      //   console.log(this.addbuild)
+      //   if(this.addbuild){
+      //     this.$nextTick(function(){
+      //         this.$refs.myadd.scrollTop=150
+      //         })
+      //     // this.$refs.myadd.scrollTop=100;
+      //     // console.log(this.$refs.myadd.scrollTop)
 
-        }else{
-            this.$nextTick(function(){
-              this.$refs.myadd.scrollTop=0;
-              })
-        }
+      //   }else{
+      //       this.$nextTick(function(){
+      //         this.$refs.myadd.scrollTop=0;
+      //         })
+      //   }
 
-      },
-      // 
-      removeInfo(){
-        // alert("11")
-        this.showparkinfo=false;
-      },
-     // 获取区域id
-      getAddress(value){
-        var that=this;
-        that.addG.areaId=value; 
-         let obj = {};  
-        obj = this.regionlist.find((item)=>{ 
-        return item.areaId === value;
-        });  
-         that.addG.areaName=obj.area; 
-      },
+      // },
+     //  // 
+     //  removeInfo(){
+     //    // alert("11")
+     //    this.showparkinfo=false;
+     //  },
+     // // 获取区域id
+     //  getAddress(value){
+     //    var that=this;
+     //    that.addG.areaId=value; 
+     //     let obj = {};  
+     //    obj = this.regionlist.find((item)=>{ 
+     //    return item.areaId === value;
+     //    });  
+     //     that.addG.areaName=obj.area; 
+     //  },
 
 
  //提交添加园区信息
-  add_build(addG){
-        var that=this;
+  // add_build(addG){
+  //       var that=this;
 
-    that.$refs[addG].validate((valid) => {
-          if (valid) {
-              // console.log(that.addG)
-               var buildingNameList1=[]
-                  for(var i=0;i<that.addbuildList.buildingNameList.length;i++){
-                    buildingNameList1.push(that.addbuildList.buildingNameList[i].blockName)
-                  }
-              if(that.addbuild&&buildingNameList1!=[]){
-                console.log(that.addbuildList.buildingNameList);
+  //   that.$refs[addG].validate((valid) => {
+  //         if (valid) {
+  //             // console.log(that.addG)
+  //              var buildingNameList1=[]
+  //                 for(var i=0;i<that.addbuildList.buildingNameList.length;i++){
+  //                   buildingNameList1.push(that.addbuildList.buildingNameList[i].blockName)
+  //                 }
+  //             if(that.addbuild&&buildingNameList1!=[]){
+  //               console.log(that.addbuildList.buildingNameList);
                  
-                 var bul={
-                  buildingNameList:buildingNameList1
-                 };
-                 // that.$store.state.userInfo.tel
-                 var tel={
-                  createOperator:that.createOperator
-                 }
-                 // var yardid={
-                 //  yardId:that.addG.yardId
+  //                var bul={
+  //                 buildingNameList:buildingNameList1
+  //                };
+  //                // that.$store.state.userInfo.tel
+  //                var tel={
+  //                 createOperator:that.createOperator
+  //                }
+  //                // var yardid={
+  //                //  yardId:that.addG.yardId
 
-                 // }
-                  var addparamGb=Object.assign(bul, tel, that.addG)
-                  // var addparamGb=Object.assign(bul, tel, yardid)
-              }else{
-                var addparamGb=that.addG
+  //                // }
+  //                 var addparamGb=Object.assign(bul, tel, that.addG)
+  //                 // var addparamGb=Object.assign(bul, tel, yardid)
+  //             }else{
+  //               var addparamGb=that.addG
 
-              }
+  //             }
 
-              axios.post('/SmartHomeTrade/garden/insertGarden',addparamGb).then(function (res) {
-                if(res.data.code==0){
-                  that.$refs[addG].resetFields();
-              }
-                console.log(res)
-                if(res.data.code==0){
-                   that.$message({
-                      type: 'success',
-                      message: res.data.message
-                    });
-                    that. getlist()
-                    that.addbuild=false;
-                    that.addGarden=false; 
-                     that. addbuildList={
-                      buildingNameList: [{
-                        blockName: ''
-                      }],
-                    };
+  //             axios.post('/SmartHomeTrade/garden/insertGarden',addparamGb).then(function (res) {
+  //               if(res.data.code==0){
+  //                 that.$refs[addG].resetFields();
+  //             }
+  //               console.log(res)
+  //               if(res.data.code==0){
+  //                  that.$message({
+  //                     type: 'success',
+  //                     message: res.data.message
+  //                   });
+  //                   that. getlist()
+  //                   that.addbuild=false;
+  //                   that.addGarden=false; 
+  //                    that. addbuildList={
+  //                     buildingNameList: [{
+  //                       blockName: ''
+  //                     }],
+  //                   };
                     
-                 }else{
-                   that.$message({
-                      type: 'error',
-                      message: res.data.message
-                    });
-                   that.addGarden=false; 
-                 }
+  //                }else{
+  //                  that.$message({
+  //                     type: 'error',
+  //                     message: res.data.message
+  //                   });
+  //                  that.addGarden=false; 
+  //                }
                    
-              })            
-          } else {
-            console.log('error submit!!');
-            return false;
-          }
-        });
-      },
+  //             })            
+  //         } else {
+  //           console.log('error submit!!');
+  //           return false;
+  //         }
+  //       });
+  //     },
       //修改园区框显示
       change(){
         var that=this;
@@ -614,35 +595,13 @@
             message: '请选择要修改的大楼'
           });
         }else {
-          that.changeGarden=true;
-          that.changeG={
-            yardType:2,
-            detailAddress:that.multipleSelection[0].detailAddress,
-            yardId:that.multipleSelection[0].yardId
-          }
+          var changparam={
+              yardType:2,
+              detailAddress:that.multipleSelection[0].detailAddress,
+              yardId:that.multipleSelection[0].yardId
+              }
+          this.$refs.mychild.parentHandleclick(changparam);
         }
-      },
-      //确认修改园区
-      change_Garden(changeG){
-        var that=this;
-        this.$refs[changeG].validate((valid) => {
-          if (valid) {
-            axios.post("/SmartHomeTrade/garden/updateGarden" ,that.changeG).then(function (res) {
-              that.$message({
-                type: 'success',
-                message: res.data.message
-              });
-              that.getlist()
-              that.changeGarden=false;
-
-            })
-
-          } else {
-            console.log('error submit!!');
-            return false;
-          }
-        });
-
       },
       //  设置管理员
       administratored(){
@@ -709,49 +668,44 @@
       },
 
       // 跳转到指定园区的大楼列表页
-      goBuildinglist(parkName,yardId){
-        this.$set(this.$store.state.parame,'garden_buildNmae',parkName)
-        this.$set(this.$store.state.parame,'garden_buildId',yardId)
-        this.$router.push({name:'buildingList'})
-      },
+      // goBuildinglist(parkName,yardId){
+      //   this.$set(this.$store.state.parame,'garden_buildNmae',parkName)
+      //   this.$set(this.$store.state.parame,'garden_buildId',yardId)
+      //   this.$router.push({name:'buildingList'})
+      // },
 
 
     //删除大楼input框
-      remove_buildName(item) {
-        var index = this.addbuildList.buildingNameList.indexOf(item)
-        if (index !== -1) {
-          this.addbuildList.buildingNameList.splice(index, 1)
-        }
-      },
+      // remove_buildName(item) {
+      //   var index = this.addbuildList.buildingNameList.indexOf(item)
+      //   if (index !== -1) {
+      //     this.addbuildList.buildingNameList.splice(index, 1)
+      //   }
+      // },
       //新增大楼input框
-      add_buildName() {
-        this.addbuildList.buildingNameList.push({
+      // add_buildName() {
+      //   this.addbuildList.buildingNameList.push({
           
-        });
-      },
+      //   });
+      // },
 
       // 获取园区信息id
-      getParklinfo(item){
-        console.log(item.yardName)
-        
-
-         this.addG={
-                   yardId:item.yardId,
-                   yardName:item.yardName,
-                   provinceName:item.provinceName,
-                  provinceId:item.provinceId,        
-                  cityId:item.cityId,        
-                  areaId:item.areaId,
-                  provinceName:item.provinceName,
-                  cityName:item.cityName,
-                  areaName:item.areaName,
-                  detailAddress:item.detailAddress,
-         }
-
-        this.showparkinfo=false;
-
-
-      }
+      // getParklinfo(item){
+      //   console.log(item.yardName)
+      //    this.addG={
+      //              yardId:item.yardId,
+      //              yardName:item.yardName,
+      //              provinceName:item.provinceName,
+      //             provinceId:item.provinceId,        
+      //             cityId:item.cityId,        
+      //             areaId:item.areaId,
+      //             provinceName:item.provinceName,
+      //             cityName:item.cityName,
+      //             areaName:item.areaName,
+      //             detailAddress:item.detailAddress,
+      //    }
+      //   this.showparkinfo=false;
+      // }
 
     },
   }
@@ -763,7 +717,6 @@
      height: 350px;
     overflow:hidden;
     overflow-y:auto;
-
   }
   /*.addB{
     height: 300px;

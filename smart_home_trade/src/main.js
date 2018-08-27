@@ -9,15 +9,28 @@ import 'element-ui/lib/theme-chalk/index.css';
 import myHeader from './view/home/myHeader';
 import myFooter from './view/home/myFooter';
 import goback from './view/home/goback/goback'
+import gobackequim from './view/home/goback/gobackequim'
 import gobackroom from './view/home/goback/gobackroom'
+import changeFloor from './components/changeFloor'
+import changebuild from './components/changebuild'
+import changePark from './components/changePark'
+import changeRoom from './components/changeRoom'
+import addPark from './components/addPark'
+
+
 import iView from 'iview';
 import 'iview/dist/styles/iview.css';
 import Mock from './mock/mock'
 
-import axios from 'axios'
+// Mock.getMock()
+
+import axios from "./axiosconfig/axiosconfig.js"
+
+// import axios from 'axios'
 
 axios.defaults.withCredentials = true;
-// Vue.prototype.$axios = axios;
+
+Vue.prototype.axios = axios;
 Vue.use(iView);
 Vue.use(ElementUI);
 Vue.config.productionTip = false
@@ -25,20 +38,28 @@ Vue.component(myHeader.name, myHeader)
 Vue.component(myFooter.name, myFooter)
 Vue.component(goback.name, goback)
 Vue.component(gobackroom.name, gobackroom)
+Vue.component(gobackequim.name, gobackequim)
+Vue.component(changebuild.name, changebuild)
+Vue.component(changeFloor.name, changeFloor)
+Vue.component(changePark.name, changePark)
+Vue.component(changeRoom.name, changeRoom)
+Vue.component(addPark.name, addPark)
 
 router.beforeEach((to, from, next) => {
+  let token = store.state.token;
   if (to.meta.Auth) {
-    if (store.state.token != null) {
+    if (token) {
       next();
     } else {
-      router.push({
-        name: 'login'
-      })
+      next({
+        path: '/login',
+        // query: { redirect: to.fullPath } 
+      });
     }
   } else {
     next();
   }
-})
+});
 
 
 if (window.sessionStorage.getItem('token')) {

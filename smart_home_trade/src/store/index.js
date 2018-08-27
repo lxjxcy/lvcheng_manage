@@ -38,7 +38,9 @@ export default new Vuex.Store({
     exitUser(state) {
       state.token = null;
       sessionStorage.removeItem('token')
+
     },
+
     setStroge(state, stedate) {
       state.setDAta = stedate;
       localStorage.setItem('setD', JSON.stringify(stedate))

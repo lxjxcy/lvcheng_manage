@@ -118,7 +118,7 @@
         },
         // 修改密码弹框
         changepass(){
-          this.changeformValidate.loginName=this.$store.state.userInfo.loginName
+          this.changeformValidate.loginName=this.$store.state.userinfo.loginName
           this.changePass=true;
         },
         //修改密码
@@ -154,7 +154,7 @@
               message: res.data.message
             });
             that.$store.commit('exitUser')
-            that.$router.push("/")
+            that.$router.push("/login")
           })
 
         },
@@ -179,7 +179,7 @@
   }
 
   .left{
-    font-size: 0.28rem;
+    font-size: 0.24rem;
     color:$color;
     line-height: 0.5rem;
   }
@@ -193,7 +193,7 @@
   }
   li{
     padding:0 10px;
-    line-height: 0.5rem;
+    line-height: 0.4rem;
 
   }
   .list-1,.list-2{

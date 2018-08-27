@@ -24,6 +24,14 @@ export default {
     padding:0;
     margin:0;
   }
+
+  /*弹框内容width*/
+   .dialogwidth{
+    padding-right: 0.53rem;
+     height: 300px;
+    overflow:hidden;
+    overflow-y:auto;
+  }
 #app {
   /*font-family: 'Avenir', Helvetica, Arial, sans-serif;*/
   /*-webkit-font-smoothing: antialiased;*/
@@ -58,7 +66,7 @@ export default {
     padding-right:5px;
   }
   header{
-    height:0.5rem;
+    height:0.4rem;
     background: #2bc999;
   }
 
@@ -73,9 +81,7 @@ export default {
 
   }
   /*左侧*/
-  aside{
-    font-size: 20px;
-  }
+ 
   .el-col-12{
     width:100%;
   }
@@ -85,23 +91,19 @@ export default {
   .all{
     display: flex;
     height: 100%;
-    flex-direction:column;
-  }
-  .container{
-    flex: 1;
-    display: flex;
+    width:100%;
+    flex-direction:row;
   }
   .footerall{
     height:0.4rem;
     width:100%;
-    background: #b0daeb;
     text-align: center;
     line-height: 0.4rem;
   }
   aside{
-    background: #2f4050;
-    flex: 1;
-    /*box-shadow: 5px 0px 6px #2fc0fb;*/
+    width:12%;
+    font-size: 20px;
+    background: #525c64;
   }
   aside a{
     text-align: center;
@@ -112,8 +114,10 @@ export default {
     font-size: 26px;
   }
   main{
-    flex: 6;
-    padding-left: 7px;overflow: hidden;
+    flex: 1;
+    padding-left: 7px;
+    width:60%;
+    overflow: hidden;
   }
   .nowuser{
     height:140px;
@@ -191,7 +195,12 @@ padding:8px 26px;
     /*border-bottom: 1px solid #ccc;*/
     /*color:#fff;*/
     /*background: #109dfd !important;*/
-/*padding:10px 20px;*/
+padding:10px 20px;
+  }
+
+  /*弹框尾部*/
+  .el-dialog__footer{
+    padding-top:5px;
   }
   .el-dialog__title{
     /*color:#fff;*/

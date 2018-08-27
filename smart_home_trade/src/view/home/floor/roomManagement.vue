@@ -2,12 +2,13 @@
   <div class="roomManagement">
       <gobackroom></gobackroom>
     <div class="top-nav">
+
     
       <el-form :inline="true" :model="formSearch" class="demo-form-inline">
         <el-form-item label="名称" prop='name'>
           <el-input v-model="formSearch.name" placeholder=""></el-input>
         </el-form-item>
-        <el-form-item label="编号" prop='userName'>
+        <el-form-item label="编号" prop='roomNum'>
           <el-input v-model="formSearch.roomNum" placeholder=""></el-input>
         </el-form-item>
         <el-form-item label="管理员" prop='userName'>
@@ -28,9 +29,11 @@
       </div>
       <ul  v-bind:class="classObject">
         <li class="l"><i class="iconfont">&#xe612;</i>添加</li>
-        <li class="l"><i class="iconfont">&#xe645;</i>修改</li>
+        <li class="l" @click="change"><i class="iconfont">&#xe645;</i>修改</li> 
         <li class="l">设置管理员</li>
       </ul>
+      <changeRoom ref="mychild" @refreshList="getroomlist"></changeRoom>
+         
 
     </div>
     <div class="main-table">
@@ -100,7 +103,6 @@
 </template>
 
 <script>
-import axios from "axios"
     export default {
         name: "roomManagement",
     
@@ -108,7 +110,7 @@ import axios from "axios"
         return {
           total:0,
           loading:true,
-            multipleSelection: [],
+          multipleSelection: [],
            classObject:{
               'r': false,
           },
@@ -164,7 +166,7 @@ import axios from "axios"
         getroomlist(){
           // alert("111")
           var that=this;
-          axios.post("/SmartHomeTrade/room/selectRoomCount",that.paramRoom).then(function(res){
+          that.axios.post("/SmartHomeTrade/room/selectRoomCount",that.paramRoom).then(function(res){
             if(res.data.code==0){
               that.loading=false;
               that.roomList=res.data.data.roomList;
@@ -195,7 +197,7 @@ import axios from "axios"
         onSubmit() {
           var that=this;
           that.loading=true
-          axios.post("/SmartHomeTrade/room/selectRoomCount",that.formSearch).then(function(res){
+          that.axios.post("/SmartHomeTrade/room/selectRoomCount",that.formSearch).then(function(res){
             if(res.data.code==0){
               that.loading=false;
               that.roomList=res.data.data.roomList;
@@ -218,30 +220,63 @@ import axios from "axios"
     // 跳转到指定房间的设备列表页
        goEquimentlist(roomName,roomId,roomaddressId){
       // alert(this.$store.state.parame.garden_buildNmae)
-        var param={
-          build_floorName:this.$store.state.parame.build_floorName,
-          build_floorId:this.$store.state.parame.build_floorId,
-          floor_roomId:this.$store.state.parame.floor_roomId,
-          floor_roomName:this.$store.state.parame.floor_roomName,
-          room_equimentName:this.$store.state.parame.floor_roomName+roomName,
-          room_equimentId:roomId,
-          addressId:this.$store.state.parame.addressId,
-          roomaddressId:roomaddressId
-        }
-        this.$store.commit('setRouterid',param)
-        if(this.$store.state.userinfo.userLevel==2){
-          this.$router.push('/park/floorList/roomList/equimentList')
-        }
-         if(this.$store.state.userinfo.userLevel==3){
-          this.$router.push('/building/roomList/equimentList')
-        }
-         if(this.$store.state.userinfo.userLevel==4){
-          this.$router.push('/floor/equimentList')
-        }
-        
+            if(this.$store.state.userinfo.userLevel==2||this.$store.state.userinfo.userLevel==3){
+               var param={
+                build_floorName:this.$store.state.parame.build_floorName,
+                build_floorId:this.$store.state.parame.build_floorId,
+                floor_roomId:this.$store.state.parame.floor_roomId,
+                floor_roomName:this.$store.state.parame.floor_roomName,
+                room_equimentName:this.$store.state.parame.floor_roomName+roomName,
+                room_equimentId:roomId,
+                addressId:this.$store.state.parame.addressId,
+                roomaddressId:roomaddressId
+              }
+            }else{
+                var param={
+                  build_floorName:this.$store.state.parame.build_floorName,
+               build_floorId:this.$store.state.parame.build_floorId,
+                floor_roomId:this.$store.state.parame.floor_roomId,
+                floor_roomName:this.$store.state.parame.floor_roomName,
+                room_equimentName:roomName,
+                room_equimentId:roomId,
+                addressId:this.$store.state.parame.addressId,
+                roomaddressId:roomaddressId
+              }
+             
+            }      
+              this.$store.commit('setRouterid',param)
+              if(this.$store.state.userinfo.userLevel==2){
+                this.$router.push('/park/floorList/roomList/equimentList')
+              }
+               if(this.$store.state.userinfo.userLevel==3){
+                this.$router.push('/building/roomList/equimentList')
+              }
+               if(this.$store.state.userinfo.userLevel==4){
+                this.$router.push('/floor/equimentList')
+              }
+              
+            },
+          //修改园区框显示
+          change(){
+            var that=this;
+            if(that.multipleSelection==''){
+              that.$message({
+                type: 'info',
+                message: '请选择要修改的房间'
+              });
+            }else {
+              var changparam={
+                  name:that.multipleSelection[0].name,
+                  addressId:that.multipleSelection[0].addressId,
+                  id:that.multipleSelection[0].id
+              }
+            
+              this.$refs.mychild.parentHandleclick(changparam);
+            }
+          }
+
       },
-      },
-    }
+}
 </script>
 
 <style scoped>

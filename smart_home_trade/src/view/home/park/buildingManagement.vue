@@ -18,8 +18,8 @@
             <el-button type="primary" @click="onSubmit">查询</el-button>
           </el-form-item>
           <el-form-item>
-          <el-button @click="resetForm('formSearch')">重置</el-button>
-        </el-form-item>
+           <el-button @click="resetForm('formSearch')">重置</el-button>
+          </el-form-item>
         </el-form>
       </div>
       <div class="nav-middle">
@@ -49,21 +49,8 @@
 
 
           <li class="l" @click="change()"><i class="iconfont" >&#xe645;</i>修改</li>
-              <el-dialog title="修改大楼" :visible.sync="changeBuilding" width="30%">
-                <div class="add-buliding">
-                  <el-form :model="changeform"  label-width="100px" :rules="rules">
-                    <el-form-item label="大楼名称" prop="buildingName">
-                      <el-input v-model="changeform.buildingName" auto-complete="off" label-width="100px"></el-input>
-                    </el-form-item>
-                  </el-form>
-                </div>
-                <div slot="footer" class="dialog-footer">
-                  <el-button type="primary" @click="senChanginfo()">确 定</el-button>
-                </div>
-              </el-dialog>
-        <!--   <li class="l" @click="deleted()"><i class="iconfont">&#xe504;</i>删除</li> -->
+          <changebuild ref="mychild" @refreshList="getBuildlist"></changebuild>
           <li class="l" @click=" administratored()">设置管理员</li>
-
             <el-dialog
               title="提示"
               :visible.sync="administrator"
@@ -212,27 +199,12 @@
             buildingname:"",
             desc: '',
           },
-          changeform:{
-            yardId:'',
-            yardName:'',
-            buildingId:'',
-            buildingName:''
-          },
-          rules:{
-            buildingName: [
-            {  required: true,message: '大楼名称不能为空'}
-          ],
-
-
-          },
-
           loading:true,
           buildingN:'222',
           multipleSelection: [],
           multipleSelection2:[],
           formLabelWidth: '100px',
           addBuilding:false,
-          changeBuilding:false,
           administrator:false,
           formSearch: {
             buildingName: null,
@@ -242,7 +214,6 @@
             yardIdList:[],
              action:1,
           },
-          currentPage3: 1,
           add:'',
           tableData2: [
             {
@@ -292,10 +263,11 @@
           var that=this;
           axios.post('/SmartHomeTrade/block/selectBlockCount',that.buildParams).then(function(res){
               if(res.data.code==0){
+                 that.blockList=res.data.data.blockList;
                 that.loading=false;
-                that.blockList=res.data.data.blockList;
+               
                 that.total=res.data.data.count;
-                console.log()
+               
               }
           })
       },
@@ -357,32 +329,19 @@
             if(this.multipleSelection==''){
               this.$message({
                 type: 'info',
-                message: '请选择要修改的大楼删除'
+                message: '请选择要修改的大楼'
               });
             }else {
-              this.changeBuilding=true;
-              console.log(this.multipleSelection[0].buildingName)
-              this.changeform.buildingName=this.multipleSelection[0].buildingName;
-              this.changeform.yardId=this.multipleSelection[0].yardId;
-              this.changeform.yardName=this.multipleSelection[0].yardName;
-              this.changeform.buildingId=this.multipleSelection[0].buildingId;
+              var changparam={
+                buildingName:this.multipleSelection[0].buildingName,
+                yardId:this.multipleSelection[0].yardId,
+                yardName:this.multipleSelection[0].yardName,
+                buildingId:this.multipleSelection[0].buildingId
+              }
+              this.$refs.mychild.parentHandleclick(changparam);
             }
         },
-        // 提交修改大楼信息
-        senChanginfo(){
-          var that=this;
-          axios.post("/SmartHomeTrade/block/updateBlock",that.changeform).then(function(res){
-                if(res.data.code==0){
-                  that.changeBuilding=false;
-                    that.$message.success(res.data.message);
-                   that.getBuildlist()
-
-                }else{
-                  that.$message.error(res.data.message);
-                }
-          })
-
-        },
+     
 
   // 跳转到指定大楼的楼层列表页
        goFloorlist(buildingName,buildingId){

@@ -1,6 +1,7 @@
 <template>
   <div class="floorManagement">
      <goback></goback>
+    
     <div class="top-nav">
       <el-form :inline="true" :model="formSearch" class="demo-form-inline">
         <el-form-item label="名称">
@@ -18,6 +19,9 @@
         <el-form-item>
           <el-button type="primary" @click="onSubmit">查询</el-button>
         </el-form-item>
+        <el-form-item>
+          <el-button @click="resetForm('formSearch')">重置</el-button>
+        </el-form-item>
       </el-form>
     </div>
 
@@ -27,11 +31,14 @@
         ---楼层列表
       </div>
       <ul v-bind:class="classObject">
-        <li class="l"><i lass="iconfont">&#xe612;</i>添加</li>
-        <li class="l"><i class="iconfont">&#xe645;</i>修改</li>
-        <li class="l"><i class="iconfont">&#xe504;</i>删除</li>
-        <li class="l">设置管理员</li>
+        <!-- 添加 -->
+        <li class="l" @click="addFloorName()"><i lass="iconfont">&#xe612;</i>添加</li>
+        <!-- 修改 -->
+        <li class="l" @click="changeFloorName()"><i class="iconfont">&#xe645;</i>修改</li>
+        <!-- 设置管理 -->
+        <li class="l" @click="setUsername()">设置管理员</li>
       </ul>
+      <changeFloor ref="mychild" @refreshList="getfloorList"></changeFloor>
     </div>
     <div class="main-table">
 
@@ -99,6 +106,7 @@
 </template>
 
 <script>
+ import changeFloor from '@/components/changeFloor'
 import axios from "axios"
     export default {
         name: "floorManagement",
@@ -135,9 +143,7 @@ import axios from "axios"
         }else{
           this.floorParam.buildingIdList=this.$store.state.userinfo.manageScopeIdList;
           this.floorParam.buildingIdList=this.$store.state.userinfo.manageScopeIdList;
-        }
-        
-       
+        }      
         this.getfloorList()
       },
 
@@ -158,13 +164,25 @@ import axios from "axios"
       // 跳转到指定楼层的房间列表页
        goRoomlist(floorName,floorId,addressId){
       // alert(this.$store.state.parame.garden_buildNmae)
-        var param={
+      if(this.$store.state.userinfo.userLevel==3){
+       var param={
           build_floorName:this.$store.state.parame.build_floorName,
           build_floorId:this.$store.state.parame.build_floorId,
           floor_roomId:floorId,
-          floor_roomName:floorName+this.$store.state.parame.build_floorName,
+          floor_roomName:floorName,
           addressId:addressId
         }
+      }else if(this.$store.state.userinfo.userLevel==2){
+         var param={
+          build_floorName:this.$store.state.parame.build_floorName,
+          build_floorId:this.$store.state.parame.build_floorId,
+          floor_roomId:floorId,
+          floor_roomName:this.$store.state.parame.build_floorName+floorName,
+          addressId:addressId
+        }
+      }
+
+       
         this.$store.commit('setRouterid',param)
         if(this.$store.state.userinfo.userLevel==2){
           this.$router.push('/park/floorList/roomList')
@@ -174,8 +192,6 @@ import axios from "axios"
         }
         
       },
-
-
                  //每页显示多少条
       handleSizeChange(val) {
         var that=this;
@@ -193,7 +209,6 @@ import axios from "axios"
           this.multipleSelection = val;
           console.log(val)
         },
-
         // 查询
         onSubmit() {
            var that=this;
@@ -212,7 +227,38 @@ import axios from "axios"
                   that.$message.error(res.data.message)
                 }
           })
+        },
+         // 清空查询
+        resetForm() {
+        var that=this;
+            that.formSearch.floorNum= null,
+            that.formSearch.name=null, 
+             that.formSearch.buildingName=null, 
+              that.formSearch.userName=null,           
+            that.getMyfloorlist()
+        },
+
+        changeFloorName() {
+          if(this.multipleSelection==''){
+              this.$message({
+                type: 'info',
+                message: '请选择要修改的大楼删除'
+              });
+            }else {
+              var changparam={
+                addressId:this.multipleSelection[0].addressId,
+                id:this.multipleSelection[0].id,
+                name:this.multipleSelection[0].name
+              }
+              this.$refs.mychild.parentHandleclick(changparam);
+            
+            }
+           
         }
+
+
+
+
       },
     }
 </script>

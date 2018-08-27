@@ -2,42 +2,52 @@
   <div class="myRoom">
 
     <div class="top-nav">
-      <el-form :inline="true" :model="formInline" class="demo-form-inline">
+      <el-form :inline="true" :model="formSearch" class="demo-form-inline">
         <el-form-item label="名称">
-          <el-input v-model="formInline.roomId" placeholder=""></el-input>
+          <el-input v-model="formSearch.name" placeholder=""></el-input>
         </el-form-item>
         <el-form-item label="编号">
-          <el-input v-model="formInline.roomName" placeholder=""></el-input>
+          <el-input v-model="formSearch.roomNum" placeholder=""></el-input>
         </el-form-item>
         <el-form-item>
           <el-button type="primary" @click="onSubmit">查询</el-button>
         </el-form-item>
+
+         <el-form-item>
+           <el-button @click="resetForm('formSearch')">重置</el-button>
+          </el-form-item>
       </el-form>
     </div>
     <div class="main-table">
 
       <el-table
-        :data="tableData3"
+        :data="roomList"
         height="435"
         border
+        v-loading='loading'
+
         style="width: 100%">
+         <el-table-column
+          type="selection"
+          width="50">
+        </el-table-column>
         <el-table-column
-          type="index"
+          prop="roomNum"
           label="房间编号"
           width="180">
         </el-table-column>
         <el-table-column
-          prop="roomName"
+          prop="name"
           label="房间名称"
           width="180">
         </el-table-column>
         <el-table-column
-          prop="equipmentNumber"
+          prop="deviceNum"
           label="设备数量"
           width="180">
         </el-table-column>
         <el-table-column
-          prop="address"
+          prop="inAddress"
           label="所在位置">
         </el-table-column>
       </el-table>
@@ -45,11 +55,10 @@
         <el-pagination
           @size-change="handleSizeChange"
           @current-change="handleCurrentChange"
-          :current-page="currentPage3"
-          :page-sizes="[100, 200, 300, 400]"
+          :page-sizes="[10, 20, 30, 400]"
           :page-size="100"
           layout="total, sizes, prev, pager, next, jumper"
-          :total="1000">
+          :total="total">
         </el-pagination>
       </div>
 
@@ -62,70 +71,81 @@
         name: "myRoom",
       data() {
         return {
-          formInline: {
-            roomId: '',
-            roomName:"",
+          total:0,
+          loading:true,
+          myRoomparam:{
+            pageSize:10,
+            currentPage:1,
+           roomListId:[],
+            adrIdList:[],
           },
-          currentPage3: 1,
-          tableData3: [{
-            // roomId: '1',
-            roomName: '逸夫楼',
-            equipmentNumber:"23",
-            address: '杭州市滨江区锦绣国际202'
-          }, {
-            // roomId: '1',
-            roomName: '逸夫楼',
-            equipmentNumber:"23",
-            address: '杭州市滨江区锦绣国际202'
+          formSearch:{
+            name:null,
+            roomNum:null,
+            roomListId:[],
+            adrIdList:[],
           },
-            {
-              // roomId: '1',
-              roomName: '逸夫楼',
-              equipmentNumber:"23",
-              address: '杭州市滨江区锦绣国际202'
-            },
-            {
-              // roomId: '1',
-              roomName: '逸夫楼',
-              equipmentNumber:"23",
-              address: '杭州市滨江区锦绣国际202'
-            },
-            {
-              // roomId: '1',
-              roomName: '逸夫楼',
-              equipmentNumber:"23",
-              address: '杭州市滨江区锦绣国际202'
-            },
-            {
-              // roomId: '1',
-              roomName: '逸夫楼',
-              equipmentNumber:"23",
-              address: '杭州市滨江区锦绣国际202'
-            },
-            {
-              // roomId: '1',
-              roomName: '逸夫楼',
-              equipmentNumber:"23",
-              address: '杭州市滨江区锦绣国际202'
-            },
-            {
-              // roomId: '1',
-              roomName: '逸夫楼',
-              equipmentNumber:"23",
-              address: '杭州市滨江区锦绣国际202'
-            },]
+          roomList: []
         }
       },
+
+     mounted(){
+        var that=this;
+        that.formSearch.roomListId=that.$store.state.userinfo.manageScopeIdList;
+         that.formSearch.adrIdList=that.$store.state.userinfo.addrList
+        that.myRoomparam.adrIdList=that.$store.state.userinfo.addrList;
+        that.myRoomparam.roomListId=that.$store.state.userinfo.manageScopeIdList;
+        that.getroomList()
+      },
       methods: {
-        handleSizeChange(val) {
-          console.log(`每页 ${val} 条`);
+        // 获取我的房间列表
+        getroomList(){
+          var that=this;
+          that.axios.post("/SmartHomeTrade/room/selectMyRoom",that.myRoomparam).then(function(res){
+              if(res.data.code==0){
+              that.loading=false;
+              if(res.data.data!=null){
+                 that.roomList=res.data.data.roomList;          
+                that.total=res.data.data.count;
+              }
+             
+            }
+          })
+
         },
-        handleCurrentChange(val) {
-          console.log(`当前页: ${val}`);
-        },
+      //每页显示多少条
+      handleSizeChange(val) {
+        var that=this;
+        that.myRoomparam.pageSize=val;
+        that.myRoomparam.currentPage=1;
+        that.getroomList()
+      },
+      //当前页
+      handleCurrentChange(val) {
+        var that=this;
+        that.myRoomparam.currentPage=val;
+        that.getroomList()
+      },
         onSubmit() {
-          console.log('submit!');
-        }
+         var that=this;
+          if(that.formSearch.name==null&&that.formSearch.roomNum==null){
+            return;
+          }
+           that.loading=true;             
+          that.axios.post("/SmartHomeTrade/room/selectMyRoom",that.formSearch).then(function(res){
+              if(res.data.code==0){
+              that.roomList=res.data.data.roomList;
+                that.loading=false;              
+            }
+          })
+        },
+         // 清空查询
+        resetForm() {
+        var that=this;
+            that.formSearch.name= null,
+            that.formSearch.name=null,           
+            that.getroomList()
+        },
       },
     }
 </script>

@@ -2,31 +2,35 @@
   <div class="myBuilding">
 
     <div class="top-nav">
-      <el-form :inline="true" :model="formInline" class="demo-form-inline">
+      <el-form :inline="true" :model="formSearch" class="demo-form-inline">
         <el-form-item label="名称">
-          <el-input v-model="formInline.roomId" placeholder=""></el-input>
+          <el-input v-model="formSearch.buildingName" placeholder=""></el-input>
         </el-form-item>
         <el-form-item label="编号">
-          <el-input v-model="formInline.roomName" placeholder=""></el-input>
+          <el-input v-model="formSearch.blockNum" placeholder=""></el-input>
         </el-form-item>
         <el-form-item>
           <el-button type="primary" @click="onSubmit">查询</el-button>
         </el-form-item>
+         <el-form-item>
+           <el-button @click="resetForm('formSearch')">重置</el-button>
+          </el-form-item>
       </el-form>
     </div>
     <div class="main-table">
 
       <el-table
-        :data="tableData3"
+        :data="blockList"
         height="435"
         border
+        v-loading='loading'
         style="width: 100%">
          <el-table-column
           type="selection"
           width="50">
         </el-table-column>
         <el-table-column
-          type="index"
+          prop="blockNum"
           label="大楼编号"
           width="180">
         </el-table-column>
@@ -36,12 +40,12 @@
           width="180">
         </el-table-column>
         <el-table-column
-          prop="floorNumber"
+          prop="roomNum"
           label="楼层数量"
           width="180">
         </el-table-column>
         <el-table-column
-          prop="address"
+          prop="yardName"
           label="所在园区">
         </el-table-column>
       </el-table>
@@ -49,11 +53,10 @@
         <el-pagination
           @size-change="handleSizeChange"
           @current-change="handleCurrentChange"
-          :current-page="currentPage3"
-          :page-sizes="[100, 200, 300, 400]"
+          :page-sizes="[10, 20, 30, 40]"
           :page-size="100"
           layout="total, sizes, prev, pager, next, jumper"
-          :total="1000">
+          :total="total">
         </el-pagination>
       </div>
 
@@ -62,74 +65,81 @@
 </template>
 
 <script>
+import axios from "axios"
     export default {
         name: "myBuilding",
       data() {
         return {
-          formInline: {
-            roomId: '',
-            roomName:"",
+          total:0,
+          loading:true,
+          myBuildingparam:{
+            pageSize:10,
+            currentPage:1,
+            buildingIdList:[]
           },
-          currentPage3: 1,
-          tableData3: [{
-            // buildingId: '1',
-            buildingName: '逸夫楼',
-            floorNumber:"23",
-            address: '杭州市滨江区锦绣国际202'
-          }, {
-            // buildingId: '1',
-            buildingName: '逸夫楼',
-            floorNumber:"23",
-            address: '杭州市滨江区锦绣国际202'
+          formSearch:{
+            blockNum:null,
+            buildingName:null,
+            buildingIdList:[]
           },
-            {
-              // buildingId: '1',
-              buildingName: '逸夫楼',
-              floorNumber:"23",
-              address: '杭州市滨江区锦绣国际202'
-            },
-            {
-              // buildingId: '1',
-              buildingName: '逸夫楼',
-              floorNumber:"23",
-              address: '杭州市滨江区锦绣国际202'
-            },
-            {
-              // buildingId: '1',
-              buildingName: '逸夫楼',
-              floorNumber:"23",
-              address: '杭州市滨江区锦绣国际202'
-            },
-            {
-              // buildingId: '1',
-              buildingName: '逸夫楼',
-              floorNumber:"23",
-              address: '杭州市滨江区锦绣国际202'
-            },
-            {
-              // buildingId: '1',
-              buildingName: '逸夫楼',
-              floorNumber:"23",
-              address: '杭州市滨江区锦绣国际202'
-            },
-            {
-              // buildingId: '1',
-              buildingName: '逸夫楼',
-              floorNumber:"23",
-              address: '杭州市滨江区锦绣国际202'
-            },]
+          blockList: []
         }
       },
+      mounted(){
+        var that=this;
+        that.formSearch.buildingIdList=that.$store.state.userinfo.manageScopeIdList;
+        that.myBuildingparam.buildingIdList=that.$store.state.userinfo.manageScopeIdList;
+        that.getMybuildlist()
+
+      },
       methods: {
-        handleSizeChange(val) {
-          console.log(`每页 ${val} 条`);
+        // 获取我的大楼列表
+        getMybuildlist(){
+          var that=this;
+          axios.post("/SmartHomeTrade/block/selectMyBlock",that.myBuildingparam).then(function(res){
+            if(res.data.code==0){
+              that.loading=false;
+              if(res.data.data!=null){
+                 that.blockList=res.data.data.blockList;         
+                that.total=res.data.data.count;
+              }
+             
+            }
+          })
         },
-        handleCurrentChange(val) {
-          console.log(`当前页: ${val}`);
-        },
+            //每页显示多少条
+      handleSizeChange(val) {
+        var that=this;
+        that.myBuildingparam.pageSize=val;
+        that.myBuildingparam.currentPage=1;
+        that.getMybuildlist()
+      },
+      //当前页
+      handleCurrentChange(val) {
+        var that=this;
+        that.myBuildingparam.currentPage=val;
+        that.getMybuildlist()
+      },
         onSubmit() {
-          console.log('submit!');
-        }
+         var that=this;
+          if(that.formSearch.blockNum==null&&that.formSearch.buildingName==null){
+            return;
+          }
+           that.loading=true;             
+          axios.post("/SmartHomeTrade/block/selectMyBlock",that.formSearch).then(function(res){
+              if(res.data.code==0){
+              that.blockList=res.data.data.blockList;
+                that.loading=false;              
+            }
+          })
+        },
+         // 清空查询
+        resetForm() {
+        var that=this;
+            that.formSearch.blockNum= null,
+            that.formSearch.buildingName=null,           
+            that.getMybuildlist()
+        },
       },
     }
 </script>

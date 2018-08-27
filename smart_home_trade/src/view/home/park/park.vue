@@ -1,13 +1,5 @@
 <template>
-  <div class="park all">
-
-    <header v-if="show">
-      <myHeader message="园区管理后台"></myHeader>
-    </header>
-
-    <div class="container" v-if="show">
-
-
+  <div class="park all"> 
       <aside>
         <el-row class="tac">
           <el-col :span="12">
@@ -52,12 +44,8 @@
         </el-row>
       </aside>
       <main>
-        <!-- <goback></goback> -->
         <router-view></router-view>
       </main>
-    </div>
-    <div class="footerall">
-      <myFooter> </myFooter>
     </div>
   </div>
 

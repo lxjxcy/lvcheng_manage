@@ -1,9 +1,5 @@
 <template>
   <div class="room all">
-    <header>
-      <myHeader message="房间管理后台"></myHeader>
-    </header>
-    <div class="container">
       <aside>
         <el-row class="tac">
           <el-col :span="12">
@@ -50,10 +46,6 @@
       <main>
         <router-view></router-view>
       </main>
-    </div>
-    <div class="footerall">
-      <myFooter> </myFooter>
-    </div>
   </div>
 </template>
 

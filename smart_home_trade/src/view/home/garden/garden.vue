@@ -1,11 +1,5 @@
 <template>
   <div class="garden all">
-   <!--  {
-      this.$store.state.userinfo.userLevel==1? -->
-    <header v-if="show">
-      <myHeader message="办公大楼设备管理后台"></myHeader>
-    </header>
-      <div class="container"  v-if="show">
         <aside>
           <el-row class="tac">
             <el-col :span="12">
@@ -49,11 +43,6 @@
         <main>
           <router-view></router-view>
         </main>
-      </div>
-      <div class="footerall">
-        <myFooter></myFooter>
-      </div>
-
   </div>
  </template>
 

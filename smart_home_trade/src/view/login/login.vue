@@ -79,9 +79,9 @@
       mixins: [goRouter],
       mounted(){
          this.getImg();
-         axios.post('/api/vehicle').then(function(res){
-          console.log(res)
-         })
+         // axios.post('/api/vehicle').then(function(res){
+         //  console.log(res)
+         // })
       },
 
       methods: {
@@ -98,14 +98,14 @@
        // 登录
         submitForm(loginForm) {
           var that=this;
-          axios.post("https://easy-mock.com/mock/5adfe7967f1c4564cd3dfbe0/example/set").then(function(res){
+        axios.post("https://easy-mock.com/mock/5adfe7967f1c4564cd3dfbe0/example/set").then(function(res){
             // console.log(res.data.data)
              that.$store.commit('setStroge',res.data.data)
           });         
           console.log(that.loginForm)
           that.$refs[loginForm].validate((valid) => {
             if (valid) {
-              axios.post('/SmartHomeTrade/user/loginUser',that.loginForm).then(function (res) {              
+            axios.post('/SmartHomeTrade/user/loginUser',that.loginForm).then(function (res) {              
                 if(res.data.code==0){
                   // that.$set(that.$store.state, 'islogin',true)
                  console.log(res.data.data.user)
@@ -114,20 +114,6 @@
                    that.$store.commit('setToken',res.data.data.user.status)
                    that.$message.success(res.data.message);
                    that.goRouter(res.data.data.user.userLevel)
-                    // if(res.data.data.user.userLevel==1){
-                    //    that.$router.push('/garden/gardenManagement')
-                    // }else if(res.data.data.user.userLevel==2){
-                    //   that.$router.push('/park/MyPark')
-                    // }else if(res.data.data.user.userLevel==3){
-                    //   that.$router.push('/building/MyBuilding')
-                    // }else if(res.data.data.user.userLevel==4){
-                    //   that.$router.push('/floor/myFloor')
-                    // }else{
-                    //   that.$router.push( '/room/myRoom')
-                    // }
-
-
-
                 }else{
                    that.$message.error(res.data.message);
                     if(res.data.message=="验证码错误"){
