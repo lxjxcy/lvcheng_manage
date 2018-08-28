@@ -28,11 +28,13 @@
         ---房间列表
       </div>
       <ul  v-bind:class="classObject">
-        <li class="l"><i class="iconfont">&#xe612;</i>添加</li>
-        <li class="l" @click="change"><i class="iconfont">&#xe645;</i>修改</li> 
-        <li class="l">设置管理员</li>
+        <li class="l" @click="addRoom()"><i class="iconfont">&#xe612;</i>添加</li>
+        <li class="l" @click="change()"><i class="iconfont">&#xe645;</i>修改</li> 
+        <li class="l" @click="administratored()">设置管理员</li>
       </ul>
-      <changeRoom ref="mychild" @refreshList="getroomlist"></changeRoom>
+      <changeRoom ref="mychild" @refreshList="getroomlist" @clearselect="clear"></changeRoom>
+      <addroom ref="myaddchild" @refreshList="getroomlist" @clearselect="clear"></addroom>
+       <setUser ref="mysetchild" @refreshList="getroomlist" @clearselect="clear"></setUser>
          
 
     </div>
@@ -216,6 +218,10 @@
             that.formSearch.userName=null,
         this.getroomlist()
       },
+         // 情况选中
+         clear(){
+         this.$refs.multipleTable.clearSelection();
+       },
 
     // 跳转到指定房间的设备列表页
        goEquimentlist(roomName,roomId,roomaddressId){
@@ -256,7 +262,7 @@
               }
               
             },
-          //修改园区框显示
+          //修改房间框显示
           change(){
             var that=this;
             if(that.multipleSelection==''){
@@ -273,7 +279,29 @@
             
               this.$refs.mychild.parentHandleclick(changparam);
             }
+          },
+          // 添加房间
+          addRoom(){
+            this.$refs.myaddchild.addgarden()
+          },
+        //  设置管理员
+        administratored(){
+          if(this.multipleSelection==''){
+            this.$message({
+              type: 'info',
+              message: '请选择大楼要设置的大楼'
+            });
+          }else {
+           
+              var param={
+               action:5,
+               adrressId: this.multipleSelection[0].addressId,
+               manageScopeId: this.multipleSelection[0].id,
+             }         
+              this.$refs.mysetchild.getAdminList(param);
+
           }
+        },
 
       },
 }

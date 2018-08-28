@@ -2,7 +2,8 @@
   <div class="my-header">
     <div class="left l">
       <ul>
-        <li class="l">{{message}}</li>
+        <li class="l"><img src="../../assets/userlogo.png"></li>
+        <li class="l title" >{{message}}</li>
         <li class="l change">
           <el-dropdown @command="handleCommand">
           <span class="el-dropdown-link">
@@ -62,9 +63,6 @@
   import axios from 'axios'
     export default {
         name: "myHeader",
-
-      props : ['message'],
-
       data(){
         const validatePass = (rule, value, callback) => {
           if (value === '') {
@@ -88,6 +86,7 @@
           }
         };
           return{
+            message:"",
             changePass:false,
             changeformValidate:{
               loginName: '',
@@ -110,7 +109,22 @@
           }
       },
       mounted(){
+       if(this.$store.state.userinfo.userLevel==1){
+          this.message="系统管理平台"
+        }else if(this.$store.state.userinfo.userLevel==2){
+            this.message="园区管理平台"
+        }
+        else if(this.$store.state.userinfo.userLevel==3){
+            this.message="大楼管理平台"
+        }
+        else if(this.$store.state.userinfo.userLevel==4){
+            this.message="楼层管理平台"
+        }else{
+          this.message="房间管理平台"
+        }
           // console.log(this.$store.state.userInfo.loginName)
+        
+        
       },
       methods:{
         handleCommand(command) {
@@ -171,7 +185,13 @@
 <style rel="stylesheet/scss" lang="scss" scoped>
   $header_color:#05509c;
   $color:#fff;
-
+img{
+  height:50px;
+  position: relative;
+  top:-5px;
+  padding: 0 13px;
+  padding-left:25px;
+}
   .el-input.is-disabled .el-input__inner {
      background-color: #fff;
      /*border-color: #e4e7ed;*/
@@ -181,7 +201,7 @@
   .left{
     font-size: 0.24rem;
     color:$color;
-    line-height: 0.5rem;
+    line-height: 0.45rem;
   }
   .right{
     font-size: 0.14rem;
@@ -193,7 +213,7 @@
   }
   li{
     padding:0 10px;
-    line-height: 0.4rem;
+    line-height: 0.45rem;
 
   }
   .list-1,.list-2{
@@ -218,7 +238,10 @@
     color:#fff;
     font-size: 14px;
   }
-
+.title{
+  font-size:20px;
+  font-weight: 500;
+}
 
 
 

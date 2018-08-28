@@ -335,7 +335,6 @@ import axios from "axios"
     filters: {
       equipmentStop: function (val) {
         console.log(val)
-
         return val == 1? '开' : val == 2 ? '关' : val == 3 ? '停': '';
       },
       equipmentHight: function (val) {
@@ -378,6 +377,7 @@ import axios from "axios"
       getequipmentlist(){
         var that=this;
         axios.post("/SmartHomeTrade/device/getDeviceList",that.equipmentParam).then(function(res){
+          that.loading=false;
           if(res.data.code==0){
             that.deviceList=res.data.data.deviceList
             that.loading=false;

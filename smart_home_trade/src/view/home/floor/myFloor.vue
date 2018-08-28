@@ -75,25 +75,35 @@ import axios from "axios"
           myFloorparam:{
             pageSize:10,
             currentPage:1,
-            floorIdList:[],
-            buildingIdList:[],
+            addRegionIdList:[]
+            // floorIdList:[],
+            // buildingIdList:[],
           },
           formSearch:{
             name:null,
             floorNum:null,
-            floorIdList:[],
-            buildingIdList:[],
+            addRegionIdList:[]
+            // floorIdList:[],
+            // buildingIdList:[],
           },
           floorList: []
         }
       },
         mounted(){
          var that=this;
-          that.formSearch.floorIdList=that.$store.state.userinfo.manageScopeIdList;
-          that.myFloorparam.floorIdList=that.$store.state.userinfo.manageScopeIdList;
-           that.formSearch.buildingIdList=that.$store.state.userinfo.addrList;
-          that.myFloorparam.buildingIdList=that.$store.state.userinfo.addrList;
-          that.getMyfloorlist()
+          var list2=that.$store.state.userinfo.addrList;
+            var list1=that.$store.state.userinfo.manageScopeIdList;
+            var obj=[]
+            for(var i=0;i<list1.length;i++){
+                var obj2={
+                  regionId:list1[i],
+                  addressId:list2[i]
+                }
+                obj.push(obj2)
+            }
+          that.formSearch.addRegionIdList=obj;
+          that.myFloorparam.addRegionIdList=obj
+           that.getMyfloorlist()
         },
 
 

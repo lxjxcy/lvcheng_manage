@@ -24,74 +24,17 @@
       </div>
       <div class="nav-middle">
         <ul>
-          <li class="l" @click="addBuilding = true"><i class="iconfont">&#xe612;</i>添加</li>
-          <el-dialog title="添加大楼" :visible.sync="addBuilding" width="30%">
-            <div class="add-buliding">
-              <el-form :model="form" label-width="100px">
-                <el-form-item label="大楼名称">
-                  <el-input v-model="form.name"></el-input>
-                </el-form-item>
-
-
-                <el-form-item label="所属区域">
-                  <el-select v-model="form.region" placeholder="请选择活动区域">
-                    <el-option label="区域一" value="shanghai"></el-option>
-                    <el-option label="区域二" value="beijing"></el-option>
-                  </el-select>
-                </el-form-item>
-              </el-form>
-            </div>
-            <div slot="footer" class="dialog-footer">
-              <el-button type="primary" @click="addBuilding = false">确 定</el-button>
-            </div>
-          </el-dialog>
-
-
-
+          <li class="l" @click="addbuildings()"><i class="iconfont">&#xe612;</i>添加</li>
           <li class="l" @click="change()"><i class="iconfont" >&#xe645;</i>修改</li>
-          <changebuild ref="mychild" @refreshList="getBuildlist"></changebuild>
-          <li class="l" @click=" administratored()">设置管理员</li>
-            <el-dialog
-              title="提示"
-              :visible.sync="administrator"
-              width="40%"
-              :before-close="handleClose"
-              @open="onOpen">
-                    <el-table
-                      :data="tableData2"
-                      height="300"
-                      ref="multipleTable2"
-                      style="width: 100%"
-                      row-key="id"
-                      @selection-change="handleSelectionChange2"
-                    >
-                      <el-table-column
-                        type="selection"
-                        :reserve-selection="true"
-                        width="50"
-                      >
-                      </el-table-column>
-                      <el-table-column
-                        prop="phone"
-                        label="账号"
-                        width="130">
-                      </el-table-column>
-                      <el-table-column
-                        prop="name"
-                        label="姓名"
-                        width="130">
-                      </el-table-column>
-                      <el-table-column
-                        prop="admintype"
-                        label="管理员类型">
-                      </el-table-column>
-                    </el-table>
+         
 
-                <span slot="footer" class="dialog-footer">
-                  <el-button type="primary" @click="administrator = false">确 定</el-button>
-                </span>
-             </el-dialog>
+
+
+          <li class="l" @click=" administratored()">设置管理员</li>
           <li class="l" @click="host()">主机清单</li>
+          <changebuild ref="mychild" @refreshList="getBuildlist" @clearselect="clear"></changebuild>
+          <addBuild ref="myaddchild" @refreshList="getBuildlist" @clearselect="clear"></addBuild>
+          <setUser ref="mysetchild" @refreshList="getBuildlist" @clearselect="clear"></setUser>
         </ul>
 
       </div>
@@ -111,9 +54,9 @@
             width="50">
           </el-table-column>
           <el-table-column
-            prop="buildingId"
+            prop="blockNum"
             label="大楼编号"
-            width="270">
+            width="180">
           </el-table-column>
           <el-table-column
             prop="buildingName"
@@ -215,37 +158,6 @@
              action:1,
           },
           add:'',
-          tableData2: [
-            {
-              phone: '1301799887',
-              name: '陆续',
-              admintype: '大楼管理员'
-            }, {
-              phone: '1301799887',
-              name: '陆续',
-              admintype: '大楼管理员'
-            }, {
-              phone: '1301799887',
-              name: '陆续',
-              admintype: '大楼管理员'
-            }, {
-              phone: '1301799887',
-              name: '陆续',
-              admintype: '大楼管理员'
-            }, {
-              phone: '1301799887',
-              name: '陆续',
-              admintype: '大楼管理员'
-            }, {
-              phone: '1301799887',
-              name: '陆续',
-              admintype: '大楼管理员'
-            }, {
-              phone: '1301799887',
-              name: '陆续',
-              admintype: '大楼管理员'
-            }
-          ],
           blockList: [],
         }
 
@@ -289,10 +201,11 @@
           this.multipleSelection = val;
           console.log(val)
         },
-        handleSelectionChange2(val) {
-          this.multipleSelection = val;
-          console.log(val)
-        },
+           // 情况选中
+         clear(){
+         this.$refs.multipleTable.clearSelection();
+       },
+
         onSubmit() {
           var that=this;
            that.loading=false;
@@ -341,6 +254,11 @@
               this.$refs.mychild.parentHandleclick(changparam);
             }
         },
+        // 添加
+        addbuildings(){
+         
+          this.$refs.myaddchild.addgarden();
+        },
      
 
   // 跳转到指定大楼的楼层列表页
@@ -361,31 +279,22 @@
               message: '请选择大楼要设置的大楼'
             });
           }else {
-            this.administrator=true;
-            console.log(this.multipleSelection[0].buildingName)
-            this.buildingN=this.multipleSelection[0].buildingName;
+           
+              var param={
+               action:3,
+               adrressId: this.multipleSelection[0].buildingId,
+               manageScopeId: this.multipleSelection[0].buildingId,
+             }         
+              this.$refs.mysetchild.getAdminList(param);
 
           }
         },
-        onOpen () {
-          setTimeout(() => {
-            this.toggleSelection([this.tableData2[1], this.tableData2[2]])
-          }, 200)
-        },
-        toggleSelection (rows) {
-          if (rows) {
-            rows.forEach(row => {
-              this.$refs.multipleTable2.toggleRowSelection(row, true)
-            })
-          } else {
-            this.$refs.multipleTable2.clearSelection()
-          }
-        },
+       
 
     //  跳转到主机清单页面
         host(){
                 
-                this.$router.push("/park/HostListing")                
+          this.$router.push("/park/HostListing")                
       }
             
 

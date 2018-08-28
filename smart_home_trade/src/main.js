@@ -16,7 +16,13 @@ import changebuild from './components/changebuild'
 import changePark from './components/changePark'
 import changeRoom from './components/changeRoom'
 import addPark from './components/addPark'
+import addroom from './components/addroom'
+import addBuild from './components/addBuild'
+import addFloor from './components/addFloor'
+import adduser from './components/adduser'
+import setUser from './components/setUser'
 
+import changeuser from './components/changeuser'
 
 import iView from 'iview';
 import 'iview/dist/styles/iview.css';
@@ -44,6 +50,12 @@ Vue.component(changeFloor.name, changeFloor)
 Vue.component(changePark.name, changePark)
 Vue.component(changeRoom.name, changeRoom)
 Vue.component(addPark.name, addPark)
+Vue.component(addBuild.name, addBuild)
+Vue.component(addFloor.name, addFloor)
+Vue.component(addroom.name, addroom)
+Vue.component(setUser.name, setUser)
+Vue.component(adduser.name, adduser)
+Vue.component(changeuser.name, changeuser)
 
 router.beforeEach((to, from, next) => {
   let token = store.state.token;

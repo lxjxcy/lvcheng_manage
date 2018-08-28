@@ -66,7 +66,7 @@ export default {
     padding-right:5px;
   }
   header{
-    height:0.4rem;
+    height:0.45rem;
     background: #2bc999;
   }
 

@@ -105,11 +105,11 @@ export default new Router({
                         component: floorManagement
                     }, {
                         path: '/building/buildingUser',
-                        name: 'buildingUser',
+                        name: 'gardenUser',
                         meta: {
                             Auth: true,
                         },
-                        component: buildingUser
+                        component: gardenUser
                     }, {
                         path: '/building/buildingAppuser',
                         name: 'buildingAppuser',
@@ -200,11 +200,11 @@ export default new Router({
                         component: buildingManagement
                     }, {
                         path: '/park/parkUser',
-                        name: 'parkUser',
+                        name: 'gardenUser',
                         meta: {
                             Auth: true,
                         },
-                        component: parkUser
+                        component: gardenUser
                     }, {
                         path: '/park/HostListing',
                         name: 'HostListing',
@@ -310,11 +310,11 @@ export default new Router({
                         component: myFloor
                     }, {
                         path: '/floor/floorUser',
-                        name: 'floorUser',
+                        name: 'gardenUser',
                         meta: {
                             Auth: true,
                         },
-                        component: floorUser
+                        component: gardenUser
                     }, {
                         path: '/floor/roomManagement',
                         name: 'roomManagement',

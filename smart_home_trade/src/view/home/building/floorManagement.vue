@@ -36,9 +36,11 @@
         <!-- 修改 -->
         <li class="l" @click="changeFloorName()"><i class="iconfont">&#xe645;</i>修改</li>
         <!-- 设置管理 -->
-        <li class="l" @click="setUsername()">设置管理员</li>
+        <li class="l" @click="administratored()">设置管理员</li>
       </ul>
-      <changeFloor ref="mychild" @refreshList="getfloorList"></changeFloor>
+      <changeFloor ref="mychild" @refreshList="getfloorList" @clearselect="clear"></changeFloor>
+       <addFloor ref="myaddchild" @refreshList="getfloorList" @clearselect="clear"></addFloor>
+        <setUser ref="mysetchild" @refreshList="getfloorList" @clearselect="clear"></setUser>
     </div>
     <div class="main-table">
 
@@ -237,7 +239,11 @@ import axios from "axios"
               that.formSearch.userName=null,           
             that.getMyfloorlist()
         },
-
+        // 情况选中
+         clear(){
+         this.$refs.multipleTable.clearSelection();
+       },
+// 修改楼层
         changeFloorName() {
           if(this.multipleSelection==''){
               this.$message({
@@ -254,7 +260,30 @@ import axios from "axios"
             
             }
            
-        }
+        },
+        // 添加楼层
+        addFloorName(){
+           this.$refs.myaddchild.addgarden();
+
+        },
+         //  设置管理员
+        administratored(){
+          if(this.multipleSelection==''){
+            this.$message({
+              type: 'info',
+              message: '请选择大楼要设置的大楼'
+            });
+          }else {
+           
+              var param={
+               action:4,
+               adrressId: this.multipleSelection[0].addressId,
+               manageScopeId: this.multipleSelection[0].id,
+             }         
+              this.$refs.mysetchild.getAdminList(param);
+
+          }
+        },
 
 
 
