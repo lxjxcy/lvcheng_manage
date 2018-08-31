@@ -18,15 +18,21 @@
     </div>
     <div class="nav-middle">
       <ul >
-        <li class="l" @click="createUser()"><i class="iconfont">&#xe612;</i>添加</li>
+        <li class="l" @click="createUser()"><i class="el-icon-plus"></i>添加</li>
         <!--修改-->
-        <li class="l"  @click="change()"><i class="iconfont">&#xe645;</i>修改</li>
+        <li class="l"  @click="change()"><i class="el-icon-edit"></i>修改</li>
         <!--删除-->
-        <li class="l"  @click="deleted()"><i class="iconfont">&#xe504;</i>删除</li>
-        <li class="l"  @click="setAccess()">设置权限</li>
+        <li class="l"  @click="deleted()"><i class="el-icon-close"></i>删除</li>
+        <li class="l"  @click="setAccess()"><i class="el-icon-setting"></i>设置权限</li>
       </ul>
         <adduser ref="mychild" @refreshList="getUserlist" @clearselect="clear"></adduser>
         <changeuser ref="mychangechild" @refreshList="getUserlist" @clearselect="clear"></changeuser>
+        <usersetScope ref="mysetScope" @refreshList="getUserlist"></usersetScope>
+         <userlookScope ref="mylookScope" @refreshList="getUserlist"></userlookScope>
+          <usersetAccess ref="mysetAccess" @refreshList="getUserlist"></usersetAccess>
+
+
+
 
     </div>
     <div class="main-table">
@@ -36,19 +42,28 @@
         ref="multipleTable"
         v-loading="loading"
         style="width: 100%"
-        @selection-change="handleSelectionChange"
+      
         tooltip-effect="dark"
         height="400"
         border>
-        <el-table-column
+   <!--      <el-table-column
           type="selection"
           width="50">
+        </el-table-column> -->
+         <el-table-column label="" width="50">
+          <template slot-scope="scope">
+              <el-radio :label="scope.row.uuid" v-model="templateRadio" @change.native="getTemplateRow(scope.$index,scope.row)">&nbsp</el-radio>
+          </template>
         </el-table-column>
         <el-table-column
-          prop="id"
           label="编号"
           width="120">
+          <template  slot-scope="scope"><span>{{scope.$index+(userParams.currentPage - 1) * userParams.pageSize + 1}} </span></template>
+
+
         </el-table-column>
+        
+
 
         <el-table-column
           prop="name"
@@ -95,10 +110,24 @@
 
 <script>
   import axios from  'axios'
+  import adduser from "../../../components/adduser.vue"
+    import changeuser from "../../../components/changeuser.vue"
+    import usersetAccess from "./usersetAccess.vue"
+     import userlookScope from "./userlookScope.vue"
+      import usersetScope from "./usersetScope.vue"
   export default {
     name: "gardenUser",
+    components:{
+      adduser,
+      changeuser,
+      userlookScope,
+      usersetScope,
+      usersetAccess,
+    },
     data() {
       return {
+        templateRadio:'',
+         templateSelection:{},
         total:0,
         userParams:{
           pageSize:10,
@@ -154,10 +183,14 @@
         that.userParams.currentPage=val;
         that.getUserlist()
       },
-      handleSelectionChange(val) {
-        this.multipleSelection = val;
-        console.log(val)
-      },
+      // handleSelectionChange(val) {
+      //   this.multipleSelection = val;
+      //   console.log(val)
+      // },
+       getTemplateRow(index,row){                
+        this.templateSelection = row;
+        console.log(this.templateSelection)
+       },
       //关闭弹框
       handleClose(done) {
         done();
@@ -198,23 +231,24 @@
       },
       // 修改
       change(){
-        if(this.multipleSelection==''){
+        if(this.templateRadio==''){
           this.$message({
             type: 'info',
             message: '请选择要修改的用户'
           });
         }else {
           var param={
-            uuid:this.multipleSelection[0].uuid,
-            name: this.multipleSelection[0].name,
-            userMobile: this.multipleSelection[0].userMobile
+            uuid:this.templateSelection.uuid,
+            name: this.templateSelection.name,
+            userMobile: this.templateSelection.userMobile
           }
          this.$refs.mychangechild.updataUser(param);
         }
       },
       //  删除
       deleted() {
-        if(this.multipleSelection!=''){
+        var that=this;
+        if(that.templateRadio!=''){
           var that=this;
           that.$confirm('此操作将永久删除, 是否继续?', '提示', {
             confirmButtonText: '确定',
@@ -223,7 +257,7 @@
           }).then(() => {
             //发送ajax
             axios.post('/SmartHomeTrade/user/deleteAdmin',{
-              uuid:that.multipleSelection[0].uuid
+              uuid:that.templateSelection.uuid
             }).then(function (res) {
               that.$message({
                 type: 'success',
@@ -240,10 +274,10 @@
               message: '已取消删除'
             });
           });
-        }else {
-          that.$message({
+        }else{
+           that.$message({
             type: 'info',
-            message: '请选择要删除的大楼删除'
+            message: '请选择要删除的用户'
           });
         }
       },
@@ -255,19 +289,29 @@
 
     //  设置权限
       setAccess(){
-          if(this.multipleSelection==''){
+          if(this.templateRadio==""){
+            // alert("sss")
             this.$message({
               type: 'info',
               message: '请选择用户'
             });
           }else {
-            this.$router.push("/park/setAccess")
+            this.$refs.mysetAccess.getopen();
+            
+
           }
+        },
+        // 查看管辖范围
+        lookScope(){
+          this.$refs.mylookScope.getopen();
+
+
         },
     // 设置管辖范围
     setScope(row){
       console.log(row)
-      this.$router.push("/garden/setScope")
+      this.$refs.mysetScope.getopen(row.userLevel);
+      // this.$router.push("/garden/setScope")
     }
     },
   }

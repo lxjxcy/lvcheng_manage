@@ -20,7 +20,7 @@
                   </el-option>
                 </el-select>
               </el-form-item>
-              <el-form-item label="添加楼层" prop="addroom">
+              <el-form-item label="添加房间" prop="addroom">
                 <el-switch v-model="addroom" @change="addbuildCahgne()"></el-switch>
               </el-form-item>
             </el-form>
@@ -123,23 +123,26 @@ export default {
   add_build(addF){
         var that=this;
 
+
     that.$refs[addF].validate((valid) => {
           if (valid) {
                var roomNameList1=[]
                   for(var i=0;i<that.addroomList.roomNameList.length;i++){
                     roomNameList1.push(that.addroomList.roomNameList[i].roomName)
                   }
-              if(that.addroom&&roomNameList1!=[]){           
+              if(that.addroom&&roomNameList1!=[]){
+                 
                  var addparamGb={
                     addressId:that.addF.addressId,
                     name:that.addF.name,
+                    roomList:roomNameList1,
                  }
 
               }else{
                  var addparamGb={
                   addressId:that.addF.addressId,
                   name:that.addF.name,
-                  roomList:roomNameList1,
+                  
                  }
               }
 

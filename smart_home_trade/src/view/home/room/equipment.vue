@@ -27,32 +27,15 @@
         ---设备列表
       </div>
       <ul v-bind:class="classObject">
-        <li class="l" @click="move = true"><i class="iconfont">&#xe612;</i>迁移设备</li>
-        <el-dialog
-          title="设备迁移"
-          :visible.sync="move"
-          width="30%"
-          :before-close="handleClose">
-          <div class="move">
-            <el-tree
-              :data="data2"
-              show-checkbox
-              node-key="id"
-              ref="tree"
-              highlight-current
-              :props="defaultProps">
-            </el-tree>
-          </div>
-          <span slot="footer" class="dialog-footer">
-            <el-button @click="move = false">取 消</el-button>
-            <el-button type="primary" @click="move = false">确 定</el-button>
-          </span>
-        </el-dialog>
+        <li class="l" @click="move = true"><i class="el-icon-location-outline"></i>迁移设备</li>
+        <li class="l"  @click="eAuthorization()"><i class="el-icon-edit-outline"></i>设备授权</li>
+        <authorizationEq ref="mychild" @refreshList="getequipmentlist"></authorizationEq>
 
 
-        <li class="l"  @click="eAuthorization()"><i class="iconfont">&#xe645;</i>设备授权</li>
+
       </ul>
     </div>
+   
     <div class="main-table">
 
       <el-table
@@ -60,13 +43,18 @@
         ref="multipleTable"
         v-loading="loading"
         style="width: 100%"
-        @selection-change="handleSelectionChange"
+   
         tooltip-effect="dark"
         height="380"
         border>
-        <el-table-column
+       <!--  <el-table-column
           type="selection"
           width="50">
+        </el-table-column> -->
+         <el-table-column label="" width="40">
+          <template slot-scope="scope">
+              <el-radio :label="scope.row.deviceNum" v-model="templateRadio" @change.native="getTemplateRow(scope.$index,scope.row)">&nbsp</el-radio>
+          </template>
         </el-table-column>
         <el-table-column
           prop="deviceNum"
@@ -79,7 +67,7 @@
           width="120">
         </el-table-column>
         <el-table-column
-          prop="type"
+          prop="typeName"
           label="设备类型"
           width="180">
         </el-table-column>
@@ -87,6 +75,15 @@
           prop="mainStatus"
           label="设备状态"
           width="180" :formatter="mainStatus">
+         <!--  <template slot-scope="scope">
+
+            <el-switch
+              v-model="scope.mainStatus"
+             disabled>
+            </el-switch>
+
+
+          </template> -->
         </el-table-column>
         <el-table-column
           prop="inAddress"
@@ -97,14 +94,11 @@
           label="操作">
           <template slot-scope="scope">
 
-            <el-button size="small" type="text" @click="handleEdit(scope.$index, scope.row)">
+            <el-button size="small" type="text" @click="switchChange(scope.row)">
               {{scope.row.mainStatus | equipmentStop}}
             </el-button>
 
-            <el-button @click="handleget(scope.row)" type="text" size="small"> 查看</el-button>
-            <el-button @click="handleClick(scope.row)" type="text" size="small">
-              {{scope.row.mainStatus | equipmentHight}}
-            </el-button>
+            <el-button @click="lookInfo(scope.row)" type="text" size="small"> 查看</el-button>
           </template>
         </el-table-column>
 
@@ -130,15 +124,16 @@
       :before-close="handleClose">
         <div class="getLnformation">
           <ul>
-            <li>设备编号：Bs001</li>
-            <li>主机厂商：控客</li>
-            <li>设备名称：走廊灯</li>
-            <li>官网名称：专用</li>
-            <li>设备类型：灯</li>
-            <li>官网地址：130,233,222,4444</li>
-            <li>设备状态：开</li>
-            <li>所属主机：主机202</li>
-            <li>设备地址：锦绣国际</li>
+            <li>设备编号：{{equipmenInfo.deviceNum}}</li>
+            <!-- <li>主机厂商：{{equipmenInfo.providerName}}</li> -->
+            <li>设备名称：{{equipmenInfo.name}}</li>
+            <!-- <li>官网名称：{{equipmenInfo}}</li> -->
+            <li>设备类型：{{equipmenInfo.typeName}}</li>
+            <!-- <li>官网地址：{{equipmenInfo}}</li> -->
+            <li v-if="equipmenInfo.mainStatus==1">设备状态 :开</li>
+            <li v-if="equipmenInfo.mainStatus==2">设备状态 :关</li>
+            <li>所属主机：{{equipmenInfo.hostName}}</li>
+            <li>设备地址：{{equipmenInfo.inAddress}}</li>
           </ul>
         </div>
       <span slot="footer" class="dialog-footer">
@@ -157,8 +152,13 @@ import axios from "axios"
 
     data() {
       return {
+          templateRadio:'',
+        templateSelection:{},
         total:0,
         loading:true,
+        equipmenInfo:{},
+        value3:true,
+
         equipmentParam:{
           pageSize:10,
           currentPage:1,
@@ -177,154 +177,7 @@ import axios from "axios"
         move:false,
         multipleSelection: [],
         getLnformation:false,
-        data2: [{
-          id: 1,
-          label: '高科技产业园1',
-          children: [{
-            id: 2,
-            label: '一号楼',
-            children: [{
-              id: 3,
-              label: '第一层',
-              children:[
-                {
-                  id: 4,
-                  label: '101',
-                },
-                {
-                  id: 5,
-                  label: '102',
-                },
 
-              ]
-            }, {
-              id: 6,
-              label: '第二层',
-              children:[
-                {
-                  id: 7,
-                  label: '201',
-                },
-                {
-                  id: 8,
-                  label: '202',
-                },
-
-              ]
-            }]
-          },
-            {
-              id: 9,
-              label: '一号楼',
-              children: [{
-                id: 10,
-                label: '第一层',
-                children:[
-                  {
-                    id: 11,
-                    label: '101',
-                  },
-                  {
-                    id: 12,
-                    label: '102',
-                  },
-
-                ]
-              }, {
-                id: 13,
-                label: '第二层',
-                children:[
-                  {
-                    id: 14,
-                    label: '201',
-                  },
-                  {
-                    id: 15,
-                    label: '202',
-                  },
-
-                ]
-              }]
-            },
-
-          ]},
-          {
-            id: 16,
-            label: '高科技产业园2',
-            children: [{
-              id: 17,
-              label: '一号楼',
-              children: [{
-                id: 18,
-                label: '第一层',
-                children:[
-                  {
-                    id: 19,
-                    label: '101',
-                    disabled: true
-                  },
-                  {
-                    id: 20,
-                    label: '102',
-                  },
-
-                ]
-              }, {
-                id: 21,
-                label: '第二层',
-                children:[
-                  {
-                    id: 22,
-                    label: '201',
-                  },
-                  {
-                    id: 23,
-                    label: '202',
-                  },
-
-                ]
-              }]
-            },
-              {
-                id: 24,
-                label: '一号楼',
-                children: [{
-                  id: 25,
-                  label: '第一层',
-                  children:[
-                    {
-                      id: 26,
-                      label: '101',
-                    },
-                    {
-                      id: 27,
-                      label: '102',
-                    },
-
-                  ]
-                }, {
-                  id: 28,
-                  label: '第二层',
-                  children:[
-                    {
-                      id: 29,
-                      label: '201',
-                    },
-                    {
-                      id: 30,
-                      label: '202',
-                    },
-
-                  ]
-                }]
-              },
-
-            ]
-          }],
-        defaultProps: {
-          children: 'children',
-          label: 'label'
-        },
         deviceList: [],
         formation:{
           equipmentid:"SB002",
@@ -335,11 +188,7 @@ import axios from "axios"
     filters: {
       equipmentStop: function (val) {
         console.log(val)
-        return val == 1? '开' : val == 2 ? '关' : val == 3 ? '停': '';
-      },
-      equipmentHight: function (val) {
-        console.log(val)
-        return val == 2? '高级': '';
+        return val == 1? '关闭' : val == 2 ? '开闭' : '';
       },
     },
     mounted(){
@@ -379,9 +228,12 @@ import axios from "axios"
         axios.post("/SmartHomeTrade/device/getDeviceList",that.equipmentParam).then(function(res){
           that.loading=false;
           if(res.data.code==0){
-            that.deviceList=res.data.data.deviceList
+            if(res.data.data!=null){
+               that.deviceList=res.data.data.deviceList;
+               that.total=res.data.data.count;  
+            }
             that.loading=false;
-             that.total=res.data.data.count;     
+                
           }
 
         })
@@ -424,6 +276,55 @@ import axios from "axios"
              that.formSearch.typeName=null,                    
             that.getequipmentlist()
         },
+        // 开关
+        switchChange(e){
+          var that=this;
+          console.log(e.mainStatus)
+          if(e.mainStatus==1){
+            var swit=false;
+            var clo="CLOSE"
+
+          }else{
+            var swit=true;
+             var clo="OPEN"
+          }
+          
+          if(e.type==1){
+            var param={
+            "on":swit
+            }
+
+
+             var Swiparam={
+              "command":"SwitchMain",
+              "argument":param,
+               userId: this.$store.state.userinfo.uuid,
+               deviceId:e.id
+              }
+          }else if(e.type==4){
+             var param={
+            "opt":clo
+            }
+            var Swiparam={
+              "command":"SetMotorOption",
+              "argument":param,
+               userId: this.$store.state.userinfo.uuid,
+               deviceId:e.id
+              }
+
+          }
+        
+         
+          that.axios.post('/SmartHomeTrade/device/deviceSwitchOnFalse',Swiparam).then(function(res){
+            if(res.data.code==0){
+              that.getequipmentlist()
+
+            }
+
+          })
+
+
+        },
 
 
 
@@ -433,10 +334,14 @@ import axios from "axios"
 
 
 
-      handleSelectionChange(val) {
-        this.multipleSelection = val;
-        console.log(val)
-      },
+      // handleSelectionChange(val) {
+      //   this.multipleSelection = val;
+      //   console.log(val)
+      // },
+        getTemplateRow(index,row){                
+        this.templateSelection = row;
+        console.log(this.templateSelection)
+       },
       //关闭设备信息框
       handleClose(done) {
             done();
@@ -444,19 +349,28 @@ import axios from "axios"
     
       //  转换状态
       mainStatus: function (row, column) {
-        return row.mainStatus == 1? '开' : row.mainStatus == 2? '关' : row.mainStatus == 3? '停':""
+        return row.mainStatus == 1? '开启' : row.mainStatus == 2? '关闭' : row.mainStatus == 3? '停':""
       },
     //  查看设备
-      handleget(row){
-        console.log(row)
+      lookInfo(row){
           this.getLnformation=true;
-     }
-     ,
+          this.equipmenInfo=row;
+     },
+     
     //  设备授权
       eAuthorization(){
-        this.$router.push({name:'EquipmentAuthorization',params:{
-            id:"123",
-          }})
+        var that=this;
+
+        if(that.templateRadio==''){
+          that.$message({
+            type: 'info',
+            message: '请选择要授权的设备'
+          });
+        }else {
+          var changparam=that.templateSelection.id
+             that.$refs.mychild.getAuthrization(changparam);
+        }
+        
       }
     },
   }

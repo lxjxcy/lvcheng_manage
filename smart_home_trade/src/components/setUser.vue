@@ -3,7 +3,7 @@
 		    <el-dialog
               title="设置管理员"
               :visible.sync="administrator"
-              width="40%"
+              width="30%"
               :before-close="handleClose"
             >
               <!-- @open="onOpen" -->
@@ -70,8 +70,6 @@
 			    	createUser:'',
 			    }
 			}
-			
-
 		},
 		filters: {
 	      userlevelStop: function (val) {

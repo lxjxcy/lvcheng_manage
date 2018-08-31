@@ -25,9 +25,14 @@
           border
           v-loading="loading"
           style="width: 100%">
-           <el-table-column
+          <!--  <el-table-column
           type="selection"
           width="50">
+        </el-table-column> -->
+         <el-table-column label="" width="40">
+          <template slot-scope="scope">
+              <el-radio :label="scope.row.floorNum" v-model="templateRadio" @change.native="getTemplateRow(scope.$index,scope.row)">&nbsp</el-radio>
+          </template>
         </el-table-column>
           <el-table-column
             prop="floorNum"
@@ -72,6 +77,8 @@ import axios from "axios"
         return {
            total:0,
           loading:true,
+              templateRadio:'',
+          templateSelection:{},
           myFloorparam:{
             pageSize:10,
             currentPage:1,
@@ -120,6 +127,10 @@ import axios from "axios"
           })
 
         },
+         getTemplateRow(index,row){                
+        this.templateSelection = row;
+        console.log(this.templateSelection)
+       },
         handleSizeChange(val) {
         var that=this;
         that.myFloorparam.pageSize=val;

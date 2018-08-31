@@ -33,10 +33,10 @@
                     <i class="iconfont">&#xe607;</i>
                     <span slot="title">模板设置</span>
                   </el-menu-item>
-                  <el-menu-item index="/garden/gardenLog">
+                 <!--  <el-menu-item index="/garden/gardenLog">
                     <i class="iconfont">&#xe60e;</i>
                     <span slot="title">日志管理</span>
-                  </el-menu-item>
+                  </el-menu-item> -->
                 </el-menu>
               </div>
               <div v-if="this.$store.state.userinfo.userLevel==2">
@@ -52,7 +52,7 @@
                         <span slot="title">我的园区</span>
                       </el-menu-item>
                       <el-menu-item index="/park/buildingManagement">
-                        <i class="iconfont">&#xe607;</i>
+                        <i class="iconfont">&#xe772;</i>
                         <span slot="title">大楼管理</span>
                       </el-menu-item>
                       <el-menu-item index="/park/parkUser">
@@ -60,13 +60,13 @@
                         <span slot="title">账户管理</span>
                       </el-menu-item>
                       <el-menu-item index="/park/parkAppuser">
-                        <i class="iconfont">&#xe60e;</i>
+                        <i class="iconfont">&#xe604;</i>
                         <span slot="title">App用户管理</span>
                       </el-menu-item>
-                      <el-menu-item index="/park/parkLog">
+                     <!--  <el-menu-item index="/park/parkLog">
                         <i class="iconfont">&#xe60e;</i>
                         <span slot="title"> 日志管理</span>
-                      </el-menu-item>
+                      </el-menu-item> -->
                   </el-menu>
                 
               </div>
@@ -79,11 +79,11 @@
                     text-color="#fff"
                     active-text-color="#ffd04b">
                       <el-menu-item index="/building/MyBuilding">
-                        <i class="iconfont">&#xe605;</i>
+                        <i class="iconfont">&#xe772;</i>
                         <span slot="title">我的大楼</span>
                       </el-menu-item>
                       <el-menu-item index="/building/floorManagment">
-                        <i class="iconfont">&#xe607;</i>
+                        <i class="iconfont">&#xe60f;</i>
                         <span slot="title">楼层管理</span>
                       </el-menu-item>
                       <el-menu-item index="/building/buildingUser">
@@ -91,13 +91,13 @@
                         <span slot="title">账户管理</span>
                       </el-menu-item>
                       <el-menu-item index="/building/buildingAppuser">
-                        <i class="iconfont">&#xe60e;</i>
+                        <i class="iconfont">&#xe604;</i>
                         <span slot="title">App用户管理</span>
                       </el-menu-item>
-                      <el-menu-item index="/building/buildingLog">
+                     <!--  <el-menu-item index="/building/buildingLog">
                         <i class="iconfont">&#xe60e;</i>
                         <span slot="title">日志管理</span>
-                      </el-menu-item>
+                      </el-menu-item> -->
                   </el-menu>
                       
               </div>
@@ -110,7 +110,7 @@
                   text-color="#fff"
                   active-text-color="#ffd04b">
                     <el-menu-item index="/room/myRoom">
-                      <i class="iconfont">&#xe605;</i>
+                      <i class="iconfont">&#xe6c2;</i>
                       <span slot="title">我的房间</span>
                     </el-menu-item>
                     <el-menu-item index="/room/equipment">
@@ -118,17 +118,17 @@
                       <span slot="title">设备管理</span>
                     </el-menu-item>
                     <el-menu-item index="/room/authorization">
-                      <i class="iconfont">&#xe607;</i>
+                      <i class="iconfont">&#xe6bf;</i>
                       <span slot="title">授权管理</span>
                     </el-menu-item>
                     <el-menu-item index="/room/roomAppuser">
-                      <i class="iconfont">&#xe60e;</i>
+                      <i class="iconfont">&#xe604;</i>
                       <span slot="title">App用户管理</span>
                     </el-menu-item>
-                    <el-menu-item index="/room/roomLog">
+                    <!-- <el-menu-item index="/room/roomLog">
                       <i class="iconfont">&#xe60e;</i>
                       <span slot="title">日志管理</span>
-                    </el-menu-item>
+                    </el-menu-item> -->
                 </el-menu>
                 
               </div>
@@ -141,11 +141,11 @@
                   text-color="#fff"
                   active-text-color="#ffd04b">
                     <el-menu-item index="/floor/myFloor">
-                      <i class="iconfont">&#xe605;</i>
+                      <i class="iconfont">&#xe60f;</i>
                       <span slot="title">我的楼层</span>
                     </el-menu-item>
                     <el-menu-item index="/floor/roomManagement">
-                      <i class="iconfont">&#xe607;</i>
+                      <i class="iconfont">&#xe6c2;</i>
                       <span slot="title">房间管理</span>
                     </el-menu-item>
                     <el-menu-item index="/floor/floorUser">
@@ -153,13 +153,13 @@
                       <span slot="title">账户管理</span>
                     </el-menu-item>
                     <el-menu-item index="/floor/floorAppuser">
-                      <i class="iconfont">&#xe60e;</i>
+                      <i class="iconfont">&#xe604;</i>
                       <span slot="title">App用户管理</span>
                     </el-menu-item>
-                    <el-menu-item index="/floor/floorLog">
+                  <!--   <el-menu-item index="/floor/floorLog">
                       <i class="iconfont">&#xe60e;</i>
                       <span slot="title">日志管理</span>
-                    </el-menu-item>
+                    </el-menu-item> -->
                 </el-menu>
                 
               </div>

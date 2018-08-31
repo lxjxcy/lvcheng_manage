@@ -92,7 +92,8 @@ export default {
         var that=this;
         that.addGarden=true;
         var param={
-          action:2,
+          action:1,
+          noPage:1,
           yardIdList:that.$store.state.userinfo.manageScopeIdList
         }
          axios.post("/SmartHomeTrade/garden/selectMyYards",param).then(function(res){

@@ -145,7 +145,7 @@ instance.interceptors.response.use(
 			store.commit('exitUser')
 			// Cookie.delete('userNameHead')
 			router.push({
-				path: "/login"
+				path: "/"
 			});
 		}
 		// else if (isError(error.response.data)) {

@@ -1,6 +1,7 @@
 
 <template>
-  <div id="app">
+  <div id="app" class="img1 note" :style ="note">
+     <!--  -->
     <router-view/>
   </div>
 </template>
@@ -11,6 +12,13 @@ export default {
   data(){
     return{
       iflook:"",
+        note: {
+          backgroundImage: "url(" + require("./assets/timg.jpg") + ") ",
+          backgroundPosition: "center center",
+          backgroundRepeat: "no-repeat",
+          backgroundSize: "cover",
+         backgroundColor:"#fff"
+        },
     }
   },
   methods:{
@@ -41,6 +49,9 @@ export default {
   .l{
     float: left;
 
+  }
+  i{
+    padding-right:5px;
   }
   .r{
     float: right;
@@ -83,7 +94,11 @@ export default {
   /*左侧*/
  
   .el-col-12{
-    width:100%;
+    width:100% !important;
+  }
+  /*多选*/
+  .el-checkbox+.el-checkbox{
+    margin-left:0;
   }
 
 
@@ -186,6 +201,7 @@ padding:8px 26px;
     line-height: 30px;
     margin:0 10px;
     cursor: pointer;
+    border-radius: 6px;
   }
   .nav-middle li:hover{
     background:#2bc999 ;

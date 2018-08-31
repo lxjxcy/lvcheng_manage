@@ -4,7 +4,7 @@
       <ul>
         <li class="l"><img src="../../assets/userlogo.png"></li>
         <li class="l title" >{{message}}</li>
-        <li class="l change">
+       <!--  <li class="l change">
           <el-dropdown @command="handleCommand">
           <span class="el-dropdown-link">
             切换<i class="el-icon-arrow-down el-icon--right"></i>
@@ -16,7 +16,7 @@
             </el-dropdown-menu>
           </el-dropdown>
 
-        </li>
+        </li> -->
       </ul>
     </div>
     <div class="right r">
@@ -157,19 +157,44 @@
         },
         back(){
           var that=this;
-          // var status=Number(that.$store.state.userInfo.status)
-          axios.post('/SmartHomeTrade/user/exitUser',{
+           that.$confirm('你确认退出登录么, ?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+            axios.post('/SmartHomeTrade/user/exitUser',{
             status:1,
             loginName:that.$store.state.userinfo.loginName
           }).then(function (res) {
-            console.log(res)
+            if(res.data.code==0){
+
+              console.log(res)
             that.$message({
               type: 'success',
               message: res.data.message
             });
             that.$store.commit('exitUser')
-            that.$router.push("/login")
+            that.$router.push("/")
+            }
+            
           })
+
+
+
+        
+        }).catch(() => {
+          that.$message({
+            type: 'info',
+            message: '已取消退出'
+          });          
+        });
+
+
+
+
+
+          // var status=Number(that.$store.state.userInfo.status)
+        
 
         },
         //关闭弹窗

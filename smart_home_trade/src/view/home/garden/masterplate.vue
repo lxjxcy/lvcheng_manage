@@ -1,126 +1,47 @@
 <template>
   <div class="masterplate">
     <div class="top-nav">
-      <el-form :inline="true" :model="formInline" class="demo-form-inline">
-        <el-form-item label="摸版名称">
+      <addMaster></addMaster>
+     <!--  <el-form :inline="true" :model="formInline" class="demo-form-inline">
+        <el-form-item label="模版名称">
           <el-input v-model="formInline.masterplateName" placeholder=""></el-input>
         </el-form-item>
         <el-form-item>
           <el-button type="primary" @click="onSubmit">查询</el-button>
         </el-form-item>
-      </el-form>
+      </el-form> -->
     </div>
     <div class="nav-middle">
       <ul>
         <!--添加-->
-        <li class="l" @click="addmodel = true"><i class="iconfont">&#xe612;</i>添加</li>
-        <el-dialog
-          title="添加模板"
-          :visible.sync="addmodel"
-          width="30%"
-          :before-close="handleClose">
-          <div class="addmodel">
-            <el-form :model="adddynamicValidateForm" ref="adddynamicValidateForm" label-width="100px" class="demo-dynamic">
-              <el-form-item
-                prop="masterplateName"
-                label="模板名称"
-                :rules="[
-      { required: true, message: '请输入模板名称', trigger: 'blur' },
-    ]"
-              >
-                <el-input v-model="adddynamicValidateForm.masterplateName" class="addInput"></el-input>
-                <el-button @click="addDomain">添加层级</el-button>
-              </el-form-item>
-              <el-form-item
-                v-for="(domain, index) in adddynamicValidateForm.domains"
-                :label="'第' + (index+1)+'层级'"
-                :key="domain.key"
-                :prop="'domains.' + index + '.value'"
-                :rules="{
-      required: true, message: '层级不能为空', trigger: 'blur'
-    }"
-              >
-                <el-input v-model="domain.value" class="addInput"></el-input>
-                <el-button @click.prevent="addremoveDomain(domain)">删除</el-button>
-              </el-form-item>
-              <el-form-item>
-
-              </el-form-item>
-            </el-form>
-          </div>
-          <span slot="footer" class="dialog-footer">
-    <el-button @click="addmodel = false">取 消</el-button>
-    <el-button type="primary" @click="add_model('adddynamicValidateForm')">保存</el-button>
-  </span>
-        </el-dialog>
-
-
-
-<!--修改-->
-
+        <li class="l" @click="add()"><i class="iconfont">&#xe612;</i>添加</li>
         <li class="l" @click="change_model()"><i class="iconfont">&#xe645;</i>修改</li>
-        <el-dialog
-          title="修改模板"
-          :visible.sync="changemodel"
-          width="30%"
-          :before-close="handleClose">
-          <div class="addmodel">
-            <el-form :model="changedynamicValidateForm" ref="changedynamicValidateForm" label-width="100px" class="demo-dynamic">
-              <el-form-item
-                prop="masterplateName"
-                label="模板名称"
-                :rules="[
-      { required: true, message: '请输入模板名称', trigger: 'blur' },
-    ]"
-              >
-                <el-input v-model="changedynamicValidateForm.masterplateName" class="addInput"></el-input>
-                <el-button @click="changeDomain">添加层级</el-button>
-              </el-form-item>
-              <el-form-item
-                v-for="(domain, index) in changedynamicValidateForm.domains"
-                :label="'第' + (index+1)+'层级'"
-                :key="domain.key"
-                :prop="'domains.' + index + '.value'"
-                :rules="{
-      required: true, message: '层级不能为空', trigger: 'blur'
-    }"
-              >
-                <el-input v-model="domain.value" class="addInput"></el-input>
-                <el-button @click.prevent="changeremoveDomain(domain)">删除</el-button>
-              </el-form-item>
-              <el-form-item>
-
-              </el-form-item>
-            </el-form>
-          </div>
-          <span slot="footer" class="dialog-footer">
-            <el-button @click="changemodel = false">取 消</el-button>
-            <el-button type="primary" @click="surechange_model('changedynamicValidateForm')">保存</el-button>
-          </span>
-        </el-dialog>
-
-
         <li class="l"  @click="deletem() "><i class="iconfont">&#xe504;</i>删除</li>
       </ul>
+       <addMaster ref="mychild" @refreshList="getMasterplate"></addMaster>
+       <changeMaster ref="mychangechild" @refreshList="getMasterplate"></changeMaster>
     </div>
     <div class="main-table">
-
       <el-table
         :data="listTemplateCount"
         ref="multipleTable"
         v-loading="loading"
         style="width: 100%"
-        @selection-change="handleSelectionChange"
         tooltip-effect="dark"
         height="400"
         border>
-        <el-table-column
+        <!-- <el-table-column
           type="selection"
           width="50">
+        </el-table-column> -->
+          <el-table-column label="" width="50">
+          <template slot-scope="scope">
+              <el-radio :label="scope.row.id" v-model="templateRadio" @change.native="getTemplateRow(scope.$index,scope.row)">&nbsp</el-radio>
+          </template>
         </el-table-column>
         <el-table-column
           prop="templateName"
-          label="摸版名称"
+          label="模板名称"
           width="120">
         </el-table-column>
         <el-table-column
@@ -155,11 +76,18 @@
 
 <script>
   import axios from 'axios'
+  import addMaster from "./addMaster.vue"
+  import changeMaster from "./changeMaster.vue"
   export default {
     name: "masterplate",
-    multipleSelection: [],
+    components:{
+      addMaster,
+      changeMaster
+    },
     data() {
       return {
+        templateRadio:'',
+        templateSelection:{},
         loading:true,
         total:0,
         setparam:{
@@ -167,65 +95,6 @@
           currentPage:1,
         },
         multipleSelection: [],
-        adddynamicValidateForm: {
-          domains: [{
-            value: ''
-          },
-            {
-              value: ''
-            },{
-              value: ''
-            },
-            {
-              value: ''
-            },
-           ],
-          masterplateName: ''
-        },
-        addmodel:false,
-        addparam:{
-          templateName:'',
-          createUser:'',
-          oeTemplateName:null,
-          toTemplateName:null,
-          thTemplateName:null,
-          frTemplateName:null,
-          feTemplateName:null,
-          sxTemplateName:null,
-          snTemplateName:null,
-          etTemplateName:null,
-          neTemplateName:null,
-          tnTemplateName:null
-        },
-        changeparam:{
-          templateName:'',
-          id:"",
-          oeTemplateName:null,
-          toTemplateName:null,
-          thTemplateName:null,
-          frTemplateName:null,
-          feTemplateName:null,
-          sxTemplateName:null,
-          snTemplateName:null,
-          etTemplateName:null,
-          neTemplateName:null,
-          tnTemplateName:null
-        },
-        changedynamicValidateForm: {
-          domains: [{
-            value: ''
-          },
-            {
-              value: ''
-            },{
-              value: ''
-            },
-            {
-              value: ''
-            },
-          ],
-          masterplateName: '',
-        },
         changemodel:false,
         formInline: {
           masterplateName: '',
@@ -306,161 +175,58 @@
         that.getMasterplate()
       },
       //选中某条数据
-      handleSelectionChange(val) {
-        this.multipleSelection = val;
-        console.log(val)
-      },
-      //关闭弹框
-      handleClose(done) {
-        done()
+      // handleSelectionChange(val) {
+      //   this.multipleSelection = val;
+      //   console.log(val)
+      // },
+        getTemplateRow(index,row){                
+        this.templateSelection = row;
+        console.log(this.templateSelection)
+       },
+   
+      // //查询
+      // onSubmit() {
+      //   console.log('submit!');
+      // },
 
-      },
-      //查询
-      onSubmit() {
-        console.log('submit!');
-      },
 
 
-      //添加模板
-      add_model(adddynamicValidateForm){
-        var that=this;
-
-        this.$refs[adddynamicValidateForm].validate((valid) => {
-          if (valid) {
-            console.log(that.adddynamicValidateForm)
-            console.log(that.adddynamicValidateForm.domains[0]);
-            for(var i=0;i<that.adddynamicValidateForm.domains.length;i++){
-              if(i==0){
-                 that.addparam.oeTemplateName=that.adddynamicValidateForm.domains[i].value
-              }
-              if(i==1){
-                that.addparam.toTemplateName=that.adddynamicValidateForm.domains[i].value
-              }
-              if(i==2){
-                that.addparam.thTemplateName=that.adddynamicValidateForm.domains[i].value
-              }
-              if(i==3){
-                that.addparam.frTemplateName=that.adddynamicValidateForm.domains[i].value
-              }
-              if(i==4){
-                that.addparam.feTemplateName=that.adddynamicValidateForm.domains[i].value
-              }
-              if(i==5){
-                that.addparam.sxTemplateName=that.adddynamicValidateForm.domains[i].value
-              }
-              if(i==6){
-                that.addparam.snTemplateName=that.adddynamicValidateForm.domains[i].value
-              }
-              if(i==7){
-                that.addparam.etTemplateName=that.adddynamicValidateForm.domains[i].value
-              }
-              if(i==8){
-                that.addparam.neTemplateName=that.adddynamicValidateForm.domains[i].value
-              }
-              if(i==9){
-                that.addparam.tnTemplateName=that.adddynamicValidateForm.domains[i].value
-              }
-            }
-              that.addparam.templateName=that.adddynamicValidateForm.masterplateName;
-            that.addparam.createUser=that.$store.state.userinfo.loginName;
-            axios.post("/SmartHomeTrade/template/insertTemplate",that.addparam).then(function (res) {
-              console.log(res)
-              that.$message({
-                type: 'success',
-                message: res.data.message
-              });
-              that.getMasterplate()
-              that.addmodel=false;
-              that.$refs[adddynamicValidateForm].resetFields();
-            })
-          } else {
-            console.log('error submit!!');
-            return false;
-          }
-        });
+      // //添加模板
+      add(){
+        this.$refs.mychild.getaddmodel();
       },
+     
       //点击修改
       change_model(){
         var that=this;
-        if(that.multipleSelection==''){
+        if(that.templateRadio==''){
           that.$message({
             type: 'info',
             message: '请选择要修改的模板'
           });
         }else {
-          that.changedynamicValidateForm.domains=that.multipleSelection[0].hierarchical
-          that.changedynamicValidateForm.masterplateName=that.multipleSelection[0].templateName
-          that.changemodel=true;
-        }
-      },
-      //确认修改
-      surechange_model(changedynamicValidateForm){
-        var that=this;
-        that.$refs[changedynamicValidateForm].validate((valid) => {
-          if (valid) {
-            for(var i=0;i<that.changedynamicValidateForm.domains.length;i++){
-              if(i==0){
-                that.changeparam.oeTemplateName=that.changedynamicValidateForm.domains[i].value
-              }
-              if(i==1){
-                that.changeparam.toTemplateName=that.changedynamicValidateForm.domains[i].value
-              }
-              if(i==2){
-                that.changeparam.thTemplateName=that.changedynamicValidateForm.domains[i].value
-              }
-              if(i==3){
-                that.changeparam.frTemplateName=that.changedynamicValidateForm.domains[i].value
-              }
-              if(i==4){
-                that.changeparam.feTemplateName=that.changedynamicValidateForm.domains[i].value
-              }
-              if(i==5){
-                that.changeparam.sxTemplateName=that.changedynamicValidateForm.domains[i].value
-              }
-              if(i==6){
-                that.changeparam.snTemplateName=that.changedynamicValidateForm.domains[i].value
-              }
-              if(i==7){
-                that.changeparam.etTemplateName=that.changedynamicValidateForm.domains[i].value
-              }
-              if(i==8){
-                that.changeparam.neTemplateName=that.changedynamicValidateForm.domains[i].value
-              }
-              if(i==9){
-                that.changeparam.tnTemplateName=that.changedynamicValidateForm.domains[i].value
-              }
-            }
-            that.changeparam.templateName=that.changedynamicValidateForm.masterplateName;
-            that.changeparam.id=that.multipleSelection[0].id;
-            axios.post("/SmartHomeTrade/template/updateTemplate",that.changeparam).then(function (res) {
-              console.log(res)
-              that.$message({
-                type: 'success',
-                message: res.data.message
-              });
-              that.getMasterplate()
-              that.changemodel=false;
-              that.$refs[changedynamicValidateForm].resetFields();
-            })
-          } else {
-            console.log('error submit!!');
-            return false;
+          // that.changedynamicValidateForm.domains=that.multipleSelection[0].hierarchical
+          // that.changedynamicValidateForm.masterplateName=that.multipleSelection[0].templateName;
+          var param={
+            hierarchical:that.templateSelection.hierarchical,
+            templateName:that.templateSelection.templateName
           }
-        });
+           that.$refs.mychangechild.getchangeMaster(param);
+          }
       },
 
       //删除
       deletem() {
         var that=this;
-        console.log(that.multipleSelection[0].id)
-        if(that.multipleSelection!=''){
+        console.log(that.templateSelection.id)
+        if(that.templateRadio!=''){
           that.$confirm('此操作将永久删除, 是否继续?', '提示', {
             confirmButtonText: '确定',
             cancelButtonText: '取消',
             type: 'warning'
           }).then(() => {
             axios.post("/SmartHomeTrade/template/deleteTemplate",{
-              id:that.multipleSelection[0].id
+              id:that.templateSelection.id
             }).then(function (res) {
               console.log(res)
               that.$message({
@@ -484,37 +250,11 @@
         }
 
       },
-
-      
-      addremoveDomain(item) {
-        var index = this.adddynamicValidateForm.domains.indexOf(item)
-        if (index !== -1) {
-          this.adddynamicValidateForm.domains.splice(index, 1)
-        }
-      },
-      addDomain() {
-        this.adddynamicValidateForm.domains.push({
-          value: '',
-          key: Date.now()
-        });
-      },
-      changeremoveDomain(item) {
-        var index = this.changedynamicValidateForm.domains.indexOf(item)
-        if (index !== -1) {
-          this.changedynamicValidateForm.domains.splice(index, 1)
-        }
-      },
-      changeDomain() {
-        this.changedynamicValidateForm.domains.push({
-          value: '',
-          key: Date.now()
-        });
-      }
     },
   }
 </script>
 
-<style scoped>
+<style>
   .addmodel{
     height: 340px;
     overflow:hidden;

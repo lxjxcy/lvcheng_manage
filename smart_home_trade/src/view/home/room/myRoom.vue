@@ -27,9 +27,14 @@
         v-loading='loading'
 
         style="width: 100%">
-         <el-table-column
+        <!--  <el-table-column
           type="selection"
           width="50">
+        </el-table-column> -->
+         <el-table-column label="" width="40">
+          <template slot-scope="scope">
+              <el-radio :label="scope.row.roomNum" v-model="templateRadio" @change.native="getTemplateRow(scope.$index,scope.row)">&nbsp</el-radio>
+          </template>
         </el-table-column>
         <el-table-column
           prop="roomNum"
@@ -71,6 +76,8 @@
         name: "myRoom",
       data() {
         return {
+            templateRadio:'',
+          templateSelection:{},
           total:0,
           loading:true,
           myRoomparam:{
@@ -126,6 +133,10 @@
         that.myRoomparam.currentPage=val;
         that.getroomList()
       },
+         getTemplateRow(index,row){                
+        this.templateSelection = row;
+        console.log(this.templateSelection)
+       },
         onSubmit() {
          var that=this;
           if(that.formSearch.name==null&&that.formSearch.roomNum==null){

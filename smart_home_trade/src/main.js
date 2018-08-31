@@ -11,24 +11,19 @@ import myFooter from './view/home/myFooter';
 import goback from './view/home/goback/goback'
 import gobackequim from './view/home/goback/gobackequim'
 import gobackroom from './view/home/goback/gobackroom'
-import changeFloor from './components/changeFloor'
-import changebuild from './components/changebuild'
-import changePark from './components/changePark'
-import changeRoom from './components/changeRoom'
-import addPark from './components/addPark'
-import addroom from './components/addroom'
-import addBuild from './components/addBuild'
-import addFloor from './components/addFloor'
-import adduser from './components/adduser'
 import setUser from './components/setUser'
+import single from './components/single'
 
-import changeuser from './components/changeuser'
+import addAppuser from './components/addAppuser'
+
+import createDepartment from './components/createDepartment'
+import addAuthrization from "./components/addAuthrization"
+import authorizationEq from "./components/authorizationEq"
+
+import multi from './components/multi'
 
 import iView from 'iview';
 import 'iview/dist/styles/iview.css';
-import Mock from './mock/mock'
-
-// Mock.getMock()
 
 import axios from "./axiosconfig/axiosconfig.js"
 
@@ -45,17 +40,16 @@ Vue.component(myFooter.name, myFooter)
 Vue.component(goback.name, goback)
 Vue.component(gobackroom.name, gobackroom)
 Vue.component(gobackequim.name, gobackequim)
-Vue.component(changebuild.name, changebuild)
-Vue.component(changeFloor.name, changeFloor)
-Vue.component(changePark.name, changePark)
-Vue.component(changeRoom.name, changeRoom)
-Vue.component(addPark.name, addPark)
-Vue.component(addBuild.name, addBuild)
-Vue.component(addFloor.name, addFloor)
-Vue.component(addroom.name, addroom)
+
 Vue.component(setUser.name, setUser)
-Vue.component(adduser.name, adduser)
-Vue.component(changeuser.name, changeuser)
+Vue.component(single.name, single)
+Vue.component(multi.name, multi)
+Vue.component(addAuthrization.name, addAuthrization)
+Vue.component(createDepartment.name, createDepartment)
+Vue.component(authorizationEq.name, authorizationEq)
+Vue.component(addAppuser.name, addAppuser)
+
+
 
 router.beforeEach((to, from, next) => {
   let token = store.state.token;
@@ -64,7 +58,7 @@ router.beforeEach((to, from, next) => {
       next();
     } else {
       next({
-        path: '/login',
+        path: '/',
         // query: { redirect: to.fullPath } 
       });
     }
@@ -100,3 +94,12 @@ new Vue({
   },
   template: '<App/>'
 })
+
+// new Vue({
+//   //el: '#app',
+//   //template: '<App/>',
+//   router,
+//   store,
+//   //components: { App }
+//   render: h => h(App)
+// }).$mount('#app')

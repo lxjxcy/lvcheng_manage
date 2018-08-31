@@ -284,7 +284,6 @@ export default {
                         blockName: ''
                       }],
                     };
-                    
                  }else{
                    that.$message({
                       type: 'error',

@@ -24,60 +24,13 @@
     <div class="nav-middle">
       <ul>
         <!--添加园区-->
-        <li class="l"  @click="addpark()"><i class="iconfont">&#xe612;</i>添加</li>
-
+        <li class="l"  @click="addpark()"><i class="el-icon-plus"></i>添加</li>
       <!--修改园区-->
-        <li class="l" @click="change()"><i class="iconfont" >&#xe645;</i>修改</li>
-       
-  
-        <li class="l" @click="administratored()">设置管理员</li>
+        <li class="l" @click="change()"><i class="el-icon-edit"></i>修改</li>
+        <li class="l" @click="administratored()"><i class="el-icon-setting"></i>设置管理员</li>
          <changePark ref="mychild" @refreshList="getlist" @clearselect="clear"></changePark>
         <addPark ref="myaddchild" @refreshList="getlist" @clearselect="clear"></addPark>
          <setUser ref="mysetchild" @refreshList="getlist" @clearselect="clear"></setUser>
-
-        <!-- <el-dialog
-          title="设置管理员"
-          :visible.sync="administrator"
-          width="40%"
-          :before-close="sethandleClose"
-          @open="onOpen">
-          <el-table
-            :data="listUser"
-            height="300"
-            ref="listUser"
-            style="width: 100%"
-            row-key="id"
-            @selection-change="handleSelectionChange2"
-          >
-            <el-table-column
-              type="selection"
-              :reserve-selection="true"
-              width="50"
-            >
-            </el-table-column>
-            <el-table-column
-              prop="id"
-              label="账号"
-              width="130">
-            </el-table-column>
-            <el-table-column
-              prop="name"
-              label="姓名"
-              width="130">
-            </el-table-column>
-            <el-table-column
-              label="管理员类型">
-              <template slot-scope="scope">
-                  {{scope.row.userLevel | userlevelStop}}
-              </template>
-            </el-table-column>
-          </el-table> -->
-
-       <!--    <span slot="footer" class="dialog-footer">
-                  <el-button type="primary" @click="admin_istrator()">确 定</el-button>
-                </span>
-        </el-dialog> -->
-
       </ul>
 
     </div>
@@ -87,17 +40,22 @@
         :data="yardsList"
         ref="multipleTable"
         style="width: 100%"
-        @selection-change="handleSelectionChange"
         tooltip-effect="dark"
         height="410"
         v-loading="loading"
         border>
-        <el-table-column
+      <!--   <el-table-column
           type="selection"
           width="50">
+        </el-table-column> -->
+          <el-table-column label="" width="50">
+          <template slot-scope="scope">
+              <el-radio :label="scope.row.gardenNum" v-model="templateRadio" @change.native="getTemplateRow(scope.$index,scope.row)">&nbsp</el-radio>
+          </template>
         </el-table-column>
+
         <el-table-column
-          prop="yardId"
+          prop="gardenNum"
           label="园区编号"
           width="270">
         </el-table-column>
@@ -105,9 +63,6 @@
           prop="yardName"
           label="园区名称"
           width="130">
-         <!--  <template slot-scope="scope">
-            <el-button @click="goBuildinglist(scope.row.yardName,scope.row.yardId)" type="text" size="small">{{scope.row.yardName}}</el-button>
-          </template> -->
         </el-table-column>
         <el-table-column
           prop="buildingNum"
@@ -148,14 +103,20 @@
 
 <script>
   import axios from 'axios'
+  import addPark from "../../../components/addPark.vue"
+   import changePark from "../../../components/changePark.vue"
+
   export default {
     name: "gardenManagement",
+    components:{
+      changePark,
+      addPark
+    },
 
     data() {
       return {
-        // showAddb:false,
-        // getParklist:[],
-        // showparkinfo:false,
+      templateRadio:'',
+      templateSelection:{},
         total:0,
         loading:true,
         params:{
@@ -163,14 +124,6 @@
           pageSize:10,
           currentPage:1
         },
-        // provincelist: [],//省
-        // citylist:[],//市
-        // regionlist:[],//区域
-        // addbuildList: {
-        //   buildingNameList: [{
-        //     blockName: ''
-        //   }],
-        // },
         addG:{
           yardId:null,
            yardName:"",
@@ -266,16 +219,20 @@
         that.params.currentPage=val;
         that. getlist()
       },
-      //选中
-      handleSelectionChange(val) {
-        this.multipleSelection = val;
-        console.log(val)
-      },
+      // //选中
+      // handleSelectionChange(val) {
+      //   this.multipleSelection = val;
+      //   console.log(val)
+      // },
+       getTemplateRow(index,row){                
+        this.templateSelection = row;
+        console.log(this.templateSelection)
+       },
 
-      handleSelectionChange2(val) {
-        this.multipleSelection2 = val;
-        console.log(val)
-      },
+      // handleSelectionChange2(val) {
+      //   this.multipleSelection2 = val;
+      //   console.log(val)
+      // },
       //查询
       onSubmit() {
         var that=this;
@@ -324,16 +281,16 @@
       //修改园区框显示
       change(){
         var that=this;
-        if(that.multipleSelection==''){
+        if(that.templateRadio==''){
           that.$message({
             type: 'info',
-            message: '请选择要修改的大楼'
+            message: '请选择要修改的园区'
           });
         }else {
           var changparam={
               yardType:2,
-              detailAddress:that.multipleSelection[0].detailAddress,
-              yardId:that.multipleSelection[0].yardId
+              detailAddress:that.templateSelection.detailAddress,
+              yardId:that.templateSelection.yardId
               }
           this.$refs.mychild.parentHandleclick(changparam);
         }
@@ -342,56 +299,23 @@
       administratored(){
 
         var that=this;
-        if(that.multipleSelection==''){
+        if(that.templateRadio==''){
           that.$message({
             type: 'info',
-            message: '请选择大楼要设置的园区'
+            message: '请选择要设置管理员的园区'
           });
         }else {
+          var manageScopeId=[];
+          manageScopeId.push(that.templateSelection.yardId)
           var param={
             action:2,
-            manageScopeId: that.multipleSelection[0].yardId,
+            manageScopeIdList: manageScopeId,
+
           }         
           that.$refs.mysetchild.getAdminList(param);
-
-          // that.administrator=true;
-          // that.onOpen()
         }
       },
-      // admin_istrator(){
-      //   var that=this;
-      //   that.setadmin={
-      //     id:that.multipleSelection[0].gardenId,
-      //     userId:that.multipleSelection2[0].id
-      //   }
 
-      //  axios.post('/SmartHomeTrade/garden/updateUser',that.setadmin).then(function (res) {
-      //    console.log(res)
-      //    that.$message({
-      //      type: 'success',
-      //      message: res.data.message
-      //    });
-      //    that.getlist()
-      //    that.administrator=false;
-      //    this.$refs.listUser.clearSelection()
-      //  })
-      // },
-
-      // //默认选中
-      // onOpen () {
-      //   setTimeout(() => {
-      //     this.toggleSelection([this.listUser[this.openid]])
-      //   }, 500)
-      // },
-      // toggleSelection (rows) {
-      //   if (rows) {
-      //     rows.forEach(row => {
-      //       this.$refs.listUser.toggleRowSelection(row, true)
-      //     })
-      //   } else {
-      //     this.$refs.listUser.clearSelection()
-      //   }
-      // },
 
     },
   }

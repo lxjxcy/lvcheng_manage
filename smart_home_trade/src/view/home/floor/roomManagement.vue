@@ -28,9 +28,9 @@
         ---房间列表
       </div>
       <ul  v-bind:class="classObject">
-        <li class="l" @click="addRoom()"><i class="iconfont">&#xe612;</i>添加</li>
-        <li class="l" @click="change()"><i class="iconfont">&#xe645;</i>修改</li> 
-        <li class="l" @click="administratored()">设置管理员</li>
+        <li class="l" @click="addRoom()"><i class="el-icon-plus"></i>添加</li>
+        <li class="l" @click="change()"><i class="el-icon-edit"></i>修改</li> 
+        <li class="l" @click="administratored()"><i class="el-icon-setting"></i>设置管理员</li>
       </ul>
       <changeRoom ref="mychild" @refreshList="getroomlist" @clearselect="clear"></changeRoom>
       <addroom ref="myaddchild" @refreshList="getroomlist" @clearselect="clear"></addroom>
@@ -45,13 +45,18 @@
         ref="multipleTable"
         v-loading="loading"
         style="width: 100%"
-        @selection-change="handleSelectionChange"
+       
         tooltip-effect="dark"
         height="380"
         border>
-        <el-table-column
+       <!--  <el-table-column
           type="selection"
           width="50">
+        </el-table-column> -->
+         <el-table-column label="" width="50">
+          <template slot-scope="scope">
+              <el-radio :label="scope.row.roomNum" v-model="templateRadio" @change.native="getTemplateRow(scope.$index,scope.row)">&nbsp</el-radio>
+          </template>
         </el-table-column>
         <el-table-column
           prop="roomNum"
@@ -105,13 +110,22 @@
 </template>
 
 <script>
+import addroom from "../../../components/addroom.vue"
+import changeRoom from "../../../components/changeRoom.vue"
     export default {
         name: "roomManagement",
+         components:{
+          changeRoom,
+          addroom
+        },
+  
     
       data() {
         return {
           total:0,
           loading:true,
+           templateRadio:'',
+        templateSelection:{},
           multipleSelection: [],
            classObject:{
               'r': false,
@@ -191,10 +205,14 @@
         that.paramRoom.currentPage=val;
         that.getroomlist()
       },
-        handleSelectionChange(val) {
-          this.multipleSelection = val;
-          console.log(val)
-        },
+        getTemplateRow(index,row){                
+        this.templateSelection = row;
+        console.log(this.templateSelection)
+       },
+        // handleSelectionChange(val) {
+        //   this.multipleSelection = val;
+        //   console.log(val)
+        // },
         // 搜索
         onSubmit() {
           var that=this;
@@ -265,16 +283,16 @@
           //修改房间框显示
           change(){
             var that=this;
-            if(that.multipleSelection==''){
+            if(that.templateRadio==''){
               that.$message({
                 type: 'info',
                 message: '请选择要修改的房间'
               });
             }else {
               var changparam={
-                  name:that.multipleSelection[0].name,
-                  addressId:that.multipleSelection[0].addressId,
-                  id:that.multipleSelection[0].id
+                  name:that.templateSelection.name,
+                  addressId:that.templateSelection.addressId,
+                  id:that.multipleSelecttemplateSelectionion.id
               }
             
               this.$refs.mychild.parentHandleclick(changparam);
@@ -286,17 +304,20 @@
           },
         //  设置管理员
         administratored(){
-          if(this.multipleSelection==''){
+          if(this.templateRadio==''){
             this.$message({
               type: 'info',
-              message: '请选择大楼要设置的大楼'
+              message: '请选择大楼要设置管理的房间'
             });
           }else {
+             var manageScopeId=[];
+          manageScopeId.push(this.templateSelection.id)
+           
            
               var param={
                action:5,
-               adrressId: this.multipleSelection[0].addressId,
-               manageScopeId: this.multipleSelection[0].id,
+               adrressId: this.templateSelection.addressId,
+               manageScopeIdList: this.templateSelection.id,
              }         
               this.$refs.mysetchild.getAdminList(param);
 

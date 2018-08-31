@@ -25,9 +25,14 @@
         border
         v-loading='loading'
         style="width: 100%">
-         <el-table-column
+        <!--  <el-table-column
           type="selection"
           width="50">
+        </el-table-column> -->
+         <el-table-column label="" width="50">
+          <template slot-scope="scope">
+              <el-radio :label="scope.row.blockNum" v-model="templateRadio" @change.native="getTemplateRow(scope.$index,scope.row)">&nbsp</el-radio>
+          </template>
         </el-table-column>
         <el-table-column
           prop="blockNum"
@@ -70,6 +75,8 @@ import axios from "axios"
         name: "myBuilding",
       data() {
         return {
+          templateRadio:'',
+          templateSelection:{},
           total:0,
           loading:true,
           myBuildingparam:{
@@ -107,6 +114,10 @@ import axios from "axios"
             }
           })
         },
+         getTemplateRow(index,row){                
+        this.templateSelection = row;
+        console.log(this.templateSelection)
+       },
             //每页显示多少条
       handleSizeChange(val) {
         var that=this;

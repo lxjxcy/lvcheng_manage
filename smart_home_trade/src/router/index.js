@@ -65,10 +65,11 @@ import setScope from '@/view/home/garden/setScope'
 Vue.use(Router)
 
 export default new Router({
+    // mode: 'history',
     routes: [
         //登陆
         {
-            path: '/login',
+            path: '/',
             name: 'login',
             component: login
         }, {
@@ -112,11 +113,11 @@ export default new Router({
                         component: gardenUser
                     }, {
                         path: '/building/buildingAppuser',
-                        name: 'buildingAppuser',
+                        name: 'roomAppuser',
                         meta: {
                             Auth: true,
                         },
-                        component: buildingAppuser
+                        component: roomAppuser
                     }, {
                         path: '/building/buildingLog',
                         name: 'buildingLog',
@@ -161,13 +162,6 @@ export default new Router({
                             Auth: true,
                         },
                         component: gardenUser
-                    }, {
-                        path: '/garden/gardenAppuser',
-                        name: 'gardenAppuser',
-                        meta: {
-                            Auth: true,
-                        },
-                        component: gardenAppuser
                     }, {
                         path: '/garden/gardenLog',
                         name: 'gardenLog',
@@ -214,11 +208,11 @@ export default new Router({
                         component: HostListing
                     }, {
                         path: '/park/parkAppuser',
-                        name: 'parkAppuser',
+                        name: 'roomAppuser',
                         meta: {
                             Auth: true,
                         },
-                        component: parkAppuser
+                        component: roomAppuser
                     }, {
                         path: '/park/setAccess',
                         name: 'setAccess',
@@ -324,11 +318,11 @@ export default new Router({
                         component: roomManagement
                     }, {
                         path: '/floor/floorAppuser',
-                        name: 'floorAppuser',
+                        name: 'roomAppuser',
                         meta: {
                             Auth: true,
                         },
-                        component: floorAppuser
+                        component: roomAppuser
                     }, {
                         path: '/floor/floorLog',
                         name: 'floorLog',

@@ -25,9 +25,14 @@
         border
          v-loading="loading"
         style="width: 100%">
-         <el-table-column
+         <!-- <el-table-column
           type="selection"
           width="50">
+        </el-table-column> -->
+         <el-table-column label="" width="50">
+          <template slot-scope="scope">
+              <el-radio :label="scope.row.gardenNum" v-model="templateRadio" @change.native="getTemplateRow(scope.$index,scope.row)">&nbsp</el-radio>
+          </template>
         </el-table-column>
         <el-table-column
           prop="gardenNum"
@@ -71,6 +76,8 @@
       data() {
         return {
           total:0,
+            templateRadio:'',
+          templateSelection:{},
           loading:true,
           myParkparam:{
             pageSize:10,
@@ -134,6 +141,10 @@
             }
           })
         },
+         getTemplateRow(index,row){                
+        this.templateSelection = row;
+        console.log(this.templateSelection)
+       },
         // 清空查询
         resetForm() {
         var that=this;

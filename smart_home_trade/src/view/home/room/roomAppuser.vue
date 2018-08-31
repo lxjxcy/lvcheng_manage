@@ -1,67 +1,49 @@
 <template>
   <div class="roomAppuser">
     <div class="top-nav">
-      <el-form :inline="true" :model="formInline" class="demo-form-inline">
+      <el-form :inline="true" :model="formSearch" class="demo-form-inline">
         <el-form-item label="姓名">
-          <el-input v-model="formInline.username" placeholder=""></el-input>
+          <el-input v-model="formSearch.name" placeholder=""></el-input>
         </el-form-item>
         <el-form-item label="电话">
-          <el-input v-model="formInline.tel" placeholder=""></el-input>
+          <el-input v-model="formSearch.userMobile" placeholder=""></el-input>
         </el-form-item>
         <el-form-item>
           <el-button type="primary" @click="onSubmit">查询</el-button>
         </el-form-item>
+         <el-form-item>
+           <el-button @click="resetForm('formSearch')">重置</el-button>
+          </el-form-item>
       </el-form>
     </div>
-    <div class="nav-middle">
+    <div class="nav-middle"> 
       <ul>
-        <!--修改-->
-        <li class="l"  @click="change()"><i class="iconfont">&#xe645;</i>修改</li>
-        <el-dialog
-          title="修改账户"
-          :visible.sync="changeUser"
-          width="30%"
-          :before-close="handleClose">
-          <div class="changeUser">
-            <el-form ref="changeformValidate" :model="changeformValidate" :rules="ruleValidate" :label-width="60">
-              <el-form-item label="姓名" :label-width="formLabelWidth" prop="name" placeholder="请输入姓名">
-                <el-input v-model="changeformValidate.name" auto-complete="off" style="width:220px"></el-input>
-              </el-form-item>
-              <el-form-item label="电话" :label-width="formLabelWidth" prop="telphone" placeholder="请输入电话">
-                <el-input v-model="changeformValidate.telphone" auto-complete="off" style="width:220px"></el-input>
-              </el-form-item>
-            </el-form>
-          </div>
-          <span slot="footer" class="dialog-footer">
-              <el-button type="primary" @click="changeUser = false">确 定</el-button>
-            </span>
-        </el-dialog>
-
-
-
-
-        <!--删除-->
-        <li class="l"  @click="deleted()"><i class="iconfont">&#xe504;</i>删除</li>
-
-        <li class="l" @click="stop()"><i class="iconfont">&#xe504;</i>暂停</li>
-        <li class="l" @click="recover()"><i class="iconfont">&#xe504;</i>恢复</li>
+        <li class="l" @click="add()" v-if="this.$store.state.userinfo.userLevel==5"><i class="el-icon-plus"></i>添加</li>
+        <li class="l" @click="change()"><i class="el-icon-edit"></i>修改</li>
+        <li class="l" @click="deleted()"><i class="el-icon-close"></i>删除</li>
+        <li class="l" @click="stop()"><i class="el-icon-error"></i>暂停</li>
+        <li class="l" @click="recover()"><i class="el-icon-success"></i>恢复</li>
+        <addAppuser ref="myaddchild" @refreshList="getApplist"></addAppuser>
       </ul>
-
     </div>
     <div class="main-table">
 
       <el-table
-        :data="tableData3"
+        :data="appUserList"
         ref="multipleTable"
         v-loading="loading"
         style="width: 100%"
-        @selection-change="handleSelectionChange"
         tooltip-effect="dark"
         height="400"
         border>
-        <el-table-column
+        <!-- <el-table-column
           type="selection"
           width="50">
+        </el-table-column> -->
+        <el-table-column label="" width="50">
+          <template slot-scope="scope">
+              <el-radio :label="scope.row.uuid" v-model="templateRadio" @change.native="getTemplateRow(scope.$index,scope.row)">&nbsp</el-radio>
+          </template>
         </el-table-column>
         <el-table-column
           prop="name"
@@ -69,7 +51,7 @@
           width="200">
         </el-table-column>
         <el-table-column
-          prop="telphone"
+          prop="userMobile"
           label="联系电话"
           width="180">
         </el-table-column>
@@ -80,18 +62,18 @@
         </el-table-column>
         <el-table-column
           label="所属部门"
-          prop="department">
+          prop="departmentName"
+          >
         </el-table-column>
       </el-table>
       <div class="block">
         <el-pagination
           @size-change="handleSizeChange"
           @current-change="handleCurrentChange"
-          :current-page="currentPage3"
-          :page-sizes="[100, 200, 300, 400]"
-          :page-size="100"
+          :page-sizes="[10, 20, 30, 40]"
+          :page-size="10"
           layout="total, sizes, prev, pager, next, jumper"
-          :total="1000">
+          :total="total">
         </el-pagination>
       </div>
 
@@ -105,181 +87,315 @@
   export default {
     name: "roomAppuser",
     data() {
-      const validateTel = (rule, value, callback) => {
-        if (value === '') {
-          callback(new Error('手机号码不能为空'));
-        }else if(!(/^1(3|4|5|7|8)\d{9}$/.test(value))||!/^(\(\d{3,4}\)|\d{3,4}-|\s)?\d{7,14}$/.test(value)){
-          callback(new Error('请输入正确手机号'));
-        }else {
-          callback();
-        }
-      };
-      const validateName = (rule, value, callback) => {
-        if (value === '') {
-          callback(new Error('姓名不能为空'));
-        }else {
-          callback();
-        }
-      };
       return {
-        multipleSelection: [],
-        formLabelWidth: '100px',
-        loading: false,
-        changeformValidate:{
-          name: '',
-          telphone: ''
+         templateRadio:'',
+        templateSelection:{},
+        // multipleSelection: [],
+        total:0,
+        appuserParam:{
+          pageSize:10,
+          currentPage:1,
+          action:"",
+          addressList:[],
+          addrRegionList:[]
         },
-        addformValidate: {
-          name: '',
-          telphone: ''
+        loading: true,
+        formSearch: {
+          name: null,
+          userMobile:null,
+          action:"",
+          addressList:[],
+          addrRegionList:[]
         },
-        formInline: {
-          username: '',
-          tel:""
-        },
-        ruleValidate: {
-          name: [
-            { required: true,validator: validateName, trigger: 'blur' }
-          ],
-          telphone: [
-            { required: true,validator: validateTel, trigger: 'blur' }
-          ],
-        },
-        add:false,
-        changeUser:false,
-        currentPage3: 1,
-        tableData3: [{
-          name:"23",
-          telphone: '13017449988',
-          state:"1",
-          department:"技术部",
-        }, {
-          name:"23",
-          telphone: '13017449988',
-          state:"1",
-          department:"技术部",
-        },
-          {
-            name:"23",
-            telphone: '13017449988',
-            state:"1",
-            department:"技术部",
-          },
-          {
-            name:"23",
-            telphone: '13017449988',
-            state:"2",
-            department:"技术部",
-          },
-          {
-            name:"23",
-            telphone: '13017449988',
-            state:"1",
-            department:"技术部",
-          },
-          {
-            name:"23",
-            telphone: '13017449988',
-            state:"3",
-            department:"技术部",
-          },
-          {
-            name:"23",
-            telphone: '13017449988',
-            state:"1",
-            department:"技术部",
-          },
-          {
-            name:"23",
-            telphone: '13017449988',
-            state:"2",
-            department:"技术部",
-          },]
+        appUserList: []
       }
     },
+    mounted(){
+      var that=this;
+
+      if(that.$store.state.userinfo.userLevel==2){
+        that.appuserParam.action=2;
+         that.formSearch.action=2;
+
+      }
+      if(that.$store.state.userinfo.userLevel==4){
+        that.appuserParam.action=4;
+         that.formSearch.action=4;
+         var list1=that.$store.state.userinfo.manageScopeIdList;
+        var list2=that.$store.state.userinfo.addrList;
+            
+            var obj=[]
+            for(var i=0;i<list1.length;i++){
+                var obj2={
+                  id:list1[i],
+                  addressId:list2[i]
+                }
+                console.log(obj2)
+                obj.push(obj2)
+            }
+             that.appuserParam.addrRegionList=obj;
+              that.formSearch.addrRegionList=obj;
+      }else{
+         that.appuserParam.addressList=that.$store.state.userinfo.manageScopeIdList
+         that.formSearch.addressList=that.$store.state.userinfo.manageScopeIdList;
+       
+
+      }
+
+      if(that.$store.state.userinfo.userLevel==3){
+        that.appuserParam.action=3;
+         that.formSearch.action=3;
+      }
+
+      if(that.$store.state.userinfo.userLevel==5){
+        that.appuserParam.action=5;
+         that.formSearch.action=5;
+      }
+      that.getApplist()
+
+    },
     methods: {
+      // 获取app用户列表
+      getApplist(){
+        var that=this;
+        if(that.$store.state.userinfo.userLevel==4){
+          var param={
+            pageSize:that.appuserParam.pageSize,
+            currentPage:that.appuserParam.currentPage,
+            action:that.appuserParam.action,
+            addrRegionList:that.appuserParam.addrRegionList
+          }
+        }else{
+           var param={
+            pageSize:that.appuserParam.pageSize,
+            currentPage:that.appuserParam.currentPage,
+            action:that.appuserParam.action,
+            addressList:that.appuserParam.addressList
+          }
+
+        }
+        that.axios.post("/SmartHomeTrade/appUser/selectAppUserListByAdrress",param).then(function(res){
+          if(res.data.code==0){
+            that.$message.success(res.data.message);
+            if(res.data.data!=null){
+               that.appUserList=res.data.data.appUserList;
+            }
+
+           
+            that.loading=false
+
+          }else{
+            that.$message.error(res.data.message);
+
+          }
+           
+
+        })
+      },
+          //每页显示多少条
       handleSizeChange(val) {
-        console.log(`每页 ${val} 条`);
+        var that=this;
+        that.appuserParam.pageSize=val;
+        that.appuserParam.currentPage=1;
+        that.getApplist()
       },
+      //当前页
       handleCurrentChange(val) {
-        console.log(`当前页: ${val}`);
-      },
-      handleSelectionChange(val) {
-        this.multipleSelection = val;
-        console.log(val)
-      },
-      //关闭弹窗
-      handleClose(done) {
-        done();
+        var that=this;
+        that.appuserParam.currentPage=val;
+        that.getApplist()
       },
       //搜索
-      onSubmit() {
-        console.log('submit!');
-      },
-      //添加
-      adduser(){
-        this.$refs[name].validate((valid) => {
-          if (valid) {
-            this.add=false;
-          } else {
-            this.$Message.error('Fail!');
+       onSubmit() {
+          var that=this;
+           that.loading=false;
+          if(that.formSearch.name==null&&that.formSearch.userMobile==null){
+            return;
           }
-        })
-        console.log(this.addformValidate.name+"...."+this.addformValidate.telphone)
-      },
+          if(that.$store.state.userinfo.userLevel==4){
+          var param={
+            action:that.formSearch.action,
+            addrRegionList:that.formSearch.addrRegionList,
+          }
+        }else{
+           var param={
+            action:that.formSearch.action,
+            addressList:that.formSearch.addressList
+          }
 
-      // 修改
-      change(){
-        if(this.multipleSelection==''){
-          this.$message({
-            type: 'info',
-            message: '请选择要修改的大楼删除'
-          });
-        }else {
-          this.changeUser=true;
-          console.log(this.multipleSelection[0].name)
-          this.changeformValidate.name=this.multipleSelection[0].name;
-          this.changeformValidate.telphone=this.multipleSelection[0].telphone;
         }
+          that.axios.post("/SmartHomeTrade/appUser/selectAppUserListByAdrress",that.formSearch).then(function(res){
+            console.log(res)            
+            if(res.data.code==0){
+              that.loading=false;
+              if(res.data.data!=null){
+                that.appUserList=res.data.data.appUserList;
+              }
+              
+             
+               // that.$message.success(res.data.message);
+            }else{
+               that.$message.error(res.data.message);
+            }
+          })
+        },
+    //清空查询
+      resetForm() {
+        var that=this;
+            that.formSearch.name= null,
+            that.formSearch.userMobile=null,
+        that.getApplist()
       },
+      // 添加
+      add(){
+       var that=this;     
+        that.$refs.myaddchild.getaddAppuser("1");
+      },
+      // handleSelectionChange(val) {
+      //   this.multipleSelection = val;
+      //   console.log(val)
+      // },
+         getTemplateRow(index,row){                
+        this.templateSelection = row;
+        console.log(this.templateSelection)
+       },
+   
+   
+
       //  删除
       deleted() {
-        if(this.multipleSelection!=''){
-          this.$confirm('此操作将永久删除, 是否继续?', '提示', {
+        var that=this;
+        if(that.templateRadio!=''){
+          that.$confirm('此操作将永久删除, 是否继续?', '提示', {
             confirmButtonText: '确定',
             cancelButtonText: '取消',
             type: 'warning'
           }).then(() => {
-            //发送ajax
-            this.$message({
-              type: 'success',
-              message: '删除成功!'
-            });
+            var param={
+              loginName:that.templateSelection.loginName,
+              ucUserId:that.templateSelection.ucUserId
+            }
+            that.axios.post("/SmartHomeTrade/appUser/deleteUserState",param).then(function(res){
+              if(res.data.code==0){
+               that.$message.success(res.data.message);
+                that.getApplist()
+              }else{
+                that.$message.error(res.data.message);
+              }
+            })
           }).catch(() => {
-            this.$message({
+            that.$message({
               type: 'info',
               message: '已取消删除'
             });
           });
         }else {
-          this.$message({
+          that.$message({
             type: 'info',
-            message: '请选择要删除的大楼删除'
+            message: '请选择要删除的用户'
           });
         }
-
       },
       //  转换状态
       formatstate: function (row, column) {
-        return row.state == 1 ? '正常' : row.state == 2 ? '恢复' : row.state == 3? '暂停':""
+        return  row.state == 1 ? '正常' : row.state == 2? '暂停':""
+      },
+      // 修改
+      change(){
+
+ this.$message.info("App用户暂时不能修改");
+
+
       },
 
       //  暂停
       stop(){
 
+        var that=this;
+        if(that.templateSelection.state==0){
+           that.$message.info("该用户已暂停");
+            that.clear()
+           return;
+
+        }
+        if(that.templateRadio!=''){
+          that.$confirm('您确定要暂停该用户么?', '提示', {
+            confirmButtonText: '确定',
+            cancelButtonText: '取消',
+            type: 'warning'
+          }).then(() => {
+            var param={
+              loginName:that.templateSelection.loginName,
+              ucUserId:that.templateSelection.ucUserId
+            }
+            that.axios.post("/SmartHomeTrade/appUser/updateUserState",param).then(function(res){
+              if(res.data.code==0){
+               that.$message.success(res.data.message);
+                that.getApplist()
+              }else{
+                that.$message.error(res.data.message);
+              }
+            })
+          }).catch(() => {
+             that.clear()
+            that.$message({
+              type: 'info',
+              message: '已取消暂停'
+            });
+          });
+        }else {
+          that.$message({
+            type: 'info',
+            message: '请选择要暂停的用户'
+          });
+        }
+
       },
+         // 清空选中
+         clear(){
+         this.$refs.multipleTable.clearSelection();
+       },
+
       //  恢复
       recover(){
+        var that=this;
+        if(that.templateSelection.state==1){
+           that.$message.info("该用户已恢复");
+           that.clear()
+           return;
+
+        }
+        if(that.templateRadio!=''){
+          that.$confirm('您确定要恢复该用户么?', '提示', {
+            confirmButtonText: '确定',
+            cancelButtonText: '取消',
+            type: 'warning'
+          }).then(() => {
+            var param={
+              loginName:that.templateSelection.loginName,
+              ucUserId:that.templateSelection.ucUserId
+            }
+            that.axios.post("/SmartHomeTrade/appUser/recoverUserState",param).then(function(res){
+              if(res.data.code==0){
+               that.$message.success(res.data.message);
+                that.getApplist()
+              }else{
+                that.$message.error(res.data.message);
+              }
+            })
+          }).catch(() => {
+             that.clear()
+            that.$message({
+              type: 'info',
+              message: '已取消恢复'
+            });
+          });
+        }else {
+          that.$message({
+            type: 'info',
+            message: '请选择要恢复的用户'
+          });
+        }
 
       }
     },

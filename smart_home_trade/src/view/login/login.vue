@@ -1,23 +1,26 @@
 <template>
   <div class="login">
-    <div class="mange">大楼管理系统</div>
+    <div class="mange"></div>
         <div class="box">
-          <div class="title">用户登录</div>
+          <div class="title">行业版管理平台</div>
           <div class="conent">
             <el-form :model="loginForm" status-icon :rules="rules2" ref="loginForm" label-width="100px" class="demo-ruleForm">
-              <el-form-item label="用户名" prop="loginName"  >
-                <el-input type="username" v-model="loginForm.loginName" auto-complete="off"></el-input>
+              <el-form-item label="" prop="loginName" style='position: relative'>
+                <i class="icon iconfont l" style='position: absolute;left:-37px'>&#xe636;</i>
+                <el-input type="username" v-model="loginForm.loginName" auto-complete="off"  class="l" placeholder="请输入用户名"></el-input>
               </el-form-item>
-              <el-form-item label="密码" prop="password"  >
-                <el-input type="password" v-model="loginForm.password" auto-complete="off"></el-input>
+              <el-form-item label="" prop="password" style='position: relative'>
+                <i class="icon iconfont l" style='position: absolute;left:-37px'>&#xe611;</i>
+                <el-input type="password" v-model="loginForm.password" auto-complete="off" class="l" placeholder="请输入密码"></el-input>
               </el-form-item>
-              <el-form-item label="验证码" prop="code" style='position: relative' >
-                <el-input type="text" v-model="loginForm.code" auto-complete="off" class="checkma"></el-input>
+              <el-form-item label="" prop="code" style='position: relative'>
+
+                <el-input type="text" style='position: relative;left:-40px' v-model="loginForm.code" auto-complete="off" class="checkma" placeholder="请输入验证码"></el-input>
                 <span v-model="imgUrl" class="check" style="position: absolute;right:0" @click="getImg()"><img :src="imgUrl" alt="" ></span>
               </el-form-item>
               <el-form-item>
-                <el-button type="primary" @click="submitForm('loginForm')" style="position: relative;top:-2px;">登录</el-button>
               </el-form-item>
+               <el-button type="primary" @click="submitForm('loginForm')" style="position: relative;top:-15px;left:25px; width: 230px;background:#0066b2" >登录</el-button>
             </el-form>
           </div>
         </div>
@@ -97,29 +100,44 @@
        // 登录
         submitForm(loginForm) {
           var that=this;
-        axios.post("https://easy-mock.com/mock/5adfe7967f1c4564cd3dfbe0/example/set").then(function(res){
-            // console.log(res.data.data)
-             that.$store.commit('setStroge',res.data.data)
-          });         
+          // axios.post("https://easy-mock.com/mock/5adfe7967f1c4564cd3dfbe0/example/set").then(function(res){
+          //   // console.log(res.data.data)
+          //    that.$store.commit('setStroge',res.data.data)
+          // });         
           console.log(that.loginForm)
           that.$refs[loginForm].validate((valid) => {
             if (valid) {
             axios.post('/SmartHomeTrade/user/loginUser',that.loginForm).then(function (res) {              
                 if(res.data.code==0){
                   // that.$set(that.$store.state, 'islogin',true)
-                 console.log(res.data.data.user)
-                  
+                 console.log(res.data.data.user)        
                    that.$store.commit('saveUserinfo',res.data.data.user)
                    that.$store.commit('setToken',res.data.data.user.status)
                    that.$message.success(res.data.message);
-                   that.goRouter(res.data.data.user.userLevel)
+                   if(res.data.data.user.userLevel==1){
+                      that.$router.push('/garden/gardenManagement')
+                   }else if(res.data.data.user.userLevel==2){
+                    that.$router.push('/park/MyPark')
+
+                   }else if(res.data.data.user.userLevel==3){
+                    that.$router.push('/building/MyBuilding')
+
+                   }else if(res.data.data.user.userLevel==4){
+                    that.$router.push('/floor/myFloor')
+
+                   }else{
+                     that.$router.push('/room/myRoom')
+                   }
+                   // that.$router.push('/park/MyPark');
+                   // that.goRouter(res.data.data.user.userLevel)
                 }else{
                    that.$message.error(res.data.message);
                     if(res.data.message=="验证码错误"){
                       that.loginForm.code=''
                        that.getImg()
-                    }if(res.data.message=="用户名或密码错误"){
+                    }else if(res.data.message=="账号或密码错误"){
                         that.$refs[loginForm].resetFields();
+                        that.getImg()
                     }  
                 }
                            
@@ -147,27 +165,39 @@
   .mange{
     font-size: 40px;
     color:#fff;
-    padding:55px 0;
+    
+    height:200px;
+  padding-left:700px
+
   }
   .box{
-    width:4.6rem;
+    width:3.5rem;
     height:325px;
-    background: #d6eefe;
+    background: #fff;
     /*margin:100px auto;*/
-    display: inline-block;
-    border:10px solid #3781bb;
+   float:right;
+   margin-right:180px;
+    border:5px solid #3781bb;
   }
   .title{
-     height:60px;
-    line-height: 60px;
-    font-size: 0.28rem;
+     height:70px;
+    line-height: 70px;
+    font-size: 0.18rem;
     color: #70d0f9;
     text-align: center;
+    font-weight: 500
   }
   .conent{
     padding-right:0.5rem;
   }
-
+i{
+  display:inline-block;
+  width:40px;
+  height:39px;
+  background:#00529b;
+  color:#fff;
+  z-index: 2;
+}
   .checkma{
     width:70%;
    float: left;
@@ -186,12 +216,13 @@
     cursor: pointer;
   }
   .el-button{
-    padding:12px 0;
+    
     width:100%;
-    text-align: center;
+   
   }
   el-input__inner{
     height:45px;
+    width:80%;
     line-height: 45px;
   }
 </style>

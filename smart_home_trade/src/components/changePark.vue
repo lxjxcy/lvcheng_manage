@@ -5,9 +5,9 @@
           :visible.sync="dialogVisible"
           width="30%"
           :before-close="handleClose">
-          <div class="add">
+          <div class="add cdialogwidth">
             <el-form label-width="100px" :model="changeParkparam" ref="changeParkparam" :rules="rules">
-              <el-form-item label="园区地址" prop="detailAddress">
+              <el-form-item label="园区地址" prop="detailAddress" :label-width="formLabelWidth">
                 <el-input v-model="changeParkparam.detailAddress"></el-input>
               </el-form-item>
             </el-form>
@@ -25,6 +25,7 @@ export default {
    data() {
       return {
         dialogVisible: false,
+         formLabelWidth: '100px',
         changeParkparam:{
 
         },
@@ -69,6 +70,9 @@ export default {
 }
 </script>
 <style>
+.cdialogwidth{
+  width:80%;
+}
 
 	
 

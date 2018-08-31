@@ -24,14 +24,10 @@
       </div>
       <div class="nav-middle">
         <ul>
-          <li class="l" @click="addbuildings()"><i class="iconfont">&#xe612;</i>添加</li>
-          <li class="l" @click="change()"><i class="iconfont" >&#xe645;</i>修改</li>
-         
-
-
-
-          <li class="l" @click=" administratored()">设置管理员</li>
-          <li class="l" @click="host()">主机清单</li>
+          <li class="l" @click="addbuildings()"><i class="el-icon-plus"></i>添加</li>
+          <li class="l" @click="change()"><i class="el-icon-edit"></i>修改</li>
+          <li class="l" @click=" administratored()"><i class="el-icon-setting"></i>设置管理员</li>
+          <li class="l" @click="host()"><i class="el-icon-tickets"></i>主机清单</li>
           <changebuild ref="mychild" @refreshList="getBuildlist" @clearselect="clear"></changebuild>
           <addBuild ref="myaddchild" @refreshList="getBuildlist" @clearselect="clear"></addBuild>
           <setUser ref="mysetchild" @refreshList="getBuildlist" @clearselect="clear"></setUser>
@@ -45,14 +41,18 @@
           ref="multipleTable"
            v-loading="loading"
           style="width: 100%"
-          @selection-change="handleSelectionChange"
           tooltip-effect="dark"
           height="410"
           border>
-          <el-table-column
+         <!--  <el-table-column
             type="selection"
             width="50">
-          </el-table-column>
+          </el-table-column> -->
+          <el-table-column label="" width="50">
+          <template slot-scope="scope">
+              <el-radio :label="scope.row.blockNum" v-model="templateRadio" @change.native="getTemplateRow(scope.$index,scope.row)">&nbsp</el-radio>
+          </template>
+        </el-table-column>
           <el-table-column
             prop="blockNum"
             label="大楼编号"
@@ -115,10 +115,15 @@
 </template>
 
 <script>
-   import axios from 'axios'   
+   import axios from 'axios' 
+   import addBuild from "../../../components/addBuild.vue"
+     import changebuild from "../../../components/changebuild.vue"
     export default {
         name: "buildingManagement",
-
+         components:{
+          changebuild,
+          addBuild
+        },
       data() {
         return {
           buildParams:{
@@ -127,21 +132,9 @@
             yardIdList:[],
             action:1,
           },
+          templateRadio:'',
+        templateSelection:{},
           total:0,
-
-          form: {
-            name: '',
-            region: '',
-           
-            buildingId:'',
-            date1: '',
-            date2: '',
-            delivery: false,
-            type: [],
-            resource: '',
-            buildingname:"",
-            desc: '',
-          },
           loading:true,
           buildingN:'222',
           multipleSelection: [],
@@ -197,10 +190,14 @@
         that.getBuildlist()
       },
         //选中
-        handleSelectionChange(val) {
-          this.multipleSelection = val;
-          console.log(val)
-        },
+        // handleSelectionChange(val) {
+        //   this.multipleSelection = val;
+        //   console.log(val)
+        // },
+         getTemplateRow(index,row){                
+        this.templateSelection = row;
+        console.log(this.templateSelection)
+       },
            // 情况选中
          clear(){
          this.$refs.multipleTable.clearSelection();
@@ -239,24 +236,23 @@
         },
         //修改
         change(){
-            if(this.multipleSelection==''){
+            if(this.templateRadio==''){
               this.$message({
                 type: 'info',
                 message: '请选择要修改的大楼'
               });
             }else {
               var changparam={
-                buildingName:this.multipleSelection[0].buildingName,
-                yardId:this.multipleSelection[0].yardId,
-                yardName:this.multipleSelection[0].yardName,
-                buildingId:this.multipleSelection[0].buildingId
+                buildingName:this.templateSelection.buildingName,
+                yardId:this.templateSelection.yardId,
+                yardName:this.templateSelection.yardName,
+                buildingId:this.templateSelection.buildingId
               }
               this.$refs.mychild.parentHandleclick(changparam);
             }
         },
         // 添加
-        addbuildings(){
-         
+        addbuildings(){         
           this.$refs.myaddchild.addgarden();
         },
      
@@ -273,24 +269,24 @@
       },
       //  设置管理员
         administratored(){
-          if(this.multipleSelection==''){
+          if(this.templateRadio==''){
             this.$message({
               type: 'info',
-              message: '请选择大楼要设置的大楼'
+              message: '请选择要设置管理员的大楼'
             });
           }else {
+             var manageScopeId=[];
+          manageScopeId.push(this.templateSelection.buildingId)
            
               var param={
                action:3,
-               adrressId: this.multipleSelection[0].buildingId,
-               manageScopeId: this.multipleSelection[0].buildingId,
+               adrressId: this.templateSelection.buildingId,
+               manageScopeIdList: manageScopeId,
              }         
               this.$refs.mysetchild.getAdminList(param);
 
           }
         },
-       
-
     //  跳转到主机清单页面
         host(){
                 

@@ -14,6 +14,7 @@
                 <el-select v-model="addF.buildingName" placeholder="请选择大楼" @change="getbuildingId">
                   <el-option
                     v-for="item in blockList"
+                    :key="item.buildingId"
                     :label="item.buildingName"
                     :value="item.buildingId">
                   </el-option>
@@ -23,7 +24,7 @@
                 <el-select v-model="addF.name" placeholder="请选择大楼" @change="getfloorInfo">
                   <el-option
                     v-for="item in floorList"
-                   
+                   :key="item.id"
                     :label="item.name"
                     :value="item.id">
                   </el-option>
@@ -56,6 +57,9 @@ export default {
         },
          formLabelWidth: '100px',
          rules: {
+          roomName: [
+            {  required: true,message: '园区名称不能为空'}
+          ],
           name: [
             {  required: true,message: '园区名称不能为空'}
           ],
@@ -83,7 +87,7 @@ export default {
           axios.post("/SmartHomeTrade/floor/selectMyFloor",param).then(function(res){
           if(res.data.code==0){
           	var result = [];
-			 var obj = {};
+			     var obj = {};
 			   for(var i =0; i<res.data.data.floorList.length; i++){
 			      if(!obj[res.data.data.floorList[i].buildingId]){
 			        result.push(res.data.data.floorList[i]);

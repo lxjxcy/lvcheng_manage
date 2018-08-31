@@ -121,7 +121,7 @@ import axios from "axios"
 		        }
 		      };
 		      return{
-		      	 add:false,//添加框
+		      	   add:false,//添加框
 		      	  formLabelWidth: '100px',
 		      	   addformValidate: {
 			          loginName: '',
@@ -167,7 +167,6 @@ import axios from "axios"
 		// 添加弹框
 		addloginUser(){
 			this.add=true;
-
 		},
 			  //获取层级id
       getUserLevel(value){
