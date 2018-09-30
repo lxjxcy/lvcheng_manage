@@ -31,6 +31,8 @@ article{
     flex: 1;
     display: flex;
     width:100%;
+    margin-top: 45px;
+    margin-bottom: 30px;
   }
 
 	

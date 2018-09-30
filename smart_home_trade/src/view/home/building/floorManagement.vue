@@ -7,9 +7,9 @@
         <el-form-item label="名称">
           <el-input v-model="formSearch.name" placeholder=""></el-input>
         </el-form-item>
-        <el-form-item label="编号">
+       <!--  <el-form-item label="编号">
           <el-input v-model="formSearch.floorNum" placeholder=""></el-input>
-        </el-form-item>
+        </el-form-item> -->
         <el-form-item label="管理员">
           <el-input v-model="formSearch.userName" placeholder=""></el-input>
         </el-form-item>
@@ -27,16 +27,16 @@
 
     <div class="nav-middle">
       <div class="l" style="font-size: 20px;font-weight: 400" v-if="this.$store.state.userinfo.userLevel==2">
-        <span>{{this.$store.state.parame.build_floorName}}</span>
+        <span>{{this.$store.state.parame.buildname}}</span>
         ---楼层列表
       </div>
       <ul v-bind:class="classObject">
         <!-- 添加 -->
-        <li class="l" @click="addFloorName()"><i class="el-icon-plus"></i>添加</li>
+        <li class="l" @click="addFloorName()" v-if="this.$store.state.extendList.addfloor==1"><i class="el-icon-plus"></i>添加</li>
         <!-- 修改 -->
-        <li class="l" @click="changeFloorName()"><i class="el-icon-edit"></i>修改</li>
+        <li class="l" @click="changeFloorName()" v-if="this.$store.state.extendList.changefloor==1"><i class="el-icon-edit"></i>修改</li>
         <!-- 设置管理 -->
-        <li class="l" @click="administratored()"><i class="el-icon-setting"></i>设置管理员</li>
+        <li class="l" @click="administratored()" v-if="this.$store.state.extendList.floorsetuser==1"><i class="el-icon-setting"></i>设置管理员</li>
       </ul>
       <changeFloor ref="mychild" @refreshList="getfloorList" @clearselect="clear"></changeFloor>
        <addFloor ref="myaddchild" @refreshList="getfloorList" @clearselect="clear"></addFloor>
@@ -50,7 +50,7 @@
         v-loading="loading"
         style="width: 100%"
         tooltip-effect="dark"
-        height="380"
+        height="408"
         border>
        <!--  <el-table-column
           type="selection"
@@ -62,14 +62,17 @@
           </template>
         </el-table-column>
         <el-table-column
-          prop="floorNum"
-          label="楼层编号"
-          width="100">
+         
+          label="序号"
+          width="55"
+          align="center">
+          <template  slot-scope="scope"><span>{{scope.$index+(floorParam.currentPage - 1) * floorParam.pageSize + 1}} </span></template>
         </el-table-column>
         <el-table-column
           prop="name"
           label="楼层名称"
-          width="120">
+         
+          align="center">
           <template slot-scope="scope">
             <el-button @click="goRoomlist(scope.row.name,scope.row.id,scope.row.addressId)" type="text" size="small">{{scope.row.name}}</el-button>
           </template>
@@ -77,21 +80,25 @@
         <el-table-column
           prop="buildingName"
           label="所在大楼"
-          width="200">
+        
+          align="center">
         </el-table-column>
         <el-table-column
           prop="roomNum"
           label="房间数量"
-          width="180">
+        
+          align="center">
         </el-table-column>
         <el-table-column
           prop="userName"
           label="管理员"
-          width="180">
+         
+          align="center">
         </el-table-column>
         <el-table-column
           prop="userMobile"
-          label="联系电话">
+          label="联系电话"
+          align="center">
         </el-table-column>
       </el-table>
       <div class="block">
@@ -115,7 +122,7 @@
  // import changeFloor from '@/components/changeFloor'
  import addFloor from "../../../components/addFloor.vue"
  import changeFloor from "../../../components/changeFloor.vue"
-import axios from "axios"
+// import axios from "axios"
     export default {
         name: "floorManagement",
         components:{
@@ -149,15 +156,38 @@ import axios from "axios"
           floorList: [],
         }
       },
+       beforeMount(){
+        if(this.$store.state.userinfo.userLevel==2){
+          this.$store.commit('saveIndex',"2-2")
+        }
+         if(this.$store.state.userinfo.userLevel==3){
+          this.$store.commit('saveIndex',"3-2")
+        }
+        
+     },
+
       mounted(){
+
+        // if(this.$store.state.userinfo.userLevel==2){
+        //   this.classObject.r=true;
+        //   this.floorParam.buildingIdList.push(this.$store.state.parame.build_floorId)
+        //   this.formSearch.buildingIdList.push(this.$store.state.parame.build_floorId)
+        // }else{
+        //   this.floorParam.buildingIdList=this.$store.state.userinfo.manageScopeIdList;
+        //   this.floorParam.buildingIdList=this.$store.state.userinfo.manageScopeIdList;
+        // }      
         if(this.$store.state.userinfo.userLevel==2){
           this.classObject.r=true;
-          this.floorParam.buildingIdList.push(this.$store.state.parame.build_floorId)
-          this.formSearch.buildingIdList.push(this.$store.state.parame.build_floorId)
+         
+        }
+        if(this.$store.state.parame.buildid==null){
+          this.floorParam.buildingIdList=null
+         this.formSearch.buildingIdList=null 
         }else{
-          this.floorParam.buildingIdList=this.$store.state.userinfo.manageScopeIdList;
-          this.floorParam.buildingIdList=this.$store.state.userinfo.manageScopeIdList;
-        }      
+          this.floorParam.buildingIdList.push(this.$store.state.parame.buildid)
+         this.formSearch.buildingIdList.push(this.$store.state.parame.buildid)     
+        }
+         
         this.getfloorList()
       },
 
@@ -166,45 +196,69 @@ import axios from "axios"
           // 获取楼层列表
           getfloorList(){
             var that=this;
-            axios.post("/SmartHomeTrade/floor/selectFloorCount",that.floorParam).then(function(res){
+            that.axios.post("/SmartHomeTrade/floor/selectFloorCount",that.floorParam).then(function(res){
               if(res.data.code==0){
                 that.loading=false;
+                if(res.data.data!=null){
                  that.total=res.data.data.count;
-                that.floorList=res.data.data.floorList;
+                 that.floorList=res.data.data.floorList;
+                }
+                
               }
               console.log(res.data.data.blockList)
             })
           },
       // 跳转到指定楼层的房间列表页
        goRoomlist(floorName,floorId,addressId){
+        var that=this;
+         if(this.$store.state.extendList.roomManagement==0){
+            that.$message.warning("您还没有房间管理权限")
+          return
+        }
       // alert(this.$store.state.parame.garden_buildNmae)
-      if(this.$store.state.userinfo.userLevel==3){
-       var param={
-          build_floorName:this.$store.state.parame.build_floorName,
-          build_floorId:this.$store.state.parame.build_floorId,
-          floor_roomId:floorId,
-          floor_roomName:floorName,
-          addressId:addressId
-        }
-      }else if(this.$store.state.userinfo.userLevel==2){
-         var param={
-          build_floorName:this.$store.state.parame.build_floorName,
-          build_floorId:this.$store.state.parame.build_floorId,
-          floor_roomId:floorId,
-          floor_roomName:this.$store.state.parame.build_floorName+floorName,
-          addressId:addressId
-        }
-      }
+      // if(this.$store.state.userinfo.userLevel==3){
+          // that.$set(that.$store.state.parame,'floorname',floorName)
+          // that.$set(that.$store.state.parame,'floorid',floorId)
+          // that.$set(that.$store.state.parame,'flooraddressId',addressId)
+         var parame={
+              parkname: that.$store.state.parame.parkname,
+              parkid: that.$store.state.parame.parkid,
+              buildname: that.$store.state.parame.buildname,
+              buildid: that.$store.state.parame.buildid,
+              allAddress:that.$store.state.parame.allAddress,
+              floorname: floorName,
+              floorid: floorId,
+              flooraddressId: addressId,
+              roomname: that.$store.state.parame.roomname,
+              roomid: that.$store.state.parame.roomid,
+              roomaddressId: that.$store.state.parame.roomaddressId
+            };
+        that.$store.commit('setRouterid',parame)
+       // var param={
+       //    build_floorName:this.$store.state.parame.build_floorName,
+       //    build_floorId:this.$store.state.parame.build_floorId,
+       //    floor_roomId:floorId,
+       //    floor_roomName:floorName,
+       //    addressId:addressId
+       //  }
+      // }else if(this.$store.state.userinfo.userLevel==2){
+        //  var param={
+        //   build_floorName:this.$store.state.parame.build_floorName,
+        //   build_floorId:this.$store.state.parame.build_floorId,
+        //   floor_roomId:floorId,
+        //   floor_roomName:this.$store.state.parame.build_floorName+floorName,
+        //   addressId:addressId
+        // }
+      // }
 
        
-        this.$store.commit('setRouterid',param)
-        if(this.$store.state.userinfo.userLevel==2){
-          this.$router.push('/park/floorList/roomList')
+        // this.$store.commit('setRouterid',param)
+        if(that.$store.state.userinfo.userLevel==2){
+          that.$router.push('/park/floorList/roomList')
         }
-         if(this.$store.state.userinfo.userLevel==3){
-          this.$router.push('/building/roomList')
-        }
-        
+         if(that.$store.state.userinfo.userLevel==3){
+          that.$router.push('/building/roomList')
+        }        
       },
                  //每页显示多少条
       handleSizeChange(val) {
@@ -230,35 +284,55 @@ import axios from "axios"
         // 查询
         onSubmit() {
            var that=this;
-           that.loading=false;
+             if(that.formSearch.floorNum==''){
+              that.formSearch.floorNum=null
+           }
+           if(that.formSearch.name==''){
+              that.formSearch.name=null
+           }
+           if(that.formSearch.buildingName==''){
+              that.formSearch.buildingName=null
+           }
+           if(that.formSearch.userName==''){
+              that.formSearch.userName=null
+           }
           if(that.formSearch.floorNum==null&&that.formSearch.name==null&&that.formSearch.buildingName==null&&that.formSearch.userName==null){
             return;
           }
-          axios.post("/SmartHomeTrade/floor/selectFloorCount",that.formSearch).then(function(res){
+           that.loading=true;
+
+          that.axios.post("/SmartHomeTrade/floor/selectFloorCount",that.formSearch).then(function(res){
+            console.log(res.data.data.floorList)
                 if(res.data.code==0){
+                  if(res.data.data!=null){
+                     that.floorList=res.data.data.floorList;
+                    // that.total=res.data.count
+                  }
+                 
                     that.loading=false;
-                    that.floorList=res.data.data.floorList;
-                      that.total=res.data.count
+                   
                     that.$message.success(res.data.message)
 
                 }else{
                   that.$message.error(res.data.message)
                 }
+               
           })
         },
          // 清空查询
         resetForm() {
         var that=this;
-            that.formSearch.floorNum= null,
-            that.formSearch.name=null, 
-             that.formSearch.buildingName=null, 
-              that.formSearch.userName=null,           
-            that.getMyfloorlist()
+            that.formSearch.floorNum= null;
+            that.formSearch.name=null;
+             that.formSearch.buildingName=null;
+            that.formSearch.userName=null;          
+            that.getfloorList()
         },
-        // 情况选中
+             // 情况选中
          clear(){
-         this.$refs.multipleTable.clearSelection();
+         this.templateRadio="";
        },
+
 // 修改楼层
         changeFloorName() {
           if(this.templateRadio==''){
@@ -297,8 +371,10 @@ import axios from "axios"
                action:4,
                adrressId: this.templateSelection.addressId,
                manageScopeIdList: manageScopeId,
-             }         
-              this.$refs.mysetchild.getAdminList(param);
+                userLevel:4
+             } 
+              var uuid=this.templateSelection.userUuid               
+              this.$refs.mysetchild.getAdminList(param,uuid);
 
           }
         },

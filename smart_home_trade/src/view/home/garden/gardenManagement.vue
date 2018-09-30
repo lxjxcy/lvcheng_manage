@@ -3,9 +3,9 @@
 
     <div class="top-nav">
       <el-form :inline="true" :model="formSearch" ref="formSearch" class="demo-form-inline">
-        <el-form-item label="编号"  prop="yardId">
-          <el-input v-model="formSearch.yardId" placeholder=""></el-input>
-        </el-form-item>
+      <!--   <el-form-item label="编号"  prop="gardenNum">
+          <el-input v-model="formSearch.gardenNum" placeholder=""></el-input>
+        </el-form-item> -->
         <el-form-item label="名称"  prop="yardName">
           <el-input v-model="formSearch.yardName" placeholder=""></el-input>
         </el-form-item>
@@ -41,47 +41,49 @@
         ref="multipleTable"
         style="width: 100%"
         tooltip-effect="dark"
-        height="410"
+        height="408"
+        align="center"
         v-loading="loading"
         border>
-      <!--   <el-table-column
-          type="selection"
-          width="50">
-        </el-table-column> -->
-          <el-table-column label="" width="50">
+          <el-table-column label="" width="50"  align="center">
           <template slot-scope="scope">
-              <el-radio :label="scope.row.gardenNum" v-model="templateRadio" @change.native="getTemplateRow(scope.$index,scope.row)">&nbsp</el-radio>
+              <el-radio :label="scope.row.gardenNum"  v-model="templateRadio" @change.native="getTemplateRow(scope.$index,scope.row)">&nbsp</el-radio>
           </template>
         </el-table-column>
-
         <el-table-column
           prop="gardenNum"
-          label="园区编号"
-          width="270">
+          label="序号"
+          width="55"
+           align="center">
         </el-table-column>
         <el-table-column
           prop="yardName"
           label="园区名称"
-          width="130">
+         
+           align="center">
         </el-table-column>
         <el-table-column
           prop="buildingNum"
           label="大楼数量"
-          width="80">
+        
+          align="center">
         </el-table-column>
         <el-table-column
           prop="deviceNum"
           label="设备数量"
-          width="80">
+         
+          align="center">
         </el-table-column>
         <el-table-column
           prop="userName"
           label="管理员"
-          width="180">
+         
+          align="center">
         </el-table-column>
         <el-table-column
           prop="userMobile"
-          label="联系电话">
+          label="联系电话"
+          align="center">
         </el-table-column>
       </el-table>
       <div class="block">
@@ -102,7 +104,7 @@
 </template>
 
 <script>
-  import axios from 'axios'
+  // import axios from 'axios'
   import addPark from "../../../components/addPark.vue"
    import changePark from "../../../components/changePark.vue"
 
@@ -165,7 +167,7 @@
         administrator:false,
         formSearch: {//搜索
           action:1,
-          yardId:null,
+          gardenNum:null,
           yardName:null,
           userName:null,
         },
@@ -179,6 +181,7 @@
       }
     },
     mounted(){
+       this.$store.commit('saveIndex',"1-1")
 
     this.getlist()       
         this.createOperator=this.$store.state.userinfo.userMobile
@@ -193,11 +196,18 @@
       getlist(){
         var that=this
        
-       axios.post('/SmartHomeTrade/garden/selectGdCount',that.params).then(function (res) {
+       that.axios.post('/SmartHomeTrade/garden/selectGdCount',that.params).then(function (res) {
             if(res.data.code==0){
-                 that.loading=false
-                that.total=res.data.data.count
+              if(res.data.data!=null){
+                  that.total=res.data.data.count
                 that.yardsList=res.data.data.yardsList
+              }else{
+                that.yardsList=[]
+              }
+                 that.loading=false
+              
+            }else{
+              that.$message.error(res.data.message)
             }
          
         })
@@ -236,11 +246,22 @@
       //查询
       onSubmit() {
         var that=this;
-        if(that.formSearch.yardId==null&&that.formSearch.yardName==null&&that.formSearch.userName==null){
+        if(that.formSearch.gardenNum==""){
+          that.formSearch.gardenNum=null
+        }
+        if(that.formSearch.yardName==""){
+          that.formSearch.yardName=null
+        }
+        if(that.formSearch.userName==null==""){
+          that.formSearch.userName=null
+        }
+
+        if(that.formSearch.gardenNum==null&&that.formSearch.yardName==null&&that.formSearch.userName==null){
+            that.getlist()
           return;
         }
         that.loading=true
-       axios.post('/SmartHomeTrade/garden/selectGdCount',that.formSearch).then(function (res) {
+       that.axios.post('/SmartHomeTrade/garden/selectGdCount',that.formSearch).then(function (res) {
           that.yardsList=res.data.data.yardsList;
           that.loading=false
         })
@@ -250,15 +271,16 @@
         var that=this;
         that.formSearch={
           action:1,
-          yardId:null,
+          gardenNum:null,
           yardName:null,
           userName:null,
         }
         that.getlist()
       },
-         // 情况选中
-         clear(){
-         this.$refs.multipleTable.clearSelection();
+         // 情除选中
+      clear(){
+         this.templateRadio="";
+         
        },
       //关闭弹框
       // handleClose(done) {
@@ -310,9 +332,10 @@
           var param={
             action:2,
             manageScopeIdList: manageScopeId,
-
-          }         
-          that.$refs.mysetchild.getAdminList(param);
+            userLevel:2
+          }
+          var uuid=that.templateSelection.userUuid       
+          that.$refs.mysetchild.getAdminList(param,uuid);
         }
       },
 

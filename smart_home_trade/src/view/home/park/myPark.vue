@@ -6,9 +6,9 @@
         <el-form-item label="名称">
           <el-input v-model="formSearch.yardName" placeholder=""></el-input>
         </el-form-item>
-        <el-form-item label="编号">
+       <!--  <el-form-item label="编号">
           <el-input v-model="formSearch.gardenNum" placeholder=""></el-input>
-        </el-form-item>
+        </el-form-item> -->
         <el-form-item>
           <el-button type="primary" @click="onSubmit">查询</el-button>
         </el-form-item>
@@ -21,7 +21,7 @@
 
       <el-table
         :data="yardsList"
-        height="435"
+        height="408"
         border
          v-loading="loading"
         style="width: 100%">
@@ -36,22 +36,26 @@
         </el-table-column>
         <el-table-column
           prop="gardenNum"
-          label="园区编号"
-          width="180">
+          label="序号"
+          width="55"
+          align="center">
         </el-table-column>
         <el-table-column
           prop="yardName"
           label="园区名称"
-          width="180">
+          
+          align="center">
         </el-table-column>
         <el-table-column
           prop="buildingNum"
           label="大楼数量"
-          width="180">
+        
+          align="center">
         </el-table-column>
         <el-table-column
           prop="gardenAdrress"
-          label="园区地址">
+          label="园区地址"
+          align="center">
         </el-table-column>
       </el-table>
       <div class="block">
@@ -95,7 +99,9 @@
         }
       },
       mounted(){
+
          var that=this;
+          that.$store.commit('saveIndex',"2-1")
           that.formSearch.yardIdList=that.$store.state.userinfo.manageScopeIdList;
           that.myParkparam.yardIdList=that.$store.state.userinfo.manageScopeIdList;
           that.getMyparklist()
@@ -105,10 +111,17 @@
           var that=this;
           that.axios.post("/SmartHomeTrade/garden/selectMyYards",that.myParkparam).then(function(res){
             if(res.data.code==0){
-              that.yardsList=res.data.data.yardsList;
-                that.loading=false;              
+              if(res.data.data!=null){
+                 that.yardsList=res.data.data.yardsList;
+                          
                 that.total=res.data.data.count;
 
+              }
+                that.loading=false;  
+             
+
+            }else{
+              that.$message.error(res.data.message)
             }
 
           })
@@ -129,15 +142,27 @@
         //查询
         onSubmit() {
           var that=this;
+          if(that.formSearch.yardName==""){
+            that.formSearch.yardName=null
+          }
+          if(that.formSearch.gardenNum==""){
+            that.formSearch.gardenNum=null
+          }
           if(that.formSearch.yardName==null&&that.formSearch.gardenNum==null){
+            that.getMyparklist()
             return;
           }
            that.loading=true;             
          this.axios.post("/SmartHomeTrade/garden/selectMyYards",that.formSearch).then(function(res){
               if(res.data.code==0){
-              that.yardsList=res.data.data.yardsList;
+                if(res.data.data!=null){
+                   that.yardsList=res.data.data.yardsList;
+                }
+             
                 that.loading=false;  
                       
+            }else{
+              that.$message.error(res.data.data)
             }
           })
         },

@@ -5,6 +5,9 @@
         <el-form-item label="姓名">
           <el-input v-model="formSearch.name" placeholder=""></el-input>
         </el-form-item>
+         <el-form-item label="用户名">
+          <el-input v-model="formSearch.loginName" placeholder=""></el-input>
+        </el-form-item>
         <el-form-item label="电话">
           <el-input v-model="formSearch.userMobile" placeholder=""></el-input>
         </el-form-item>
@@ -18,21 +21,27 @@
     </div>
     <div class="nav-middle">
       <ul >
-        <li class="l" @click="createUser()"><i class="el-icon-plus"></i>添加</li>
+        <!-- 添加 -->
+        <li class="l" @click="createUser()"  v-if="this.$store.state.userinfo.userLevel==1||(this.$store.state.userinfo.userLevel==2&&this.$store.state.extendList.parkAdduser==1)||(this.$store.state.userinfo.userLevel==3&&this.$store.state.extendList.buildAdduser==1)||(this.$store.state.userinfo.userLevel==4&&this.$store.state.extendList.floorAdduser==1)"><i class="el-icon-plus" ></i>添加</li>
         <!--修改-->
-        <li class="l"  @click="change()"><i class="el-icon-edit"></i>修改</li>
+
+
+        <li class="l"  @click="change()"  v-if="this.$store.state.userinfo.userLevel==1||(this.$store.state.userinfo.userLevel==2&&this.$store.state.extendList.parkChangeuser==1)||(this.$store.state.userinfo.userLevel==3&&this.$store.state.extendList.buildChangeuser==1)||(this.$store.state.userinfo.userLevel==4&&this.$store.state.extendList.floorChangeuser==1)"><i class="el-icon-edit" ></i>修改</li>
         <!--删除-->
-        <li class="l"  @click="deleted()"><i class="el-icon-close"></i>删除</li>
-        <li class="l"  @click="setAccess()"><i class="el-icon-setting"></i>设置权限</li>
+
+
+
+      <!--   <li class="l"  @click="deleted()" v-if="this.$store.state.userinfo.userLevel==1||(this.$store.state.userinfo.userLevel==2&&this.$store.state.extendList.parkDeleteuser==1)||(this.$store.state.userinfo.userLevel==3&&this.$store.state.extendList.buildDeleteuser==1)||(this.$store.state.userinfo.userLevel==4&&this.$store.state.extendList.floorDeleteuser==1)"><i class="el-icon-close" ></i>删除</li> -->
+
+
+
+        <li class="l"  @click="setAccess()" v-if="this.$store.state.userinfo.userLevel==1||(this.$store.state.userinfo.userLevel==2&&this.$store.state.extendList.parkSetaccess==1)||(this.$store.state.userinfo.userLevel==3&&this.$store.state.extendList.buildSetaccess==1)||(this.$store.state.userinfo.userLevel==4&&this.$store.state.extendList.floorSetaccess==1)"><i class="el-icon-setting"></i>设置权限</li>
       </ul>
         <adduser ref="mychild" @refreshList="getUserlist" @clearselect="clear"></adduser>
         <changeuser ref="mychangechild" @refreshList="getUserlist" @clearselect="clear"></changeuser>
-        <usersetScope ref="mysetScope" @refreshList="getUserlist"></usersetScope>
-         <userlookScope ref="mylookScope" @refreshList="getUserlist"></userlookScope>
-          <usersetAccess ref="mysetAccess" @refreshList="getUserlist"></usersetAccess>
-
-
-
+        <usersetScope ref="mysetScope" @refreshList="getUserlist" @clearselect="clear"></usersetScope>
+         <userlookScope ref="mylookScope" @refreshList="getUserlist" @clearselect="clear"></userlookScope>
+          <usersetAccess ref="mysetAccess" @refreshList="getUserlist" @clearselect="clear"></usersetAccess>
 
     </div>
     <div class="main-table">
@@ -41,49 +50,50 @@
         :data="listNextAdmin"
         ref="multipleTable"
         v-loading="loading"
-        style="width: 100%"
-      
+        style="width: 100%"      
         tooltip-effect="dark"
-        height="400"
+        height="408"
         border>
-   <!--      <el-table-column
-          type="selection"
-          width="50">
-        </el-table-column> -->
          <el-table-column label="" width="50">
           <template slot-scope="scope">
               <el-radio :label="scope.row.uuid" v-model="templateRadio" @change.native="getTemplateRow(scope.$index,scope.row)">&nbsp</el-radio>
           </template>
         </el-table-column>
         <el-table-column
-          label="编号"
-          width="120">
+          label="序号"
+          width="55"
+           align="center">
           <template  slot-scope="scope"><span>{{scope.$index+(userParams.currentPage - 1) * userParams.pageSize + 1}} </span></template>
-
-
         </el-table-column>
-        
-
-
         <el-table-column
           prop="name"
           label="姓名"
-          width="200">
+        
+           align="center">
+        </el-table-column>
+         <el-table-column
+          prop="loginName"
+          label="用户名"
+         
+           align="center">
         </el-table-column>
         <el-table-column
           prop="userMobile"
           label="联系电话"
-          width="180">
+         
+           align="center">
         </el-table-column>
         <el-table-column
           label="类型"
-          width="180">
+        
+           align="center">
           <template slot-scope="scope">
             {{scope.row.userLevel | userlevelStop}}
           </template>
         </el-table-column>
         <el-table-column
-          label="管辖范围">
+          label="管辖范围"
+           align="center">
           <template slot-scope="scope">
             <el-button @click="lookScope(scope.row)" type="text" size="small">查看</el-button>
             <el-button @click="setScope(scope.row)" type="text" size="small">设置</el-button>
@@ -109,7 +119,7 @@
 </template>
 
 <script>
-  import axios from  'axios'
+  // import axios from  'axios'
   import adduser from "../../../components/adduser.vue"
     import changeuser from "../../../components/changeuser.vue"
     import usersetAccess from "./usersetAccess.vue"
@@ -126,6 +136,7 @@
     },
     data() {
       return {
+         fullscreenLoading: false,
         templateRadio:'',
          templateSelection:{},
         total:0,
@@ -133,6 +144,7 @@
           pageSize:10,
           currentPage:1,
           createUser:'',
+           beScopeId:null,
         },
         multipleSelection: [],     
         loading: true,
@@ -143,12 +155,34 @@
           name: null,
           userMobile:null,
           createUser:'',
+          loginName:null,
+          beScopeId:null,
 
         },
         listNextAdmin: []
       }
     },
     mounted(){
+       if(this.$store.state.userinfo.userLevel==1){
+         this.$store.commit('saveIndex',"1-2")
+         this.formSearch.beScopeId=null;
+       }
+        if(this.$store.state.userinfo.userLevel==2){
+         this.$store.commit('saveIndex',"2-3")
+          this.userParams.beScopeId=this.$store.state.parame.parkid;
+           this.formSearch.beScopeId=this.$store.state.parame.parkid;
+       }
+        if(this.$store.state.userinfo.userLevel==3){
+         this.$store.commit('saveIndex',"3-3")
+          this.userParams.beScopeId=this.$store.state.parame.buildid;
+           this.formSearch.beScopeId=this.$store.state.parame.buildid;
+       }
+        if(this.$store.state.userinfo.userLevel==4){
+         this.$store.commit('saveIndex',"4-3")
+          this.userParams.beScopeId=this.$store.state.parame.floorid;
+           this.formSearch.beScopeId=this.$store.state.parame.floorid;
+       }
+      
       this.userParams.createUser=this.$store.state.userinfo.userMobile;
       this.formSearch.createUser=this.$store.state.userinfo.userMobile;
       this.getUserlist()
@@ -162,12 +196,42 @@
       // 获取用户列表
       getUserlist(){
         var that=this;
-        axios.post("/SmartHomeTrade/user/selectNextAdmin",that.userParams).then(function (res) {
-          console.log(res)
-          that.listNextAdmin =res.data.data.listNextAdmin;
-          that.loading=false;
-          that.total=res.data.data.Count;
-        })
+        // if(that.$store.state.userinfo.userLevel==2){
+        //   that.axios.post("/SmartHomeTrade/user/selectYardNxUser",that.userParams).then(function (res) {
+        //       console.log(res)
+        //       if(res.data.code==0){
+        //         that.loading=false;
+        //         if(res.data.data!=null){
+        //            that.listNextAdmin =res.data.data.userList;
+                   
+        //            that.total=res.data.data.count;
+        //         }
+
+        //       }else{
+        //         that.$message.error(res.data.message)
+        //       }
+             
+        //     })
+        // }else{
+            that.axios.post("/SmartHomeTrade/user/selectNextAdmin",that.userParams).then(function (res) {
+               console.log(res)
+              if(res.data.code==0){
+                that.loading=false;
+                if(res.data.data!=null){
+                   that.listNextAdmin =res.data.data.listNextAdmin;
+                   
+                   that.total=res.data.data.Count;
+                }
+
+              }else{
+                that.$message.error(res.data.message)
+              }
+            
+            })
+        // }
+        
+
+       
       },
 
       //每页显示多少条
@@ -204,14 +268,48 @@
       //查询
       onSubmit() {
         var that=this;
-        if(that.formSearch.name!=null||that.formSearch.userMobile!=null){
+        if(that.formSearch.name==""){
+         
+          that.formSearch.name=null
+         
+        }
+         if(that.formSearch.userMobile==""){
+          that.formSearch.userMobile=null
+        }
+          if(that.formSearch.loginName==""){
+          that.formSearch.loginName=null
+        }
+        if(that.formSearch.name!=null||that.formSearch.userMobile!=null||that.formSearch.loginName!=null){
           that.loading=true;
           console.log(that.formSearch);
-          axios.post('/SmartHomeTrade/user/selectNextAdminByNmOrMobile',that.formSearch).then(function (res) {
-            console.log(res);
-            that.listNextAdmin=res.data.data.AdminList;
-            that.loading=false
-          })
+          // if(that.$store.state.userinfo.userLevel==2){
+          //     that.axios.post('/SmartHomeTrade/user/selectYardNxUser',that.formSearch).then(function (res) {        
+          //     if(res.data.code==0){
+          //       if(res.data.data!=null){
+          //        that.listNextAdmin=res.data.data.userList;
+          //         that.loading=false
+          //       }
+          //     }else{
+          //       that.$message.error(res.data.message)
+          //     }
+          //   })
+          // }else{
+              that.axios.post('/SmartHomeTrade/user/selectNextAdminByNmOrMobile',that.formSearch).then(function (res) {        
+              if(res.data.code==0){
+                if(res.data.data!=null){
+                 that.listNextAdmin=res.data.data.AdminList;
+                  that.loading=false
+                }
+              }else{
+                that.$message.error(res.data.message)
+              }
+            })
+
+        // }
+          
+        }else{
+           that.getUserlist()
+
         }
       },
       //清空查询
@@ -220,6 +318,8 @@
         that.formSearch.name=null,
           
           that.formSearch.userMobile=null,
+           that.formSearch.loginName=null,
+
 
         
         that.getUserlist()
@@ -240,7 +340,9 @@
           var param={
             uuid:this.templateSelection.uuid,
             name: this.templateSelection.name,
-            userMobile: this.templateSelection.userMobile
+            userMobile: this.templateSelection.userMobile,
+            userLevel:this.templateSelection.userLevel,
+            userId:this.templateSelection.userId,
           }
          this.$refs.mychangechild.updataUser(param);
         }
@@ -249,14 +351,19 @@
       deleted() {
         var that=this;
         if(that.templateRadio!=''){
-          var that=this;
+          if(that.templateSelection.userLevel==3){
+              that.$message.warning("大楼管理员不能删除")
+              return;
+            }
+         
           that.$confirm('此操作将永久删除, 是否继续?', '提示', {
             confirmButtonText: '确定',
             cancelButtonText: '取消',
             type: 'warning'
           }).then(() => {
+
             //发送ajax
-            axios.post('/SmartHomeTrade/user/deleteAdmin',{
+            that.axios.post('/SmartHomeTrade/user/deleteAdmin',{
               uuid:that.templateSelection.uuid
             }).then(function (res) {
               that.$message({
@@ -282,37 +389,68 @@
         }
       },
 
-      // 情况选中
+      // 情除选中
       clear(){
-         this.$refs.multipleTable.clearSelection();
+         this.templateRadio="";
        },
 
     //  设置权限
       setAccess(){
+
           if(this.templateRadio==""){
-            // alert("sss")
             this.$message({
               type: 'info',
               message: '请选择用户'
             });
           }else {
-            this.$refs.mysetAccess.getopen();
+            console.log(this.templateSelection.uuid)
+            var param={
+              userId:this.templateSelection.uuid,
+              userLevel:this.templateSelection.userLevel
+            }
+          
+            
+            this.$refs.mysetAccess.getopen(param);
             
 
           }
         },
+        // 加载设置管理员
+        setloading(){
+           this.fullscreenLoading = true;
+        },
+         // 设置管理员成功
+        clearloading(){
+           this.fullscreenLoading = false;
+        },
         // 查看管辖范围
-        lookScope(){
-          this.$refs.mylookScope.getopen();
+        lookScope(row){
 
 
+        if(this.$store.state.userinfo.userLevel==1||(this.$store.state.userinfo.userLevel==2&&this.$store.state.extendList.parkSetaccess==1)||(this.$store.state.userinfo.userLevel==3&&this.$store.state.extendList.buildSetaccess==1)||(this.$store.state.userinfo.userLevel==4&&this.$store.state.extendList.floorSetaccess==1)){
+            this.$refs.mylookScope.getopen(row);
+
+          }else{
+             that.$message.warning("您还没有权限")
+              return
+          }
+
+
+          
         },
     // 设置管辖范围
     setScope(row){
       console.log(row)
-      this.$refs.mysetScope.getopen(row.userLevel);
-      // this.$router.push("/garden/setScope")
-    }
+       if(this.$store.state.userinfo.userLevel==1||(this.$store.state.userinfo.userLevel==2&&this.$store.state.extendList.parkSetaccess==1)||(this.$store.state.userinfo.userLevel==3&&this.$store.state.extendList.buildSetaccess==1)||(this.$store.state.userinfo.userLevel==4&&this.$store.state.extendList.floorSetaccess==1)){
+            this.$refs.mysetScope.getopen(row);
+            
+          }else{
+             that.$message.warning("您还没有权限")
+              return
+          }
+     
+     
+     }
     },
   }
 </script>

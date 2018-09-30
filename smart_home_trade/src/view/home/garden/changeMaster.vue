@@ -127,7 +127,7 @@
 	            }
 	            that.changeparam.templateName=that.changedynamicValidateForm.masterplateName;
 	            that.changeparam.id=that.multipleSelection[0].id;
-	            axios.post("/SmartHomeTrade/template/updateTemplate",that.changeparam).then(function (res) {
+	            that.axios.post("/SmartHomeTrade/template/updateTemplate",that.changeparam).then(function (res) {
 	              console.log(res)
 	              that.$message({
 	                type: 'success',

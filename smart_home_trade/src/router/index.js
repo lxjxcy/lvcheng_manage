@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 import login from '@/view/login/login'
-
+import unfind from '@/view/login/unfind'
 // home页面
 import home from '@/view/home/home'
 
@@ -25,6 +25,9 @@ import parkLog from '@/view/home/park/parkLog'
 import setAccess from '@/view/home/park/setAccess'
 
 
+import myEquipment from '@/view/home/park/myEquipment'
+
+
 //大楼管理员相关页面
 // import building from '@/view/home/building/building'
 import MyBuilding from '@/view/home/building/MyBuilding'
@@ -37,11 +40,13 @@ import buildingLog from '@/view/home/building/buildingLog'
 // import room from '@/view/home/room/room'
 import myRoom from '@/view/home/room/myRoom'
 import equipment from '@/view/home/room/equipment'
-import authorization from '@/view/home/room/authorization'
+// import EquipmentAuthorization from '@/view/home/room/EquipmentAuthorization'
+import authorization from "@/view/home/room/authorization"
+import authorManagement from "@/view/home/room/authorManagement"
 import roomAppuser from '@/view/home/room/roomAppuser'
 import roomLog from '@/view/home/room/roomLog'
 import EquipmentAuthorization from '@/view/home/room/EquipmentAuthorization'
-
+import userAuthorization from '@/view/home/room/userAuthorization'
 //系统管理员相关页面
 // import garden from '@/view/home/garden/garden'
 import gardenManagement from '@/view/home/garden/gardenManagement'
@@ -49,6 +54,7 @@ import gardenUser from '@/view/home/garden/gardenUser'
 import masterplate from '@/view/home/garden/masterplate'
 import gardenAppuser from '@/view/home/garden/gardenAppuser'
 import gardenLog from '@/view/home/garden/gardenLog'
+
 
 
 //列表
@@ -73,6 +79,10 @@ export default new Router({
             name: 'login',
             component: login
         }, {
+            path: '/404',
+            name: 'unfind',
+            component: unfind
+        }, {
             path: '/home',
             name: 'home',
             component: home,
@@ -81,14 +91,7 @@ export default new Router({
                 // redirect: '/building/MyBuilding',
                 name: 'asideBar',
                 component: asideBar,
-                children: [{
-                        path: '/building/MyBuilding',
-                        name: 'MyBuilding',
-                        meta: {
-                            Auth: true,
-                        },
-                        component: MyBuilding
-                    },
+                children: [
                     // 大楼管理
                     {
                         path: '/building/MyBuilding',
@@ -139,6 +142,46 @@ export default new Router({
                             Auth: true,
                         },
                         component: equipment
+                    }, {
+                        path: '/building/myEquipment',
+                        name: 'myEquipment',
+                        meta: {
+                            Auth: true,
+                        },
+                        component: myEquipment
+                    }, {
+                        path: '/building/authorManagement',
+                        name: 'authorManagement',
+                        redirect: "/building/authorManagement/user",
+                        meta: {
+                            Auth: true,
+                        },
+                        component: authorManagement,
+                        children: [{
+                                path: '/building/authorManagement/user',
+                                name: 'userAuthorization',
+
+                                meta: {
+                                    Auth: true,
+                                },
+                                component: userAuthorization,
+                            }, {
+                                path: '/building/authorManagement/equipment',
+                                name: 'EquipmentAuthorization',
+                                meta: {
+                                    Auth: true,
+                                },
+                                component: EquipmentAuthorization,
+                            },
+
+                        ]
+                    }, {
+                        path: '/building/authorizationInfo',
+                        name: 'authorization',
+                        meta: {
+                            Auth: true,
+                        },
+                        component: authorization,
                     },
                     // 系统管理
                     {
@@ -169,14 +212,9 @@ export default new Router({
                             Auth: true,
                         },
                         component: gardenLog
-                    }, {
-                        path: '/garden/setScope',
-                        name: 'setScope',
-                        meta: {
-                            Auth: true,
-                        },
-                        component: setScope
                     },
+
+
                     // 园区管理
                     {
                         path: '/park/MyPark',
@@ -214,13 +252,6 @@ export default new Router({
                         },
                         component: roomAppuser
                     }, {
-                        path: '/park/setAccess',
-                        name: 'setAccess',
-                        meta: {
-                            Auth: true,
-                        },
-                        component: setAccess
-                    }, {
                         path: '/park/parkLog',
                         name: 'parkLog',
                         meta: {
@@ -248,6 +279,46 @@ export default new Router({
                             Auth: true,
                         },
                         component: equipment
+                    }, {
+                        path: '/park/myEquipment',
+                        name: 'myEquipment',
+                        meta: {
+                            Auth: true,
+                        },
+                        component: myEquipment
+                    }, {
+                        path: '/park/authorManagement',
+                        name: 'authorManagement',
+                        redirect: "/park/authorManagement/user",
+                        meta: {
+                            Auth: true,
+                        },
+                        component: authorManagement,
+                        children: [{
+                                path: '/park/authorManagement/user',
+                                name: 'userAuthorization',
+
+                                meta: {
+                                    Auth: true,
+                                },
+                                component: userAuthorization,
+                            }, {
+                                path: '/park/authorManagement/equipment',
+                                name: 'EquipmentAuthorization',
+                                meta: {
+                                    Auth: true,
+                                },
+                                component: EquipmentAuthorization,
+                            },
+
+                        ]
+                    }, {
+                        path: '/park/authorizationInfo',
+                        name: 'authorization',
+                        meta: {
+                            Auth: true,
+                        },
+                        component: authorization,
                     },
                     //房间
 
@@ -266,12 +337,39 @@ export default new Router({
                         },
                         component: equipment
                     }, {
-                        path: '/room/authorization',
+                        path: '/room/authorManagement',
+                        name: 'authorManagement',
+                        redirect: "/room/authorManagement/user",
+                        meta: {
+                            Auth: true,
+                        },
+                        component: authorManagement,
+                        children: [{
+                                path: '/room/authorManagement/user',
+                                name: 'userAuthorization',
+
+                                meta: {
+                                    Auth: true,
+                                },
+                                component: userAuthorization,
+                            }, {
+                                path: '/room/authorManagement/equipment',
+                                name: 'EquipmentAuthorization',
+                                meta: {
+                                    Auth: true,
+                                },
+                                component: EquipmentAuthorization,
+                            },
+
+
+                        ]
+                    }, {
+                        path: '/room/authorizationInfo',
                         name: 'authorization',
                         meta: {
                             Auth: true,
                         },
-                        component: authorization
+                        component: authorization,
                     }, {
                         path: '/room/roomAppuser',
                         name: 'roomAppuser',
@@ -286,13 +384,6 @@ export default new Router({
                             Auth: true,
                         },
                         component: roomLog
-                    }, {
-                        path: '/room/EquipmentAuthorization',
-                        name: 'EquipmentAuthorization',
-                        meta: {
-                            Auth: true,
-                        },
-                        component: EquipmentAuthorization
                     },
                     // 楼层
                     {
@@ -337,7 +428,48 @@ export default new Router({
                             Auth: true,
                         },
                         component: equipment
-                    }
+                    }, {
+                        path: '/floor/myEquipment',
+                        name: 'myEquipment',
+                        meta: {
+                            Auth: true,
+                        },
+                        component: myEquipment
+                    }, {
+                        path: '/floor/authorManagement',
+                        name: 'authorManagement',
+                        redirect: "/floor/authorManagement/user",
+                        meta: {
+                            Auth: true,
+                        },
+                        component: authorManagement,
+                        children: [{
+                                path: '/floor/authorManagement/user',
+                                name: 'userAuthorization',
+
+                                meta: {
+                                    Auth: true,
+                                },
+                                component: userAuthorization,
+                            }, {
+                                path: '/floor/authorManagement/equipment',
+                                name: 'EquipmentAuthorization',
+                                meta: {
+                                    Auth: true,
+                                },
+                                component: EquipmentAuthorization,
+                            },
+
+                        ]
+                    }, {
+                        path: '/floor/authorizationInfo',
+                        name: 'authorization',
+                        meta: {
+                            Auth: true,
+                        },
+                        component: authorization,
+                    },
+
                 ]
             }]
         }

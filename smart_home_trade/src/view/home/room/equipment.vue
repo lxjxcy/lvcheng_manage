@@ -3,12 +3,12 @@
     <gobackequim></gobackequim>
     <div class="top-nav">
        <el-form :inline="true" :model="formSearch" class="demo-form-inline">
-        <el-form-item label="名称">
+        <el-form-item label="设备名称">
           <el-input v-model="formSearch.name" placeholder=""></el-input>
         </el-form-item>
-        <el-form-item label="编号">
+       <!--  <el-form-item label="编号">
           <el-input v-model="formSearch.deviceNum" placeholder=""></el-input>
-        </el-form-item>
+        </el-form-item> -->
          <el-form-item label="设备类型">
           <el-input v-model="formSearch.typeName" placeholder=""></el-input>
         </el-form-item>
@@ -22,14 +22,22 @@
     </div>
 
     <div class="nav-middle">
-       <div class="l" style="font-size: 20px;font-weight: 400" v-if="this.$store.state.userinfo.userLevel==2||this.$store.state.userinfo.userLevel==3||this.$store.state.userinfo.userLevel==4">
-        <span>{{this.$store.state.parame.room_equimentName}}</span>
+       <div class="l" style="font-size: 20px;font-weight: 400" v-if="this.$store.state.userinfo.userLevel==2">
+        <span>{{this.$store.state.parame.buildname}}{{this.$store.state.parame.floorname}}{{this.$store.state.parame.roomname}}</span>
+        ---设备列表
+      </div>
+       <div class="l" style="font-size: 20px;font-weight: 400" v-if="this.$store.state.userinfo.userLevel==3">
+        <span>{{this.$store.state.parame.floorname}}{{this.$store.state.parame.roomname}}</span>
+        ---设备列表
+      </div>
+       <div class="l" style="font-size: 20px;font-weight: 400" v-if="this.$store.state.userinfo.userLevel==4">
+        <span>{{this.$store.state.parame.roomname}}</span>
         ---设备列表
       </div>
       <ul v-bind:class="classObject">
-        <li class="l" @click="move = true"><i class="el-icon-location-outline"></i>迁移设备</li>
-        <li class="l"  @click="eAuthorization()"><i class="el-icon-edit-outline"></i>设备授权</li>
-        <authorizationEq ref="mychild" @refreshList="getequipmentlist"></authorizationEq>
+        <!-- <li class="l" @click="move = true" v-if="this.$store.state.userinfo.userLevel==5&&this.$store.state.extendList.movequement==1"><i class="el-icon-location-outline"></i>迁移设备</li> -->
+        <li class="l"  @click="eAuthorization()" v-if="this.$store.state.userinfo.userLevel==5&&this.$store.state.extendList.quementAuthor==1"><i class="el-icon-edit-outline"></i>设备授权</li>
+        <authorizationEq ref="mychild" @refreshList="getequipmentlist"  @clearselect="clear"></authorizationEq>
 
 
 
@@ -45,36 +53,40 @@
         style="width: 100%"
    
         tooltip-effect="dark"
-        height="380"
+        height="404"
         border>
        <!--  <el-table-column
           type="selection"
           width="50">
         </el-table-column> -->
-         <el-table-column label="" width="40">
+         <el-table-column label="" width="50">
           <template slot-scope="scope">
               <el-radio :label="scope.row.deviceNum" v-model="templateRadio" @change.native="getTemplateRow(scope.$index,scope.row)">&nbsp</el-radio>
           </template>
         </el-table-column>
         <el-table-column
           prop="deviceNum"
-          label="设备编号"
-          width="100">
+          label="序号"
+          width="55"
+           align="center">
         </el-table-column>
         <el-table-column
           prop="name"
           label="设备名称"
-          width="120">
+         
+           align="center">
         </el-table-column>
         <el-table-column
           prop="typeName"
           label="设备类型"
-          width="180">
+         
+           align="center">
         </el-table-column>
         <el-table-column
           prop="mainStatus"
           label="设备状态"
-          width="180" :formatter="mainStatus">
+         :formatter="mainStatus"
+           align="center">
          <!--  <template slot-scope="scope">
 
             <el-switch
@@ -88,14 +100,16 @@
         <el-table-column
           prop="inAddress"
           label="所在位置"
-          width="200">
+         
+           align="center">
         </el-table-column>
         <el-table-column
-          label="操作">
+          label="操作"
+           align="center">
           <template slot-scope="scope">
 
             <el-button size="small" type="text" @click="switchChange(scope.row)">
-              {{scope.row.mainStatus | equipmentStop}}
+              {{scope.row | equipmentStop}}
             </el-button>
 
             <el-button @click="lookInfo(scope.row)" type="text" size="small"> 查看</el-button>
@@ -124,7 +138,7 @@
       :before-close="handleClose">
         <div class="getLnformation">
           <ul>
-            <li>设备编号：{{equipmenInfo.deviceNum}}</li>
+            <li>设备编号：{{equipmenInfo.id}}</li>
             <!-- <li>主机厂商：{{equipmenInfo.providerName}}</li> -->
             <li>设备名称：{{equipmenInfo.name}}</li>
             <!-- <li>官网名称：{{equipmenInfo}}</li> -->
@@ -132,7 +146,7 @@
             <!-- <li>官网地址：{{equipmenInfo}}</li> -->
             <li v-if="equipmenInfo.mainStatus==1">设备状态 :开</li>
             <li v-if="equipmenInfo.mainStatus==2">设备状态 :关</li>
-            <li>所属主机：{{equipmenInfo.hostName}}</li>
+            <li>所属主机：{{equipmenInfo.hostId}}</li>
             <li>设备地址：{{equipmenInfo.inAddress}}</li>
           </ul>
         </div>
@@ -146,7 +160,7 @@
 </template>
 
 <script>
-import axios from "axios"
+// import axios from "axios"
   export default {
     name: "equipment",
 
@@ -185,47 +199,61 @@ import axios from "axios"
         }
       }
     },
+
+
     filters: {
       equipmentStop: function (val) {
         console.log(val)
-        return val == 1? '关闭' : val == 2 ? '开闭' : '';
+          if(val.type==1||val.type==4){
+
+            return val.mainStatus == 1? '关闭' : val.mainStatus == 2 ? '开启' : '';
+          }
       },
     },
+
+    beforeMount(){
+        if(this.$store.state.userinfo.userLevel==2){
+          this.$store.commit('saveIndex',"2-2")
+        }
+         if(this.$store.state.userinfo.userLevel==3){
+          this.$store.commit('saveIndex',"3-2")
+        }
+         if(this.$store.state.userinfo.userLevel==4){
+          this.$store.commit('saveIndex',"4-2")
+        }
+          if(this.$store.state.userinfo.userLevel==5){
+          this.$store.commit('saveIndex',"5-2")
+        }
+        
+     },
+
     mounted(){
         var that=this;
+
+        // that.$store.commit('saveIndex',"5-2")
         if(that.$store.state.userinfo.userLevel==2||that.$store.state.userinfo.userLevel==3||that.$store.state.userinfo.userLevel==4){
           that.classObject.r=true;
-          var obj=[]
-          var obj1= {
-            id:that.$store.state.parame.room_equimentId,
-            addressId:that.$store.state.parame.roomaddressId
-          };
-          obj.push(obj1)
-          that.equipmentParam.addressIdList=obj
-          that.formSearch.addressIdList=obj
-        }else{
-            var list2=that.$store.state.userinfo.addrList;
-            var list1=that.$store.state.userinfo.manageScopeIdList;
-            var obj=[]
-            for(var i=0;i<list1.length;i++){
-                var obj2={
-                  id:list1[i],
-                  addressId:list2[i]
-                }
-                console.log(obj2)
-                obj.push(obj2)
-            }
-             that.equipmentParam.addressIdList=obj;
-             that.formSearch.addressIdList=obj;  
-                     
         }
+         if(that.$store.state.parame.roomid==null&&that.$store.state.parame.roomaddressId==null){
+            that.equipmentParam.addressIdList=null
+            that.formSearch.addressIdList=null
+         }else{
+               var obj=[]
+              var obj1= {
+                id:that.$store.state.parame.roomid,
+                addressId:that.$store.state.parame.roomaddressId
+              };
+              obj.push(obj1)
+              that.equipmentParam.addressIdList=obj
+              that.formSearch.addressIdList=obj
+         }
         that.getequipmentlist()        
       },
     methods: {
       // 获取设备列表
       getequipmentlist(){
         var that=this;
-        axios.post("/SmartHomeTrade/device/getDeviceList",that.equipmentParam).then(function(res){
+        that.axios.post("/SmartHomeTrade/device/getDeviceList",that.equipmentParam).then(function(res){
           that.loading=false;
           if(res.data.code==0){
             if(res.data.data!=null){
@@ -237,8 +265,6 @@ import axios from "axios"
           }
 
         })
-
-
       },
      // 每页几条
         handleSizeChange(val) {
@@ -256,11 +282,21 @@ import axios from "axios"
         //查询
         onSubmit() {
           var that=this;
+          if(that.formSearch.deviceNum==''){
+            that.formSearch.deviceNum=null
+          }
+           if(that.formSearch.name==''){
+            that.formSearch.name=null
+          }
+           if(that.formSearch.typeName==''){
+            that.formSearch.typeName=null
+          }
           if(that.formSearch.deviceNum==null&&that.formSearch.name==null&&that.formSearch.typeName==null){
+             that.getequipmentlist()
             return;
           }
            that.loading=true;             
-          axios.post("/SmartHomeTrade/device/getDeviceList",that.formSearch).then(function(res){
+          that.axios.post("/SmartHomeTrade/device/getDeviceList",that.formSearch).then(function(res){
               if(res.data.code==0){
               that.deviceList=res.data.data.deviceList;
                 that.loading=false;  
@@ -276,30 +312,82 @@ import axios from "axios"
              that.formSearch.typeName=null,                    
             that.getequipmentlist()
         },
-        // 开关
+         //  转换状态
+      mainStatus: function (row, column) {
+        if(row.type==1||row.type==4){
+           return row.mainStatus == 1? '开启' : row.mainStatus == 2? '关闭' : row.mainStatus == 3? '停':""
+        }
+
+       
+      },
+
+      getTemplateRow(index,row){                
+        this.templateSelection = row;
+        debugger
+        console.log(this.templateSelection)
+       },
+      //关闭设备信息框
+      handleClose(done) {
+            done();
+      },
+             // 情况选中
+         clear(){
+         this.templateRadio="";
+       },
+
+
+    //  设备授权
+      eAuthorization(){
+        var that=this;
+
+        if(that.templateRadio==''){
+          that.$message({
+            type: 'info',
+            message: '请选择要授权的设备'
+          });
+        }else {
+          var changparam={
+               deviceId:that.templateSelection.id,
+               deviceName:that.templateSelection.name 
+          }
+             that.$refs.mychild.getAuthrization(changparam);
+        }
+        
+      },
+      //  查看设备
+      lookInfo(row){
+        // if(this.$store.state.userinfo.userDeviceAuth!=1){
+        //   this.$message.info("抱歉,您没有查看设备的权限")
+        //   return
+        // }
+          this.getLnformation=true;
+          this.equipmenInfo=row;
+        },
+        // 操作设备
         switchChange(e){
+           if(this.$store.state.userinfo.userDeviceAuth!=1){
+              this.$message.info("抱歉,您没有操作设备的权限")
+             return
+           }
           var that=this;
           console.log(e.mainStatus)
+
+        
+
           if(e.mainStatus==1){
             var swit=false;
             var clo="CLOSE"
-
           }else{
             var swit=true;
              var clo="OPEN"
-          }
-          
+          }         
           if(e.type==1){
             var param={
             "on":swit
             }
-
-
              var Swiparam={
               "command":"SwitchMain",
               "argument":param,
-               userId: this.$store.state.userinfo.uuid,
-               deviceId:e.id
               }
           }else if(e.type==4){
              var param={
@@ -308,17 +396,24 @@ import axios from "axios"
             var Swiparam={
               "command":"SetMotorOption",
               "argument":param,
-               userId: this.$store.state.userinfo.uuid,
-               deviceId:e.id
               }
 
-          }
-        
-         
-          that.axios.post('/SmartHomeTrade/device/deviceSwitchOnFalse',Swiparam).then(function(res){
+          } 
+
+         // 共同参数
+            var commparam={
+               userId: this.$store.state.userinfo.uuid,
+               deviceId:e.id,
+               userDeviceAuth:this.$store.state.userinfo.userDeviceAuth
+            }
+
+          var param = Object.assign(commparam, Swiparam);       
+          that.axios.post('/SmartHomeTrade/device/deviceSwitchOnFalse',param).then(function(res){
             if(res.data.code==0){
               that.getequipmentlist()
 
+            }else{
+              that.$message.error(res.data.message)
             }
 
           })
@@ -334,48 +429,28 @@ import axios from "axios"
 
 
 
-      // handleSelectionChange(val) {
-      //   this.multipleSelection = val;
-      //   console.log(val)
-      // },
-        getTemplateRow(index,row){                
-        this.templateSelection = row;
-        console.log(this.templateSelection)
-       },
-      //关闭设备信息框
-      handleClose(done) {
-            done();
-      },
-    
-      //  转换状态
-      mainStatus: function (row, column) {
-        return row.mainStatus == 1? '开启' : row.mainStatus == 2? '关闭' : row.mainStatus == 3? '停':""
-      },
-    //  查看设备
-      lookInfo(row){
-          this.getLnformation=true;
-          this.equipmenInfo=row;
-     },
-     
-    //  设备授权
-      eAuthorization(){
-        var that=this;
 
-        if(that.templateRadio==''){
-          that.$message({
-            type: 'info',
-            message: '请选择要授权的设备'
-          });
-        }else {
-          var changparam=that.templateSelection.id
-             that.$refs.mychild.getAuthrization(changparam);
-        }
-        
-      }
+
+
+
+
+
+
+
+
+
+
+    
+     
+
     },
   }
 </script>
 
 <style scoped>
+.getLnformation{
+  height:250px;
+
+}
 
 </style>

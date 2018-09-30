@@ -5,24 +5,24 @@
           :visible.sync="changeUser"
           width="30%"
           :before-close="handleClose">
-          <div class="changeUser">
+          <div class="changeUser" style="padding-right: 10%;height:250px">
             <el-form ref="changeformValidate" :model="changeformValidate" :rules="ruleValidate" :label-width="60">
               <el-form-item label="姓名" :label-width="formLabelWidth" prop="name" >
-                <el-input v-model="changeformValidate.name" auto-complete="off" style="width:220px" placeholder="请输入姓名"></el-input>
+                <el-input v-model="changeformValidate.name" @focus="removeValid('name')" auto-complete="off" placeholder="请输入姓名"></el-input>
               </el-form-item>
               <el-form-item label="电话" :label-width="formLabelWidth" prop="userMobile">
-                <el-input v-model="changeformValidate.userMobile" auto-complete="off"  placeholder="请输入电话" style="width:220px"></el-input>
+                <el-input v-model="changeformValidate.userMobile" @focus="removeValid('userMobile')" auto-complete="off"  placeholder="请输入电话"></el-input>
               </el-form-item>
             </el-form>
           </div>
           <span slot="footer" class="dialog-footer">
-              <el-button type="primary" @click="change_User('changeformValidate')">确 定</el-button>
+              <el-button type="primary" @click="change_User('changeformValidate')"  v-loading.fullscreen.lock="fullscreenLoading" element-loading-text="正在提交" element-loading-background="rgba(0, 0, 0, 0)">确 定</el-button>
             </span>
         </el-dialog>
 	</div>
 </template>
 <script>
-import axios from "axios"
+// import axios from "axios"
 	export default{
 		name:"changeuser",
 		data(){
@@ -46,33 +46,49 @@ import axios from "axios"
 		      };
 			return{
 				changeUser:false,
+				 fullscreenLoading:false,
 				 formLabelWidth: '100px',
 				 ruleValidate: {
 		          name: [
-		            { required: true,validator: name, trigger: 'blur' }
+		            { required: true,validator: name, }
 		          ],
 		          userMobile: [
 		            { required: true,validator: userMobile, trigger: 'blur' }
 		          ],
 		        },
 		         changeformValidate:{
-			          uuid:'',
-			          name: '',
-			          userMobile: ''
+			          uuid:null,
+			          name: null,
+			          userMobile: null,
+			          userLevel:null,
+			          userId:null
 			        },
 			}
 		},
 		methods:{
 			updataUser(e){
 				this.changeUser=true;
-				this.changeformValidate=e;
+				this.changeformValidate.uuid=e.uuid;
+				this.changeformValidate.name=e.name;
+				this.changeformValidate.userMobile=e.userMobile;
+				if(e.userLevel==3){
+					this.changeformValidate.userLevel=e.userLevel
+					this.changeformValidate.userId=e.userId
+				}
+
 			},
+			   // 获取焦点清空验证提示
+	      removeValid(formName){
+	      	this.$refs[formName].clearValidate();
+	      },
 			// 提交修改信息
 			 change_User(changeformValidate){
 		        var that=this;
 		        that.$refs[changeformValidate].validate((valid) => {
 		          if (valid) {
-		           axios.post('/SmartHomeTrade/user/updateNextAdmin',that.changeformValidate).then(function (res) {
+		          	that.fullscreenLoading=true;
+		           that.axios.post('/SmartHomeTrade/user/updateNextAdmin',that.changeformValidate).then(function (res) {
+		           	that.fullscreenLoading=false;
 		                  console.log(res)
 		                  if(res.data.code==0){
 		                  	that.$message({
@@ -80,7 +96,9 @@ import axios from "axios"
 				                message: res.data.message
 						        });
 				               that.$emit('refreshList');
+				               that.$emit('clearselect');
 				              that.changeUser=false;
+
 		                  }else{
 		                  	that.$message({
 				                type: 'error',

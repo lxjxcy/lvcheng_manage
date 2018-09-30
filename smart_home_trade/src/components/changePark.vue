@@ -7,13 +7,13 @@
           :before-close="handleClose">
           <div class="add cdialogwidth">
             <el-form label-width="100px" :model="changeParkparam" ref="changeParkparam" :rules="rules">
-              <el-form-item label="园区地址" prop="detailAddress" :label-width="formLabelWidth">
-                <el-input v-model="changeParkparam.detailAddress"></el-input>
+              <el-form-item label="园区地址" prop="detailAddress" :label-width="formLabelWidth" ref="detailAddress">
+                <el-input v-model="changeParkparam.detailAddress" @focus="removeValid('detailAddress')"></el-input>
               </el-form-item>
             </el-form>
           </div>
           <span slot="footer" class="dialog-footer">
-            <el-button type="primary" @click="dialogchang('changeParkparam')">确 定</el-button>
+            <el-button type="primary" @click="dialogchang('changeParkparam')"  v-loading.fullscreen.lock="fullscreenLoading" element-loading-text="正在提交" element-loading-background="rgba(0, 0, 0, 0)">确 定</el-button>
           </span>
     </el-dialog>
 	</div>
@@ -26,6 +26,7 @@ export default {
       return {
         dialogVisible: false,
          formLabelWidth: '100px',
+          fullscreenLoading:false,
         changeParkparam:{
 
         },
@@ -45,15 +46,22 @@ export default {
       	this.dialogVisible=true;
       	this.changeParkparam=e;
       },
+         // 获取焦点清空验证提示
+        removeValid(formName){
+          this.$refs[formName].clearValidate();
+        },
       dialogchang(changeParkparam){ 
       	var that=this;
       	that.$refs[changeParkparam].validate((valid) => {
           if (valid) {
+            that.fullscreenLoading=true;
 		      	 that.axios.post("/SmartHomeTrade/garden/updateGarden",that.changeParkparam).then(function(res){
+              that.fullscreenLoading=false;
                 if(res.data.code==0){
                   that.dialogVisible=false;
                     that.$message.success(res.data.message);
                     that.$emit('refreshList');
+                    this.$emit('clearselect');
                 }else{
                   that.$message.error(res.data.message);
                 }

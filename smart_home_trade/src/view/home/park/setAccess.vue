@@ -513,6 +513,8 @@
   }
   .active{
     padding-left: 20px;
+  width:100%;
+  overflow-x: scroll;
   }
 
 

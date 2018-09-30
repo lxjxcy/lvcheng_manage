@@ -5,15 +5,15 @@
 		  :visible.sync="dialogVisible"
 		  width="30%"
 		  :before-close="handleClose">
-		   <div class="dialogwidth">
+		   <div class="dialogwidth" style="padding-right: 10%">
             <el-form :model="changeFloorparam"  ref="changeFloorparam" label-width="100px" :rules="rules">
-              <el-form-item label="大楼名称" prop="name">
-                <el-input v-model="changeFloorparam.name" auto-complete="off" label-width="100px"></el-input>
+              <el-form-item label="楼层名称" prop="name" ref="name" label-width="100px">
+                <el-input v-model="changeFloorparam.name" @focus="removeValid('name')" auto-complete="off" ></el-input>
               </el-form-item>
             </el-form>
           </div>
           <div slot="footer" class="dialog-footer">
-            <el-button type="primary" @click="dialogchang('changeFloorparam')">确 定</el-button>
+            <el-button type="primary" @click="dialogchang('changeFloorparam')"  v-loading.fullscreen.lock="fullscreenLoading" element-loading-text="正在提交" element-loading-background="rgba(0, 0, 0, 0)">确 定</el-button>
           </div>
 		</el-dialog>
 	</div>
@@ -25,6 +25,7 @@ export default {
    data() {
       return {
         dialogVisible: false,
+         fullscreenLoading:false,
         changeFloorparam:{
 
         },
@@ -45,16 +46,23 @@ export default {
       	this.dialogVisible=true;
       	this.changeFloorparam=e;
       },
+         // 获取焦点清空验证提示
+        removeValid(formName){
+          this.$refs[formName].clearValidate();
+        },
 
       dialogchang(changeFloorparam){ 
       	var that=this;
       	that.$refs[changeFloorparam].validate((valid) => {
           if (valid) {
+            that.fullscreenLoading=true;
 		      	 that.axios.post("/SmartHomeTrade/floor/updateFloor",that.changeFloorparam).then(function(res){
+              that.fullscreenLoading=false;
                 if(res.data.code==0){
                   that.dialogVisible=false;
                     that.$message.success(res.data.message);
                     that.$emit('refreshList');
+                      that.$emit('clearselect');
                 }else{
                   that.$message.error(res.data.message);
                 }

@@ -6,9 +6,9 @@
         <el-form-item label="名称">
           <el-input v-model="formSearch.name" placeholder=""></el-input>
         </el-form-item>
-        <el-form-item label="编号">
+       <!--  <el-form-item label="编号">
           <el-input v-model="formSearch.roomNum" placeholder=""></el-input>
-        </el-form-item>
+        </el-form-item> -->
         <el-form-item>
           <el-button type="primary" @click="onSubmit">查询</el-button>
         </el-form-item>
@@ -22,7 +22,7 @@
 
       <el-table
         :data="roomList"
-        height="435"
+        height="408"
         border
         v-loading='loading'
 
@@ -31,29 +31,33 @@
           type="selection"
           width="50">
         </el-table-column> -->
-         <el-table-column label="" width="40">
+         <el-table-column label="" width="50">
           <template slot-scope="scope">
               <el-radio :label="scope.row.roomNum" v-model="templateRadio" @change.native="getTemplateRow(scope.$index,scope.row)">&nbsp</el-radio>
           </template>
         </el-table-column>
         <el-table-column
           prop="roomNum"
-          label="房间编号"
-          width="180">
+          label="序号"
+          width="55"
+          align="center">
         </el-table-column>
         <el-table-column
           prop="name"
           label="房间名称"
-          width="180">
+         
+          align="center">
         </el-table-column>
         <el-table-column
           prop="deviceNum"
           label="设备数量"
-          width="180">
+         
+          align="center">
         </el-table-column>
         <el-table-column
           prop="inAddress"
-          label="所在位置">
+          label="所在位置"
+          align="center">
         </el-table-column>
       </el-table>
       <div class="block">
@@ -98,6 +102,7 @@
 
      mounted(){
         var that=this;
+         that.$store.commit('saveIndex',"5-1")
         that.formSearch.roomListId=that.$store.state.userinfo.manageScopeIdList;
          that.formSearch.adrIdList=that.$store.state.userinfo.addrList
         that.myRoomparam.adrIdList=that.$store.state.userinfo.addrList;
@@ -139,7 +144,14 @@
        },
         onSubmit() {
          var that=this;
+         if(that.formSearch.name==""){
+            that.formSearch.name=null
+         }
+          if(that.formSearch.roomNum==""){
+            that.formSearch.roomNum=null
+         }
           if(that.formSearch.name==null&&that.formSearch.roomNum==null){
+            that.getroomList()
             return;
           }
            that.loading=true;             

@@ -2,21 +2,15 @@
   <div class="my-header">
     <div class="left l">
       <ul>
-        <li class="l"><img src="../../assets/userlogo.png"></li>
+        <li class="l listimg" @click="nowreload()"><img src="../../assets/userlogo.png"></li>
         <li class="l title" >{{message}}</li>
-       <!--  <li class="l change">
-          <el-dropdown @command="handleCommand">
-          <span class="el-dropdown-link">
-            切换<i class="el-icon-arrow-down el-icon--right"></i>
-          </span>
-            <el-dropdown-menu slot="dropdown">
-              <el-dropdown-item command="a">园区管理</el-dropdown-item>
-              <el-dropdown-item command="b">楼层管理</el-dropdown-item>
-              <el-dropdown-item command="c">房间管理</el-dropdown-item>
-            </el-dropdown-menu>
-          </el-dropdown>
-
-        </li> -->
+        <li class="l change">
+          <switchPark v-if="this.$store.state.userinfo.userLevel==2"></switchPark>
+          <switchRoom v-if="this.$store.state.userinfo.userLevel==5"></switchRoom>
+          <switchBuild v-if="this.$store.state.userinfo.userLevel==3"></switchBuild>
+          <switchFloor v-if="this.$store.state.userinfo.userLevel==4"></switchFloor>
+         
+        </li>
       </ul>
     </div>
     <div class="right r">
@@ -24,34 +18,11 @@
           <li class="l"><i class="iconfont">&#xe636;</i>当前用户：{{this.$store.state.userinfo.loginName}}</li>
           <li class="l list-1" @click="changepass()"><i class="iconfont">&#xe611;</i>修改密码</li>
           <!--修改密码-->
-            <el-dialog
-              title="修改密码"
-              :visible.sync="changePass"
-              width="30%"
-              :before-close="handleClose">
-              <div class="changePass">
-                <!--<div class="now-user">当前用户：<span>{{this.$store.state.userInfo.loginName}}</span></div>-->
-                <el-form ref="changeformValidate" :model="changeformValidate" :rules="ruleValidate" :label-width="60">
-                  <el-form-item label="当前用户" :label-width="formLabelWidth" prop="oldPsw" >
-                    <el-input v-model="changeformValidate.loginName" auto-complete="off" style="width:220px"  :disabled="true"></el-input>
-                  </el-form-item>
-                  <el-form-item label="原密码" :label-width="formLabelWidth" prop="oldPsw" >
-                    <el-input v-model="changeformValidate.password" auto-complete="off" style="width:220px" placeholder="请输入原密码"></el-input>
-                  </el-form-item>
-                  <el-form-item label=" 新密码" :label-width="formLabelWidth" prop="newPsw" >
-                    <el-input v-model="changeformValidate.newPassword" auto-complete="off" style="width:220px" placeholder="请输入新密码"></el-input>
-                  </el-form-item>
-                </el-form>
-
-
-
-              </div>
-              <span slot="footer" class="dialog-footer">
-                <el-button type="primary" @click="changsubmit('changeformValidate')">提交</el-button>
-              </span>
-            </el-dialog>
+            
           <li class="l list-2" @click="back()"><i class="iconfont">&#xe795;</i>退出</li>
+
         </ul>
+        <changePassword  ref="mychild"></changePassword>
 
     </div>
 
@@ -60,9 +31,21 @@
 </template>
 
 <script>
-  import axios from 'axios'
+  // import axios from 'axios'
+  import changePassword from "../login/changePassword.vue"
+  import switchPark from "./switch/switchPark.vue"
+  import switchRoom from "./switch/switchRoom.vue"
+  import switchBuild from "./switch/switchBuild.vue"
+  import switchFloor from "./switch/switchFloor.vue"
     export default {
         name: "myHeader",
+        components:{
+         changePassword,
+         switchPark,
+         switchRoom,
+         switchBuild,
+         switchFloor
+        },
       data(){
         const validatePass = (rule, value, callback) => {
           if (value === '') {
@@ -87,28 +70,12 @@
         };
           return{
             message:"",
-            changePass:false,
-            changeformValidate:{
-              loginName: '',
-              password: '',
-              newPassword:''
-
-            },
-            formLabelWidth: '100px',
-            ruleValidate: {
-              loginName: [
-                { required: true,validator: validateName, trigger: 'blur' }
-              ],
-              password: [
-                { required: true,validator: validatePass, trigger: 'blur' }
-              ],
-              newPassword: [
-                { required: true,validator: validateNewpass, trigger: 'blur' }
-              ],
-            },
+            username:""
+           
           }
       },
       mounted(){
+        this.username=this.$store.state.userinfo.loginName
        if(this.$store.state.userinfo.userLevel==1){
           this.message="系统管理平台"
         }else if(this.$store.state.userinfo.userLevel==2){
@@ -122,85 +89,52 @@
         }else{
           this.message="房间管理平台"
         }
-          // console.log(this.$store.state.userInfo.loginName)
-        
-        
       },
       methods:{
-        handleCommand(command) {
-          this.$message('click on item ' + command);
+        nowreload(){
+         location.reload()
         },
+       
         // 修改密码弹框
         changepass(){
-          this.changeformValidate.loginName=this.$store.state.userinfo.loginName
-          this.changePass=true;
+           this.$refs.mychild.openDialog();          
         },
-        //修改密码
-        changsubmit(changeformValidate){
-          var that=this;
-          that.$refs[changeformValidate].validate((valid) => {
-            if (valid) {
-             axios.post("/SmartHomeTrade/user/updatePassword",that.changeformValidate).then(function (res) {
-               that.$message({
-                 type: 'success',
-                 message: res.data.message
-               });
-               that.changePass=false
-             })
 
-            } else {
-              console.log('error submit!!');
-              return false;
-            }
-          });
-
-        },
+        
         back(){
-          var that=this;
-           that.$confirm('你确认退出登录么, ?', '提示', {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
-          type: 'warning'
-        }).then(() => {
-            axios.post('/SmartHomeTrade/user/exitUser',{
-            status:1,
-            loginName:that.$store.state.userinfo.loginName
-          }).then(function (res) {
-            if(res.data.code==0){
+            var that=this;
+             that.$confirm('你确认退出登录么?', '提示', {
+            confirmButtonText: '确定',
+            cancelButtonText: '取消',
+            type: 'warning'
+          }).then(() => {
+              that.axios.post('/SmartHomeTrade/user/exitUser',{
+              status:1,
+              loginName:that.$store.state.userinfo.loginName
+            }).then(function (res) {
+              if(res.data.code==0){
 
-              console.log(res)
+                console.log(res)
+              that.$message({
+                type: 'success',
+                message: res.data.message
+              });
+              that.$store.commit('exitUser')
+               that.$set(that.$store.state,'isgoback',true)
+              // that.$router.push("/")
+             
+              that.$router.push({name:'login',params:{username:that.username}})
+              }            
+            })        
+          }).catch(() => {
             that.$message({
-              type: 'success',
-              message: res.data.message
-            });
-            that.$store.commit('exitUser')
-            that.$router.push("/")
-            }
-            
-          })
-
-
-
-        
-        }).catch(() => {
-          that.$message({
-            type: 'info',
-            message: '已取消退出'
-          });          
-        });
-
-
-
-
-
-          // var status=Number(that.$store.state.userInfo.status)
-        
-
+              type: 'info',
+              message: '已取消退出'
+            });          
+          });
         },
         //关闭弹窗
-        handleClose(done) {
-          done();
-        },
+
       }
 
 
@@ -212,10 +146,10 @@
   $color:#fff;
 img{
   height:50px;
+  display: inline-block;
+  padding:0 20px;
   position: relative;
-  top:-5px;
-  padding: 0 13px;
-  padding-left:25px;
+  top:-3px;
 }
   .el-input.is-disabled .el-input__inner {
      background-color: #fff;
@@ -224,21 +158,25 @@ img{
   }
 
   .left{
-    font-size: 0.24rem;
+    font-size: 24px;
     color:$color;
-    line-height: 0.45rem;
+    line-height: 45px;
   }
   .right{
-    font-size: 0.14rem;
+    font-size: 14px;
     color:$color;
-    /*line-height: 0.5rem;*/
+    /*line-height: 50px;*/
   }
   .change{
-    font-size:0.18rem ;
+    font-size:18px ;
+  }
+  .listimg{
+    line-height: 45px;
+    cursor: pointer
   }
   li{
     padding:0 10px;
-    line-height: 0.45rem;
+    line-height: 45px;
 
   }
   .list-1,.list-2{

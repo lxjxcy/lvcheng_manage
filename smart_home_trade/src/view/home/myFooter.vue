@@ -15,7 +15,7 @@
 
 
   .myFooter{
-    height:0.4rem;
+    height:30px;
     width:100%;
     background: #505c5d;
     text-align: center;

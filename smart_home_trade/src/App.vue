@@ -1,6 +1,6 @@
 
 <template>
-  <div id="app" class="img1 note" :style ="note">
+  <div id="app">
      <!--  -->
     <router-view/>
   </div>
@@ -11,14 +11,7 @@ export default {
   name: 'App',
   data(){
     return{
-      iflook:"",
-        note: {
-          backgroundImage: "url(" + require("./assets/timg.jpg") + ") ",
-          backgroundPosition: "center center",
-          backgroundRepeat: "no-repeat",
-          backgroundSize: "cover",
-         backgroundColor:"#fff"
-        },
+    
     }
   },
   methods:{
@@ -35,7 +28,7 @@ export default {
 
   /*弹框内容width*/
    .dialogwidth{
-    padding-right: 0.53rem;
+    padding-right: 53px;
      height: 300px;
     overflow:hidden;
     overflow-y:auto;
@@ -59,6 +52,15 @@ export default {
   ul{
     list-style: none;
   }
+  /*选择框*/
+ /* .el-input--suffix .el-input__inner{
+    padding-right:50% !important;
+
+  }*/
+/*  .el-select .el-input__inner{
+    padding-right:30% !important;
+
+  }*/
 
   @font-face {
     font-family: 'iconfont';
@@ -77,30 +79,44 @@ export default {
     padding-right:5px;
   }
   header{
-    height:0.45rem;
+    height:45px;
     background: #2bc999;
+    position: fixed;
+    top:0;
+    left:0;
+    z-index: 1333;
+    width:100%;
+
   }
 
   /*按钮颜色*/
   .el-button--primary{
-    background-color:#14ac86;
-    border-color: #14ac86;
+    background-color:#14ac86 !important;
+    border-color: #14ac86 !important;
   }
   .el-button:focus, .el-button:hover{
-    background-color:#2bc999;
-    color:#fff;
+    background-color:#2bc999 !important;
+    color:#fff !important;
 
   }
+
   /*左侧*/
  
   .el-col-12{
     width:100% !important;
+    /*padding-right:3px;*/
+  }
+  .el-menu{
+    border-right: 0 !important;
   }
   /*多选*/
   .el-checkbox+.el-checkbox{
     margin-left:0;
   }
 
+body .el-table th.gutter{
+    display: table-cell!important;
+}
 
 
   .all{
@@ -110,15 +126,25 @@ export default {
     flex-direction:row;
   }
   .footerall{
-    height:0.4rem;
+    height:30px;
     width:100%;
     text-align: center;
-    line-height: 0.4rem;
+    line-height: 30px;
+    font-size: 14px;
+    position: fixed;
+    bottom: 0;
+    left:0;
+    /*margin-top:30px;*/
   }
   aside{
     width:12%;
     font-size: 20px;
     background: #525c64;
+     overflow:hidden;
+    overflow-y:auto;
+    /* overflow: hidden;*/
+     height:100%;
+
   }
   aside a{
     text-align: center;
@@ -132,7 +158,8 @@ export default {
     flex: 1;
     padding-left: 7px;
     width:60%;
-    overflow: hidden;
+    overflow:hidden;
+    overflow-y:auto;
   }
   .nowuser{
     height:140px;
@@ -141,44 +168,54 @@ export default {
     text-align: center;
   }
   .nowuser i{
-    font-size: 0.8rem;
+    font-size: 80px;
   }
 
 
 
   /*表格*/
   .top-nav{
-    height:.5rem;
+    height:45px;
     font-size: 16px;
     /*line-height: 0.6rem;*/
     border-bottom: 2px solid #2fc0fb ;
-    margin-bottom: 0.1rem;
+    margin-bottom: 10px;
     /*background: #f0f0f0;*/
     padding-top:8px;
-    padding-bottom: 0.47rem;
+    padding-bottom: 45px;
   }
 
   .el-button--small, .el-button--small.is-round{
     padding:4.5px 15px;
   }
+  /*表格头颜色*/
   .el-table--border th, .el-table__fixed-right-patch{
-    background:#f9f8f8;
-    color:#000;
+    background:#f9f8f8 !important;
+    color:#000 !important;
   }
+
   .el-table td, .el-table th{
-    padding:8px 0;
+    /*padding:6px 0 !important;*/
+    height:36.6px !important;
+    line-height: 36.6px !important;
+    padding:0 !important;
   }
+ 
   .top-nav input{
-    margin-left: 10px;
-    height:0.3rem;
-    width:1rem;
-    birder:1px solid #eceef4
+    /*margin-left: %;*/
+    height:30px;
+    width:90%;
+    border:1px solid #eceef4
   }
   .top-nav button{
 padding:8px 26px;
   }
+  /*分页框*/
   .el-pagination{
-    height:30px;
+    height:40px !important;
+    float: right !important;
+    padding-top: 10px !important;
+    padding-right:5px !important;
   }
   .main-table{
     overflow: hidden;
@@ -208,15 +245,17 @@ padding:8px 26px;
   }
   /*弹框*/
   .el-dialog__header{
-    /*border-bottom: 1px solid #ccc;*/
+    border-bottom: 1px solid #ccc;
     /*color:#fff;*/
     /*background: #109dfd !important;*/
-padding:10px 20px;
+padding:10px 20px !important;
   }
 
   /*弹框尾部*/
   .el-dialog__footer{
+     border-top: 1px solid #ccc;
     padding-top:5px;
+
   }
   .el-dialog__title{
     /*color:#fff;*/
@@ -249,13 +288,13 @@ padding:10px 20px;
   }
 
   .el-input--prefix .el-input__inner{
-    width:1.5rem
+    /*width:150px;*/
 
 
 
   }
   .el-input__prefix{
-    left:0.18rem
+    left:18px
   }
 
   /*设置权限*/

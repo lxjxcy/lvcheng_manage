@@ -6,38 +6,64 @@
           width="30%"
           :before-close="handleClose"
           append-to-body>
-          <div class="model-conent">
+          <div class="model-conent" style="padding-right: 10%">
             <el-form ref="addformValidate" :model="addformValidate" :rules="ruleValidate" :label-width="60">
-              <el-form-item label="用户名" :label-width="formLabelWidth" prop="loginName" placeholder="请输入用户名">
-                <el-input v-model="addformValidate.loginName" auto-complete="off" style="width:220px"></el-input>
+
+              <el-form-item label="用户名" :label-width="formLabelWidth" prop="loginName" ref="loginName">
+                <el-input v-model="addformValidate.loginName" @focus="removeValid('loginName')" auto-complete="off" placeholder="请输入用户名"></el-input>
               </el-form-item>
-              <el-form-item label="密码" :label-width="formLabelWidth" prop="password" placeholder="请输入密码">
-                <el-input type="password" v-model="addformValidate.password" auto-complete="off" style="width:220px"></el-input>
+
+              <!-- <el-form-item label="密码" :label-width="formLabelWidth" prop="password" ref="password">
+                <el-input type="password" v-model="addformValidate.password"  auto-complete="off" style="width:220px" placeholder="请输入6-20位数字,字母或符号" @focus="removeValid('password')"></el-input>
               </el-form-item>
-              <el-form-item label="姓名" :label-width="formLabelWidth" prop="name" placeholder="请输入姓名">
-                <el-input type="text" v-model="addformValidate.name" auto-complete="off" style="width:220px"></el-input>
+ -->
+              <el-form-item label="姓名" :label-width="formLabelWidth" prop="name" ref="name">
+                <el-input type="text" placeholder="请输入姓名" v-model="addformValidate.name" @focus="removeValid('name')" auto-complete="off"> </el-input>
               </el-form-item>
+               <el-form-item label="电话" :label-width="formLabelWidth" prop="userMobile" ref="userMobile">
+                <el-input v-model="addformValidate.userMobile" @focus="removeValid('userMobile')" auto-complete="off"  placeholder="请输入电话"></el-input>
+              </el-form-item>
+
               <el-form-item label="所属部门" prop="Dname" :label-width="formLabelWidth">
-                <el-select v-model="addformValidate.Dname" placeholder="" @change="getUserLevel">
+                <el-select v-model="addformValidate.dptId"  @change="getUserLevel" style="width:100%" placeholder="请选择部门">
                   <el-option
                     v-for="item in dptList"
                     :key="item.dptId"
-                    :label="item.name"
+                    :label="item.addressId_name"
                     :value="item.dptId">
                   </el-option>
                 </el-select>
-              </el-form-item>        
-              <el-form-item label="电话" :label-width="formLabelWidth" prop="userMobile" placeholder="请输入电话">
-                <el-input v-model="addformValidate.userMobile" auto-complete="off" style="width:220px"></el-input>
               </el-form-item>
-              <el-form-item label="邮箱" :label-width="formLabelWidth" prop="userEmail" placeholder="请输入姓名">
-                <el-input v-model="addformValidate.userEmail" auto-complete="off" style="width:220px"></el-input>
+
+              <el-form-item label="可见用户" :label-width="formLabelWidth" v-if="this.$store.state.userinfo.userLevel!=5">
+	               <el-select
+					    v-model="addformValidate.authCreateUser"
+					    multiple
+					    collapse-tags
+					    placeholder="请选择用户" 
+					    style="width:100%">
+					    <el-option
+					      v-for="item in listNextAdmin"
+					      :key="item.userMobile"
+					      :label="item.name"
+					      :value="item.userMobile">
+					    </el-option>
+					</el-select>
+	          </el-form-item> 
+
+             
+
+             <!--  <el-form-item label="邮箱" :label-width="formLabelWidth" prop="userEmail" ref="userEmail">
+                <el-input v-model="addformValidate.userEmail" @focus="removeValid('userEmail')" auto-complete="off" style="width:220px" placeholder="请输入邮箱"></el-input>
               </el-form-item>
+ -->
             </el-form>
+            <span style="color: #909090;font-size: 12px">(提示：app用户初始密码为手机号后六位)</span>
           </div>
           <span slot="footer" class="dialog-footer">
-                  <el-button type="primary" @click="addappuser('addformValidate')">确 定</el-button>
-                </span>
+                  <el-button type="primary" @click="addappuser('addformValidate')"  v-loading.fullscreen.lock="fullscreenLoading" element-loading-text="正在提交" element-loading-background="rgba(0, 0, 0, 0)">确 定</el-button>
+           </span>
+
         </el-dialog>
 		
 	</div>
@@ -59,109 +85,172 @@
 		      //用户名验证
 		      const loginName = (rule, value, callback) => {
 		        if (value === '') {
-		          callback(new Error('姓名不能为空'));
-		        }else {
+		          callback(new Error('用户名不能为空'));
+		        }else if(!(/^\S{1,6}$/.test(value))){
+		        	callback(new Error('请输入6位之内的非空字符串'));
+
+		        }
+		        else {
 		          callback();
 		        }
 		      };
-		      //层级管理验证userLevel
-		      const userLevel = (rule, value, callback) => {
-		        if (value === '') {
-		          callback(new Error('曾经不能为空'));
-		        }else {
-		          callback();
-		        }
-		      };
-		      //密码验证
-		      const password = (rule, value, callback) => {
-		        if (value === '') {
-		          callback(new Error('密码不能为空'));
-		        }else {
-		          callback();
-		        }
-		      };
+		      // //密码验证
+		      // const password = (rule, value, callback) => {
+		      //   if (value === '') {
+		      //     callback(new Error('密码不能为空'));
+		      //   }
+		      //   else if(!(/^[a-zA-Z0-9\W_]{6,20}/.test(value))){
+		      //   	callback(new Error('请输入6-20位数字，字母或符号'));
+
+		      //   }else {
+		      //     callback();
+		      //   }
+		      // };
 		      //真实姓名验证
 		      const name = (rule, value, callback) => {
 		        if (value === '') {
 		          callback(new Error('真实姓名不能为空'));
+		        }else if(!(/^\S{1,6}$/.test(value))){
+		        	callback(new Error('请输入6位之内的非空字符串'));
+
 		        }else {
 		          callback();
 		        }
 		      };
 		      //邮箱验证
-		      const userEmail = (rule, value, callback) => {
-		        if (value === '') {
-		          callback(new Error('邮箱不能为空'));
-		        }else if(!(/^([0-9A-Za-z\-_\.]+)@([0-9a-z]+\.[a-z]{2,3}(\.[a-z]{2})?)$/g).test(value)){
-		          callback(new Error('邮箱格式不正确'));
-		        }else {
-		          callback();
-		        }
-		      };
+		      // const userEmail = (rule, value, callback) => {
+		      //   if (value === '') {
+		      //     callback(new Error('邮箱不能为空'));
+		      //   }else if(!(/^([0-9A-Za-z\-_\.]+)@([0-9a-z]+\.[a-z]{2,3}(\.[a-z]{2})?)$/g).test(value)){
+		      //     callback(new Error('邮箱格式不正确'));
+		      //   }else {
+		      //     callback();
+		      //   }
+		      // };
 	      return {
 	        dialogVisible: false,
+	        fullscreenLoading:false,
 	         formLabelWidth: '100px',
 		      	   addformValidate: {
 			          loginName: '',
-			          password: '',
+			          // password: '',
 			          name:'',
 			          userMobile:'',
-			          userEmail:'',
+			          // userEmail:'',
 			          Dname:'',
+			          dptId:"",
 			          roomId:'',
 			          departmentId:'',
-			          userAddressId:''
-			          
+			          userAddressId:'',
+			          authCreateUser:null,    
 			        },
+			        listNextAdmin:[],
 			        dptList:[],
 			        url:"",
 			        ruleValidate: {
 			          loginName: [
 			            { required: true,validator: loginName, trigger: 'blur' }
 			          ],
-			          password: [
-			            { required: true,validator: password, trigger: 'blur' }
-			          ],
+			          // password: [
+			          //   { required: true,validator: password, trigger: 'blur' }
+			          // ],
 			          name: [
 			            { required: true,validator: name, trigger: 'blur' }
 			          ],
 			          userMobile: [
 			            { required: true,validator: userMobile, trigger: 'blur' }
 			          ],
-			          userEmail: [
-			            { required: true,validator: userEmail, trigger: 'blur' }
-			          ],
-			          Dname:[
-			            { required: true,validator: userLevel, trigger: 'blur' }
+			          // userEmail: [
+			          //   { required: true,validator: userEmail, trigger: 'blur' }
+			          // ],
+			          dptId:[
+			            { required: true,message: '部门不能为空', }
 			          ],
 
 			        },
 	       };
 	    },
 	    methods: {
-	    	getaddAppuser(e){
-	    		console.log(e)
+	    	getaddAppuser(){
 	    		var that=this;
 	    		that.dialogVisible=true;
-	    		
-	    		if(e=="1"){
+	    		// 部门
 				   that.axios.post("/SmartHomeTrade/department/selectDepartmentByMobile",{
 			          createUser:that.$store.state.userinfo.userMobile,
 			        }).then(function(res){
 			        	if(res.data.code==0){
-			        		that.dptList=res.data.data.dptList
+			        		var dptList=res.data.data.dptList;
+			        		for(var i=0;i<dptList.length;i++){
+			        			if(dptList[i].adrScope!=null){
+			        					dptList[i].addressId_name=dptList[i].name+"      ("+dptList[i].adrScope+")"
+			        			}else{
+			        				dptList[i].addressId_name=dptList[i].name
+			        			}
+			        		
+
+			        		}
+			        		that.dptList=dptList
 			        	}
 			        })
-	    		}
+			        // 用户
+			          if(that.$store.state.userinfo.userLevel==2){
+			          	var beScopeId=that.$store.state.parame.parkid;
+			          }
+			          if(that.$store.state.userinfo.userLevel==3){
+			          	var beScopeId=that.$store.state.parame.buildid;
+			          }
+			          if(that.$store.state.userinfo.userLevel==4){
+			          	var beScopeId=that.$store.state.parame.floorid;
+			          }
+			       var userParams={
+			       	createUser:that.$store.state.userinfo.userMobile,
+			       	beScopeId:beScopeId
+			       }
+				    // if(that.$store.state.userinfo.userLevel==2){
+			     //      that.axios.post("/SmartHomeTrade/user/selectYardNxUser",{
+			     //      	createUser:that.$store.state.userinfo.userMobile,
+			     //      	action:2,
+
+			     //      }).then(function (res) {
+			     //          console.log(res)
+			     //          that.listNextAdmin =res.data.data.userList;
+			     //        })
+			     //    }else if(that.$store.state.userinfo.userLevel==3||that.$store.state.userinfo.userLevel==4){
+			            // that.axios.post("/SmartHomeTrade/user/selectNextAdmin",userParams).then(function (res) {
+			            //   console.log(res)
+			            //   that.listNextAdmin =res.data.data.listNextAdmin;
+			            // })
+			        // }
+			        that.axios.post("/SmartHomeTrade/user/selectNextAdmin",userParams).then(function (res) {
+		               console.log(res)
+		              if(res.data.code==0){
+		                if(res.data.data!=null){
+		                   that.listNextAdmin =res.data.data.listNextAdmin;		                   
+		             
+		                }
+
+		              }else{
+		                // that.$message.error(res.data.message)
+		              } 
+		            })
+
+	    		
+
 	    			
-	    		},	     
+	        },	
+
 		       //关闭弹框
 	      handleClose(done) {
 	        done();
 	         this.$emit('clearselect');
 	        this.resetaddUser("addformValidate")
+	       
 
 
+	      },
+	      // 获取焦点清空验证提示
+	      removeValid(formName){
+	      	this.$refs[formName].clearValidate();
 	      },
 	      // 获取部门信息
 	      getUserLevel(e){
@@ -180,26 +269,30 @@
 	      	var that=this;
 	      	that.$refs[addformValidate].validate((valid) => {
 		          if (valid) {
+		          	that.fullscreenLoading=true;
 		          	var param={
 		          	  loginName: that.addformValidate.loginName,
-			          password: that.addformValidate.password,
+			          // password: that.addformValidate.password,
 			          name:that.addformValidate.name,
 			          userMobile:that.addformValidate.userMobile,
-			          userEmail:that.addformValidate.userEmail,
+			          // userEmail:that.addformValidate.userEmail,
 			          roomId:that.addformValidate.roomId,
 			          departmentId:that.addformValidate.departmentId,
 			          userAddressId:that.addformValidate.userAddressId,
 			          createUser:that.$store.state.userinfo.userMobile,
+			          authCreateUser:that.addformValidate.authCreateUser
+
 		          	}
 		          	that.axios.post("/SmartHomeTrade/appUser/insertAppUser",param).then(function(res){
+		          		that.fullscreenLoading=false;
 		          		if(res.data.code==0){
 		          			that.$emit('refreshList');
 		          			 that.resetaddUser("addformValidate")
 		          			that.dialogVisible=false;
 		          			 that.$message.success(res.data.message);
 		          		}else{
-		          			that.dialogVisible=false;
-		          			 that.resetaddUser("addformValidate")
+		          			// that.dialogVisible=false;
+		          			 // that.resetaddUser("addformValidate")
 		          			that.$message.error(res.data.message);
 		          		}
 

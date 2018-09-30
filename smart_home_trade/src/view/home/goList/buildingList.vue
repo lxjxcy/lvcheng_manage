@@ -113,7 +113,7 @@
 </template>
 
 <script>
-  import axios from  'axios'
+  // import axios from  'axios'
   export default {
     name: "buildingManagement",
 
@@ -194,7 +194,7 @@
       getbuildList(){
         console.log("ssss")
         var that=this;
-        axios.post('/garden/selectBlockCount',that.builparams).then(function (res) {
+        that.axios.post('/garden/selectBlockCount',that.builparams).then(function (res) {
 
           if(res.data.code==0){
             that.loading=false;

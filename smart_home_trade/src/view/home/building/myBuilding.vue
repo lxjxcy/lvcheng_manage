@@ -4,11 +4,11 @@
     <div class="top-nav">
       <el-form :inline="true" :model="formSearch" class="demo-form-inline">
         <el-form-item label="名称">
-          <el-input v-model="formSearch.buildingName" placeholder=""></el-input>
+          <el-input v-model="formSearch.buildingName" ></el-input>
         </el-form-item>
-        <el-form-item label="编号">
+       <!--  <el-form-item label="编号">
           <el-input v-model="formSearch.blockNum" placeholder=""></el-input>
-        </el-form-item>
+        </el-form-item> -->
         <el-form-item>
           <el-button type="primary" @click="onSubmit">查询</el-button>
         </el-form-item>
@@ -21,7 +21,7 @@
 
       <el-table
         :data="blockList"
-        height="435"
+        height="408"
         border
         v-loading='loading'
         style="width: 100%">
@@ -36,22 +36,26 @@
         </el-table-column>
         <el-table-column
           prop="blockNum"
-          label="大楼编号"
-          width="180">
+          label="序号"
+          width="55"
+           align="center">
         </el-table-column>
         <el-table-column
           prop="buildingName"
           label="大楼名称"
-          width="180">
+         
+           align="center">
         </el-table-column>
         <el-table-column
           prop="roomNum"
           label="楼层数量"
-          width="180">
+         
+           align="center">
         </el-table-column>
         <el-table-column
           prop="yardName"
-          label="所在园区">
+          label="所在园区"
+           align="center">
         </el-table-column>
       </el-table>
       <div class="block">
@@ -70,7 +74,7 @@
 </template>
 
 <script>
-import axios from "axios"
+// import axios from "axios"
     export default {
         name: "myBuilding",
       data() {
@@ -94,6 +98,7 @@ import axios from "axios"
       },
       mounted(){
         var that=this;
+         that.$store.commit('saveIndex',"3-1")
         that.formSearch.buildingIdList=that.$store.state.userinfo.manageScopeIdList;
         that.myBuildingparam.buildingIdList=that.$store.state.userinfo.manageScopeIdList;
         that.getMybuildlist()
@@ -103,7 +108,7 @@ import axios from "axios"
         // 获取我的大楼列表
         getMybuildlist(){
           var that=this;
-          axios.post("/SmartHomeTrade/block/selectMyBlock",that.myBuildingparam).then(function(res){
+          that.axios.post("/SmartHomeTrade/block/selectMyBlock",that.myBuildingparam).then(function(res){
             if(res.data.code==0){
               that.loading=false;
               if(res.data.data!=null){
@@ -133,14 +138,22 @@ import axios from "axios"
       },
         onSubmit() {
          var that=this;
+         if(that.formSearch.blockNum==""){
+            that.formSearch.blockNum=null
+         }
+           if(that.formSearch.buildingName==""){
+            that.formSearch.buildingName=null
+         }
           if(that.formSearch.blockNum==null&&that.formSearch.buildingName==null){
             return;
           }
            that.loading=true;             
-          axios.post("/SmartHomeTrade/block/selectMyBlock",that.formSearch).then(function(res){
+          that.axios.post("/SmartHomeTrade/block/selectMyBlock",that.formSearch).then(function(res){
               if(res.data.code==0){
               that.blockList=res.data.data.blockList;
                 that.loading=false;              
+            }else{
+              that.$message.error(res.data.message)
             }
           })
         },

@@ -18,14 +18,44 @@
     </div>
     <div class="nav-middle"> 
       <ul>
-        <li class="l" @click="add()" v-if="this.$store.state.userinfo.userLevel==5"><i class="el-icon-plus"></i>添加</li>
-        <li class="l" @click="change()"><i class="el-icon-edit"></i>修改</li>
-        <li class="l" @click="deleted()"><i class="el-icon-close"></i>删除</li>
-        <li class="l" @click="stop()"><i class="el-icon-error"></i>暂停</li>
-        <li class="l" @click="recover()"><i class="el-icon-success"></i>恢复</li>
-        <addAppuser ref="myaddchild" @refreshList="getApplist"></addAppuser>
+        <li class="l" @click="add()"><i class="el-icon-plus"></i>添加</li>
+        <!-- v-if="this.$store.state.userinfo.userLevel==5&&this.$store.state.extendList.room_addappuser==1"  -->
+        <li class="l" @click="change()" v-if="(this.$store.state.userinfo.userLevel==2&&this.$store.state.extendList.park_changeappuser==1)||(this.$store.state.userinfo.userLevel==3&&this.$store.state.extendList.build_changeappuser==1)||(this.$store.state.userinfo.userLevel==4&&this.$store.state.extendList.floor_changeappuser==1)||(this.$store.state.userinfo.userLevel==5&&this.$store.state.extendList.room_addappuser==1)">
+          <i class="el-icon-edit" ></i>修改</li>
+
+
+        <li class="l" @click="deleted()" v-if="(this.$store.state.userinfo.userLevel==2&&this.$store.state.extendList.park_deleteappuser==1)||(this.$store.state.userinfo.userLevel==3&&this.$store.state.extendList.build_deleteappuser==1)||(this.$store.state.userinfo.userLevel==4&&this.$store.state.extendList.floor_deleteappuser==1)||(this.$store.state.userinfo.userLevel==5&&this.$store.state.extendList.room_deleteappuser==1)">
+           <i class="el-icon-close" > </i>删除</li>
+
+
+         
+
+        <li class="l" @click="stop()" v-if="(this.$store.state.userinfo.userLevel==2&&this.$store.state.extendList.park_stopappuser==1)||(this.$store.state.userinfo.userLevel==3&&this.$store.state.extendList.build_stopappuser==1)||(this.$store.state.userinfo.userLevel==4&&this.$store.state.extendList.floor_stopappuser==1)||(this.$store.state.userinfo.userLevel==5&&this.$store.state.extendList.room_stopappuser==1)">
+             <i class="el-icon-error"></i>暂停</li>
+
+
+
+
+        <li class="l" @click="recover()" v-if="(this.$store.state.userinfo.userLevel==2&&this.$store.state.extendList.park_recoveredappuser==1)||(this.$store.state.userinfo.userLevel==3&&this.$store.state.extendList.build_recoveredappuser==1)||(this.$store.state.userinfo.userLevel==4&&this.$store.state.extendList.floor_stopappuser==1)||(this.$store.state.userinfo.userLevel==5&&this.$store.state.extendList.room_recoveredappuser==1)">
+          <i class="el-icon-success"></i>恢复</li>
+
+
+         <li class="l" @click="createDepart()">
+          <!-- v-if="this.$store.state.userinfo.userLevel==5&&this.$store.state.extendList.changedement==1" -->
+          <i class="el-icon-edit-outline"></i>创建部门</li>
+
+
+          <li class="l" @click="uploads()">
+          <i class="el-icon-upload2" > </i>批量导入</li>
+
+         <!--  <li class="l" @click="exportdata()">
+          <i class="el-icon-download" > </i>下载模板</li> -->
+        <addAppuser ref="myaddchild" @refreshList="getApplist"  @clearselect="clear"></addAppuser>
+        <changeappuser ref="mychangechild" @refreshList="getApplist"  @clearselect="clear"></changeappuser>
+         <createDepartment ref="mycreatechild"  @refreshList="getApplist"  @clearselect="clear"></createDepartment>
       </ul>
     </div>
+     <load ref="myloadchild" @refreshList="getApplist"></load>
     <div class="main-table">
 
       <el-table
@@ -34,7 +64,7 @@
         v-loading="loading"
         style="width: 100%"
         tooltip-effect="dark"
-        height="400"
+        height="408"
         border>
         <!-- <el-table-column
           type="selection"
@@ -46,24 +76,41 @@
           </template>
         </el-table-column>
         <el-table-column
+          label="序号"
+          width="55"
+           align="center">
+          <template  slot-scope="scope"><span>{{scope.$index+(appuserParam.currentPage - 1) * appuserParam.pageSize + 1}} </span></template>
+        </el-table-column>
+        <el-table-column
           prop="name"
           label="姓名"
-          width="200">
+         
+          align="center">
         </el-table-column>
         <el-table-column
           prop="userMobile"
           label="联系电话"
-          width="180">
+         
+          align="center">
         </el-table-column>
         <el-table-column
           prop="state"
           label="状态"
-          width="180" :formatter="formatstate">
+         :formatter="formatstate"
+          align="center">
         </el-table-column>
         <el-table-column
           label="所属部门"
           prop="departmentName"
-          >
+          align="center"
+         >
+        </el-table-column>
+         <el-table-column
+          prop="action"
+          label="用户来源"
+         
+          align="center" 
+          :formatter="formataction">
         </el-table-column>
       </el-table>
       <div class="block">
@@ -84,8 +131,15 @@
 </template>
 
 <script>
+import changeappuser from "../../../components/changeappuser.vue"
+import load from "./load.vue"
+
   export default {
     name: "roomAppuser",
+    components:{
+      changeappuser,
+      load
+    },
     data() {
       return {
          templateRadio:'',
@@ -95,62 +149,39 @@
         appuserParam:{
           pageSize:10,
           currentPage:1,
-          action:"",
-          addressList:[],
-          addrRegionList:[]
+          createUser:null,
         },
         loading: true,
         formSearch: {
           name: null,
           userMobile:null,
-          action:"",
-          addressList:[],
-          addrRegionList:[]
+          createUser:null
         },
         appUserList: []
       }
     },
+    beforeMount(){
+
+      if(this.$store.state.userinfo.userLevel==2){
+         this.$store.commit('saveIndex',"2-4")
+      }
+      if(this.$store.state.userinfo.userLevel==4){
+         this.$store.commit('saveIndex',"4-4")
+      }
+
+      if(this.$store.state.userinfo.userLevel==3){
+         this.$store.commit('saveIndex',"3-4")
+      }
+      if(this.$store.state.userinfo.userLevel==5){
+         this.$store.commit('saveIndex',"5-4")
+      }
+
+    },
     mounted(){
       var that=this;
+      that.appuserParam.createUser=that.$store.state.userinfo.userMobile
+       that.formSearch.createUser=that.$store.state.userinfo.userMobile
 
-      if(that.$store.state.userinfo.userLevel==2){
-        that.appuserParam.action=2;
-         that.formSearch.action=2;
-
-      }
-      if(that.$store.state.userinfo.userLevel==4){
-        that.appuserParam.action=4;
-         that.formSearch.action=4;
-         var list1=that.$store.state.userinfo.manageScopeIdList;
-        var list2=that.$store.state.userinfo.addrList;
-            
-            var obj=[]
-            for(var i=0;i<list1.length;i++){
-                var obj2={
-                  id:list1[i],
-                  addressId:list2[i]
-                }
-                console.log(obj2)
-                obj.push(obj2)
-            }
-             that.appuserParam.addrRegionList=obj;
-              that.formSearch.addrRegionList=obj;
-      }else{
-         that.appuserParam.addressList=that.$store.state.userinfo.manageScopeIdList
-         that.formSearch.addressList=that.$store.state.userinfo.manageScopeIdList;
-       
-
-      }
-
-      if(that.$store.state.userinfo.userLevel==3){
-        that.appuserParam.action=3;
-         that.formSearch.action=3;
-      }
-
-      if(that.$store.state.userinfo.userLevel==5){
-        that.appuserParam.action=5;
-         that.formSearch.action=5;
-      }
       that.getApplist()
 
     },
@@ -158,27 +189,15 @@
       // 获取app用户列表
       getApplist(){
         var that=this;
-        if(that.$store.state.userinfo.userLevel==4){
-          var param={
-            pageSize:that.appuserParam.pageSize,
-            currentPage:that.appuserParam.currentPage,
-            action:that.appuserParam.action,
-            addrRegionList:that.appuserParam.addrRegionList
-          }
-        }else{
-           var param={
-            pageSize:that.appuserParam.pageSize,
-            currentPage:that.appuserParam.currentPage,
-            action:that.appuserParam.action,
-            addressList:that.appuserParam.addressList
-          }
-
-        }
-        that.axios.post("/SmartHomeTrade/appUser/selectAppUserListByAdrress",param).then(function(res){
+        that.axios.post("/SmartHomeTrade/appUser/selectUserByCreateUser",that.appuserParam).then(function(res){
           if(res.data.code==0){
-            that.$message.success(res.data.message);
+            // that.$message.success(res.data.message);
             if(res.data.data!=null){
                that.appUserList=res.data.data.appUserList;
+               that.total=res.data.data.count
+
+            }else{
+              that.appUserList=[]
             }
 
            
@@ -205,26 +224,25 @@
         that.appuserParam.currentPage=val;
         that.getApplist()
       },
+      // 情况选中
+       clear(){
+         this.templateRadio="";
+       },
       //搜索
        onSubmit() {
           var that=this;
            that.loading=false;
+           if(that.formSearch.name==''){
+            that.formSearch.name=null
+           }
+            if(that.formSearch.userMobile==''){
+            that.formSearch.userMobile=null
+           }
           if(that.formSearch.name==null&&that.formSearch.userMobile==null){
+             that.getApplist()
             return;
           }
-          if(that.$store.state.userinfo.userLevel==4){
-          var param={
-            action:that.formSearch.action,
-            addrRegionList:that.formSearch.addrRegionList,
-          }
-        }else{
-           var param={
-            action:that.formSearch.action,
-            addressList:that.formSearch.addressList
-          }
-
-        }
-          that.axios.post("/SmartHomeTrade/appUser/selectAppUserListByAdrress",that.formSearch).then(function(res){
+          that.axios.post("/SmartHomeTrade/appUser/selectUserByCreateUser",that.formSearch).then(function(res){
             console.log(res)            
             if(res.data.code==0){
               that.loading=false;
@@ -249,16 +267,16 @@
       // 添加
       add(){
        var that=this;     
-        that.$refs.myaddchild.getaddAppuser("1");
+        that.$refs.myaddchild.getaddAppuser();
       },
-      // handleSelectionChange(val) {
-      //   this.multipleSelection = val;
-      //   console.log(val)
-      // },
          getTemplateRow(index,row){                
         this.templateSelection = row;
         console.log(this.templateSelection)
        },
+       // 创建部门
+       createDepart(){
+       this.$refs.mycreatechild.opendialogVisible();
+    },
    
    
 
@@ -300,24 +318,38 @@
       formatstate: function (row, column) {
         return  row.state == 1 ? '正常' : row.state == 2? '暂停':""
       },
-      // 修改
+       formataction: function (row, column) {
+        return  row.action == 1 ? '授权' : "创建"
+      },
+      
+       // 修改
       change(){
+        if(this.templateRadio==''){
+          this.$message({
+            type: 'info',
+            message: '请选择要修改的用户'
+          });
+        }else {
+          if(this.templateSelection.createUser!==this.$store.state.userinfo.userMobile){
+            this.$message.warning("该用户不是您创建的，无法修改")
+            return;
+          }
 
- this.$message.info("App用户暂时不能修改");
-
-
+          var param=this.templateSelection
+         this.$refs.mychangechild.getchangeAppuser(param);
+        }
       },
 
       //  暂停
       stop(){
 
         var that=this;
-        if(that.templateSelection.state==0){
+        if(that.templateSelection.state==2){
            that.$message.info("该用户已暂停");
-            that.clear()
            return;
 
         }
+        debugger
         if(that.templateRadio!=''){
           that.$confirm('您确定要暂停该用户么?', '提示', {
             confirmButtonText: '确定',
@@ -332,6 +364,8 @@
               if(res.data.code==0){
                that.$message.success(res.data.message);
                 that.getApplist()
+                 that.templateRadio='';
+               that.templateSelection={};
               }else{
                 that.$message.error(res.data.message);
               }
@@ -351,17 +385,14 @@
         }
 
       },
-         // 清空选中
-         clear(){
-         this.$refs.multipleTable.clearSelection();
-       },
+   
+   
 
       //  恢复
       recover(){
         var that=this;
         if(that.templateSelection.state==1){
            that.$message.info("该用户已恢复");
-           that.clear()
            return;
 
         }
@@ -379,6 +410,8 @@
               if(res.data.code==0){
                that.$message.success(res.data.message);
                 that.getApplist()
+                that.templateRadio='';
+               that.templateSelection={};
               }else{
                 that.$message.error(res.data.message);
               }
@@ -397,8 +430,89 @@
           });
         }
 
-      }
+      },
+           // 导入
+    uploads(){
+    
+       this.$refs.myloadchild.openDia();
+
     },
+
+// 下载摸版
+    exportdata() {
+      this.axios.get('/SmartHomeTrade/user/downloadTemplate',{responseType: 'blob'}).then((res) => {
+
+                  let fileName = 'appUserInfo.xls'
+                  let blob = new Blob([res.data], { type: 'application/x-xls' })
+                    if (window.navigator.msSaveOrOpenBlob) {
+                      navigator.msSaveBlob(blob, fileName);
+                    } else {
+                      var link = document.createElement('a');
+                      link.href = window.URL.createObjectURL(blob);
+                      link.download = fileName;
+                      link.click();
+                      window.URL.revokeObjectURL(link.href);
+                    }
+              })
+      // this.axios.get("/SmartHomeTrade/user/downloadTemplate",{responseType: 'blob'}).then((res) => {
+      //             let fileName = 'App用户列表.xls';
+      //             let blob = new Blob([res.data], { type: 'application/x-xls' })
+      //               if (window.navigator.msSaveOrOpenBlob) {
+      //                 navigator.msSaveBlob(blob, fileName);
+      //               } else {
+      //                 var link = document.createElement('a');
+      //                 link.href = window.URL.createObjectURL(blob);
+      //                 link.download = fileName;
+      //                 link.click();
+      //                 window.URL.revokeObjectURL(link.href);
+      //               }
+      //             }
+        // require.ensure([], () => {
+        //   const { export_json_to_excel } = require('@/vendor/Export2Excel');
+        //   const tHeader = ['姓名', '联系电话', '状态', '所属部门'];
+        //   const filterVal = ['name', 'userMobile', 'state', 'departmentName'];
+        //   const list = this.appUserList;
+        //   const data = this.formatJson(filterVal, list);
+        //   export_json_to_excel(tHeader, data, 'app用户列表');
+        // })
+        },
+
+
+        // formatJson(filterVal, jsonData) {
+        //   return jsonData.map(v => filterVal.map(j => v[j]))
+        // }
+  
+
+    },
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
   }
 </script>
 

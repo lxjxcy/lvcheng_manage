@@ -6,25 +6,25 @@
 		  width="30%"
 		  :before-close="handleClose"
 		  append-to-body>
-		  <div class="dialogheight">
+		  <div class="dialogheight" style="padding-right: 10%">
 		  	<el-form label-width="100px" :model="addD" ref="addD" :rules="rules">
               <el-form-item label="部门名称" prop="departmentName" style="position: relative;">
-                <el-input v-model="addD.departmentName" placeholder="部门名称" style="width:100%"></el-input> 
+                <el-input v-model="addD.departmentName" placeholder="部门名称" @focus="removeValid('departmentName')"></el-input> 
               </el-form-item>
-              <el-form-item label="所属房间" prop="name">
-                <el-select v-model="addD.name" placeholder="请选择房间" @change="getroomgId">
+              <el-form-item label="所属大楼" prop="buildingName" v-if="this.$store.state.userinfo.userLevel==2">
+                <el-select v-model="addD.buildingName" placeholder="请选择大楼" @change="getBuildId" style="width:100%">
                   <el-option
-                    v-for="item in roomList"
-                    :key="item.id"
-                    :label="item.name"
-                    :value="item.id">
+                    v-for="item in blockList"
+                    :key="item.buildingId"
+                    :label="item.buildingName"
+                    :value="item.buildingId">
                   </el-option>
                 </el-select>
               </el-form-item>
             </el-form>
 		  </div>
 		  <span slot="footer" class="dialog-footer">
-		    <el-button type="primary" @click="surecreta('addD')">保存</el-button>
+		    <el-button type="primary" @click="surecreta('addD')"  v-loading.fullscreen.lock="fullscreenLoading" element-loading-text="正在提交" element-loading-background="rgba(0, 0, 0, 0)">保存</el-button>
 		  </span>
 		</el-dialog>
 		
@@ -36,39 +36,51 @@
 		 data() {
 	      return {
 	        dialogVisible: false,
-	         addD: {
-		          name: '',
+	         fullscreenLoading:false,
+	         addD: { 
+	              buildingName:null, 
+	              
 		          departmentName: '',
-		          roomId:'',
-		          addressId:''
+		          addressId:null
 		        },
+		      parkAddress:null,
+		      parkBuildname:null,
 			 rules: {
-	          name: [
-	            {  required: true,message: '房间名称不能为空'}
+	          buildingName: [
+	            {  required: true,message: '大楼名称不能为空'}
 	          ],
 	           departmentName: [
 	            {  required: true,message: '部门名称不能为空'}
 	          ],
 	         
 	        },
-	        roomList:[]
+	        blockList:[]
 	      };
 	    },
+	       // 获取焦点清空验证提示
+	      removeValid(formName){
+	      	this.$refs[formName].clearValidate();
+	      },
 	    methods: {
 	    	opendialogVisible(){
 	    		var that=this;
 	    		that.dialogVisible=true;
-	    		var param={
-	    			  pageSize:10,
-                     currentPage:1,
-	    			 roomListId:that.$store.state.userinfo.manageScopeIdList,
-                     adrIdList:that.$store.state.userinfo.addrList,
+	    		if(that.$store.state.userinfo.userLevel==2){
+	    			var list=[]
+	    		    list.push(that.$store.state.parame.parkid);
+		    		var param={
+		    			noPage:1,
+		    			yardIdList:list,
+		    			action:1,
+		    		}
+		    		 that.axios.post("/SmartHomeTrade/block/selectBlockCount",param).then(function(res){
+		    		 	if(res.data.code==0){
+		    		 		that.blockList=res.data.data.blockList;
+		    		 	}
+		    		 })
+
 	    		}
-	    		 that.axios.post("/SmartHomeTrade/room/selectMyRoom",param).then(function(res){
-	    		 	if(res.data.code==0){
-	    		 		that.roomList=res.data.data.roomList;
-	    		 	}
-	    		 })
+	    		
 	    		
 	    	},
 
@@ -77,23 +89,46 @@
 	    		var that=this;
 	    		this.$refs[addD].validate((valid) => {
 		          if (valid) {
+		         	if(that.$store.state.userinfo.userLevel==5){
+		          		var address=that.$store.state.parame.roomaddressId
+		          		var  adrScope= that.$store.state.parame.inAddress
+
+		          	}
+		          	if(that.$store.state.userinfo.userLevel==2){
+		          		var address=that.parkAddress
+		          		var adrScope=that.parkBuildname
+		          	}
+		          	if(that.$store.state.userinfo.userLevel==3){
+		          		var address=that.$store.state.parame.buildid;
+		          		var adrScope=that.$store.state.parame.allAddress
+
+		          	}
+		          	if(that.$store.state.userinfo.userLevel==4){
+		          		var address=that.$store.state.parame.flooraddressId
+		          		var  adrScope= that.$store.state.parame.building_floorName
+		          	}
 		           var param={
 	    			name:that.addD.departmentName,
-	    			roomId:that.addD.roomId,
 	    			createUser:that.$store.state.userinfo.userMobile,
-	    			addressId:that.addD.addressId
+	    			addressId:address,
+	    			adrScope:adrScope,
 	    		   }
+	    		   
+	    		   that.fullscreenLoading=true;
+	    		   // var param=Object.assign(commparam,)
 		    		that.axios.post("/SmartHomeTrade/department/insertDpt",param).then(function(res){
+		    			that.fullscreenLoading=false;
 		    			if(res.data.code==0){
 		    				 that.$message.success(res.data.message);
 		    				 that.$refs[addD].resetFields();
 		    				 that.$emit('refreshList');
+		    				 that.dialogVisible=false;
 		    			}else{
 		    				that.$message.error(res.data.message);
 		    			}
 		    		})
 
-	    		that.dialogVisible=false;
+	    		
 		          } else {
 		            console.log('error submit!!');
 		            return false;
@@ -101,12 +136,13 @@
 		        });
 	    		
 	    	},
-	    	// 获取房间id
-	    	getroomgId(value){
-	    		this.addD.roomId=value;
-	    		for(var i=0;i<this.roomList.length;i++){
-	    			if(this.roomList[i].id==value){
-	    				this.addD.addressId=this.roomList[i].addressId
+	    	// 获取id
+	    	getBuildId(value){
+	    		this.parkAddress=value;
+
+	    		for(var i=0;i<this.blockList.length;i++){
+	    			if(this.blockList[i].buildingId==value){
+	    				this.parkBuildname=this.blockList[i].addressInfo
 
 	    			}
 	    		}

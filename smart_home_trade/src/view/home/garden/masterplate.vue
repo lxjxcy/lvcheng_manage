@@ -28,7 +28,7 @@
         v-loading="loading"
         style="width: 100%"
         tooltip-effect="dark"
-        height="400"
+        height="408"
         border>
         <!-- <el-table-column
           type="selection"
@@ -42,15 +42,17 @@
         <el-table-column
           prop="templateName"
           label="模板名称"
-          width="120">
+        
+          align="center">
         </el-table-column>
         <el-table-column
           prop="hierarchical"
-          label="层级">
+          label="层级"
+          align="center">
           {
             hierarchical?
              <template slot-scope="scope">
-            <el-breadcrumb separator-class="el-icon-arrow-right">
+            <el-breadcrumb separator-class="el-icon-arrow-right" style="display: inline-block">
               <el-breadcrumb-item v-for="item in scope.row.hierarchical"  :key="index">{{item.value}}</el-breadcrumb-item>
             </el-breadcrumb>
           </template>
@@ -75,7 +77,7 @@
 </template>
 
 <script>
-  import axios from 'axios'
+  // import axios from 'axios'
   import addMaster from "./addMaster.vue"
   import changeMaster from "./changeMaster.vue"
   export default {
@@ -103,6 +105,7 @@
       }
     },
     mounted(){
+       this.$store.commit('saveIndex',"1-3")
         this.getMasterplate()
       console.log(this.tableData3)
     },
@@ -110,8 +113,13 @@
       //获取模板列表
       getMasterplate(){
         var that=this;
-        axios.post('/SmartHomeTrade/template/selectTemplate',that.setparam).then(function (res) {
+        that.axios.post('/SmartHomeTrade/template/selectTemplate',that.setparam).then(function (res) {
             console.log(res.data.data.listTemplateCount)
+            if(res.data.data==null){
+              that.loading=false;
+              return;
+
+            }
           that.total=res.data.data.Count;
             that.loading=false;
           var mlist=[]
@@ -225,7 +233,7 @@
             cancelButtonText: '取消',
             type: 'warning'
           }).then(() => {
-            axios.post("/SmartHomeTrade/template/deleteTemplate",{
+            that.axios.post("/SmartHomeTrade/template/deleteTemplate",{
               id:that.templateSelection.id
             }).then(function (res) {
               console.log(res)

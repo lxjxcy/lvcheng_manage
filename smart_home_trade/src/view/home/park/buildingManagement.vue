@@ -5,9 +5,9 @@
           <el-form-item label="大楼名称"  prop="yardName">
             <el-input v-model="formSearch.buildingName" placeholder=""></el-input>
           </el-form-item>
-          <el-form-item label="大楼编号"  prop="yardNblockNumame">
+        <!--   <el-form-item label="大楼编号"  prop="yardNblockNumame">
             <el-input v-model="formSearch.blockNum" placeholder=""></el-input>
-          </el-form-item>
+          </el-form-item> -->
           <el-form-item label="管理员"  prop="userName">
             <el-input v-model="formSearch.userName" placeholder=""></el-input>
           </el-form-item>
@@ -21,13 +21,14 @@
            <el-button @click="resetForm('formSearch')">重置</el-button>
           </el-form-item>
         </el-form>
+       
       </div>
       <div class="nav-middle">
         <ul>
-          <li class="l" @click="addbuildings()"><i class="el-icon-plus"></i>添加</li>
-          <li class="l" @click="change()"><i class="el-icon-edit"></i>修改</li>
-          <li class="l" @click=" administratored()"><i class="el-icon-setting"></i>设置管理员</li>
-          <li class="l" @click="host()"><i class="el-icon-tickets"></i>主机清单</li>
+          <li class="l" @click="addbuildings()" v-if="this.$store.state.extendList.addbuild==1"><i class="el-icon-plus"></i>添加</li>
+          <li class="l" @click="change()" v-if="this.$store.state.extendList.changebuild==1"><i class="el-icon-edit"></i>修改</li>
+          <li class="l" @click=" administratored()" v-if="this.$store.state.extendList.buildsetuser==1"><i class="el-icon-setting"></i>设置管理员</li>
+          <li class="l" @click="host()" v-if="this.$store.state.extendList.hostlist==1"><i class="el-icon-tickets"></i>主机清单</li>
           <changebuild ref="mychild" @refreshList="getBuildlist" @clearselect="clear"></changebuild>
           <addBuild ref="myaddchild" @refreshList="getBuildlist" @clearselect="clear"></addBuild>
           <setUser ref="mysetchild" @refreshList="getBuildlist" @clearselect="clear"></setUser>
@@ -42,7 +43,7 @@
            v-loading="loading"
           style="width: 100%"
           tooltip-effect="dark"
-          height="410"
+          height="408"
           border>
          <!--  <el-table-column
             type="selection"
@@ -55,46 +56,54 @@
         </el-table-column>
           <el-table-column
             prop="blockNum"
-            label="大楼编号"
-            width="180">
+            label="序号"
+            width="55"
+            align="center">
           </el-table-column>
           <el-table-column
             prop="buildingName"
             label="大楼名称"
-            width="150">
+          
+            align="center">
          <template slot-scope="scope">
             <el-button @click="goFloorlist(scope.row.buildingName,scope.row.buildingId)" type="text" size="small">{{scope.row.buildingName}}</el-button>
           </template>
 
           </el-table-column>
           <el-table-column
-            prop="hostName"
+            prop="hostId"
             label="主机"
-            width="100">
+          
+            align="center">
           </el-table-column>
           <el-table-column
             prop="roomNum"
             label="楼层数量"
-            width="100">
+           
+            align="center">
           </el-table-column>
           <el-table-column
             prop="dcNum"
             label="设备数量"
-            width="100">
+           
+            align="center">
           </el-table-column>
           <el-table-column
             prop="yardName"
             label="所在园区"
-            width="100">
+           
+            align="center">
           </el-table-column>
           <el-table-column
             prop="userName"
             label="管理员"
-            width="100">
+           
+            align="center">
           </el-table-column>
           <el-table-column
             prop="userMobile"
-            label="联系电话">
+            label="联系电话"
+            align="center">
           </el-table-column>
         </el-table>
         <div class="block">
@@ -115,7 +124,7 @@
 </template>
 
 <script>
-   import axios from 'axios' 
+   // import axios from 'axios' 
    import addBuild from "../../../components/addBuild.vue"
      import changebuild from "../../../components/changebuild.vue"
     export default {
@@ -152,27 +161,47 @@
           },
           add:'',
           blockList: [],
+          iftrue:'',
         }
 
       },
       mounted(){
       var that=this;
-      that.formSearch.yardIdList=this.$store.state.userinfo.manageScopeIdList;
-      that.buildParams.yardIdList=this.$store.state.userinfo.manageScopeIdList;
+       that.$store.commit('saveIndex',"2-2")
+      that.formSearch.yardIdList.push(this.$store.state.parame.parkid);
+      that.buildParams.yardIdList.push(this.$store.state.parame.parkid);
       that.getBuildlist()
 
       },
+     computed: {
+      listenshowpage1() {
+        return this.$store.state.ifswitch;
+      }
+    },
+    watch: {
+      listenshowpage1: function(a, b) {
+        console.log("修改前卫：" + a);
+         console.log("修改后为：" + b);
+        return 1;
+       
+      }
+    },
+
       methods: {
+
         // 获取大楼列表
         getBuildlist(){
+
           var that=this;
-          axios.post('/SmartHomeTrade/block/selectBlockCount',that.buildParams).then(function(res){
+          that.axios.post('/SmartHomeTrade/block/selectBlockCount',that.buildParams).then(function(res){
               if(res.data.code==0){
-                 that.blockList=res.data.data.blockList;
-                that.loading=false;
-               
-                that.total=res.data.data.count;
-               
+                if(res.data.data!=null){
+                   that.blockList=res.data.data.blockList;
+                   that.total=res.data.data.count;
+                }
+                that.loading=false;    
+              }else{
+                that.$message.error(res.data.message)
               }
           })
       },
@@ -199,17 +228,28 @@
         console.log(this.templateSelection)
        },
            // 情况选中
-         clear(){
-         this.$refs.multipleTable.clearSelection();
+       clear(){
+         this.templateRadio="";
        },
 
         onSubmit() {
           var that=this;
-           that.loading=false;
+          if(that.formSearch.buildingName==""){
+            that.formSearch.buildingName=null
+          }
+           if(that.formSearch.yardName==""){
+            that.formSearch.yardName=null
+          }
+           if(that.formSearch.userName==""){
+            that.formSearch.userName=null
+          }
+          
           if(that.formSearch.buildingName==null&&that.formSearch.yardName==null&&that.formSearch.blockNum==null&&that.formSearch.userName==null){
+            that.getBuildlist()
             return;
           }
-          axios.post("/SmartHomeTrade/block/selectBlockCount",that.formSearch).then(function(res){
+           that.loading=true;
+          that.axios.post("/SmartHomeTrade/block/selectBlockCount",that.formSearch).then(function(res){
             console.log(res)            
             if(res.data.code==0){
               that.loading=false;
@@ -259,13 +299,36 @@
 
   // 跳转到指定大楼的楼层列表页
        goFloorlist(buildingName,buildingId){
-      // alert(this.$store.state.parame.garden_buildNmae)
-        var param={
-          build_floorName:buildingName,
-          build_floorId:buildingId
+        var that=this;
+        if(this.$store.state.extendList.floorManagment==0){
+            that.$message.warning("您还没有楼层管理权限")
+          return
         }
-        this.$store.commit('setRouterid',param)
-        this.$router.push('/park/floorList')
+      // alert(this.$store.state.parame.garden_buildNmae)
+        // var param={
+        //   build_floorName:buildingName,
+        //   build_floorId:buildingId
+        // }
+         that.$set(that.$store.state.parame,'buildname',buildingName)
+        that.$set(that.$store.state.parame,'buildid',buildingId)
+         var parame={
+              parkname: that.$store.state.parame.parkname,
+              parkid: that.$store.state.parame.parkid,
+              buildname: buildingName,
+              buildid: buildingId,
+              floorname: that.$store.state.parame.floorname,
+              floorid: that.$store.state.parame.floorid,
+              flooraddressId: that.$store.state.parame.flooraddressId,
+              roomname: that.$store.state.parame.roomname,
+              roomid: that.$store.state.parame.roomid,
+              roomaddressId: that.$store.state.parame.roomaddressId
+            };
+        that.$store.commit('setRouterid',parame)
+
+
+
+
+        that.$router.push('/park/floorList')
       },
       //  设置管理员
         administratored(){
@@ -282,11 +345,14 @@
                action:3,
                adrressId: this.templateSelection.buildingId,
                manageScopeIdList: manageScopeId,
-             }         
-              this.$refs.mysetchild.getAdminList(param);
+                userLevel:3
+             }  
+              var uuid=this.templateSelection.userUuid         
+              this.$refs.mysetchild.getAdminList(param,uuid);
 
           }
         },
+
     //  跳转到主机清单页面
         host(){
                 
@@ -331,7 +397,7 @@
 
 <style scoped>
   .add-buliding{
-    padding-right: 0.53rem;
+    padding-right: 53px;
     /*text-align: center;*/
     /*padding-left:0.8rem;*/
   }

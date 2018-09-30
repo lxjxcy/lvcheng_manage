@@ -6,9 +6,9 @@
            <el-form-item label="名称">
              <el-input v-model="formSearch.name" placeholder=""></el-input>
            </el-form-item>
-           <el-form-item label="编号">
+           <!-- <el-form-item label="编号">
              <el-input v-model="formSearch.floorNum" placeholder=""></el-input>
-           </el-form-item>
+           </el-form-item> -->
            <el-form-item>
              <el-button type="primary" @click="onSubmit">查询</el-button>
            </el-form-item>
@@ -21,7 +21,7 @@
 
         <el-table
           :data="floorList"
-          height="435"
+          height="408"
           border
           v-loading="loading"
           style="width: 100%">
@@ -29,29 +29,33 @@
           type="selection"
           width="50">
         </el-table-column> -->
-         <el-table-column label="" width="40">
+         <el-table-column label="" width="50">
           <template slot-scope="scope">
               <el-radio :label="scope.row.floorNum" v-model="templateRadio" @change.native="getTemplateRow(scope.$index,scope.row)">&nbsp</el-radio>
           </template>
         </el-table-column>
           <el-table-column
             prop="floorNum"
-            label="楼层编号"
-            width="180">
+            label="序号"
+            width="55"
+            align="center">
           </el-table-column>
           <el-table-column
             prop="name"
             label="楼层名称"
-            width="180">
+            
+            align="center">
           </el-table-column>
           <el-table-column
             prop="roomNum"
             label="房间数"
-            width="180">
+           
+            align="center">
           </el-table-column>
           <el-table-column
             prop="buildingName"
-            label="所在位置">
+            label="所在位置"
+            align="center">
           </el-table-column>
         </el-table>
         <div class="block">
@@ -70,7 +74,7 @@
 </template>
 
 <script>
-import axios from "axios"
+// import axios from "axios"
     export default {
         name: "myFloor",
       data() {
@@ -98,6 +102,7 @@ import axios from "axios"
       },
         mounted(){
          var that=this;
+          that.$store.commit('saveIndex',"4-1")
           var list2=that.$store.state.userinfo.addrList;
             var list1=that.$store.state.userinfo.manageScopeIdList;
             var obj=[]
@@ -117,12 +122,17 @@ import axios from "axios"
       methods: {
         getMyfloorlist(){
           var that=this;
-          axios.post("/SmartHomeTrade/floor/selectMyFloor",that.myFloorparam).then(function(res){
+          that.axios.post("/SmartHomeTrade/floor/selectMyFloor",that.myFloorparam).then(function(res){
              if(res.data.code==0){
-              that.floorList=res.data.data.floorList;
-                that.loading=false;              
-                that.total=res.data.data.count;
+              if(res.data.data!=null){
+                that.floorList=res.data.data.floorList;
+                            
+               that.total=res.data.data.count;
+              }
+               that.loading=false; 
 
+            }else{
+              that.$message.error(res.data.message)
             }
           })
 
@@ -146,11 +156,20 @@ import axios from "axios"
         //查询
         onSubmit() {
           var that=this;
+          if(that.formSearch.name==""){
+            that.formSearch.name=null
+
+          }
+            if(that.formSearch.floorNum==""){
+            that.formSearch.floorNum=null
+
+          }
           if(that.formSearch.name==null&&that.formSearch.floorNum==null){
+             that.getMyfloorlist()
             return;
           }
            that.loading=true;             
-          axios.post("/SmartHomeTrade/floor/selectMyFloor",that.formSearch).then(function(res){
+          that.axios.post("/SmartHomeTrade/floor/selectMyFloor",that.formSearch).then(function(res){
               if(res.data.code==0){
               that.floorList=res.data.data.floorList;
                 that.loading=false;  

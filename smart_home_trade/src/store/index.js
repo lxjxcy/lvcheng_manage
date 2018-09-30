@@ -5,28 +5,29 @@ Vue.use(Vuex)
 export default new Vuex.Store({
   state: {
     parame: {
-      garden_buildNmae: '',
-      garden_buildId: '',
-      build_floorName: '',
-      build_floorId: '',
-      floor_roomName: '',
-      floor_roomId: '',
+      parkname: null,
+      parkid: null,
+      buildname: null,
+      buildid: null,
+      allAddress: null,
+      building_floorName: null,
+      floorname: null,
+      inAddress: null,
+      floorid: null,
+      flooraddressId: null,
+      roomname: null,
+      roomid: null,
+      roomaddressId: null,
+
     },
+    switchName: "",
+    isgoback: false,
+    ifswitch: true,
     userinfo: {},
     setDAta: [],
-    set: [{
-      id: 121,
-      label: '添加'
-    }, {
-      id: 122,
-      label: '修改'
-    }, {
-      id: 123,
-      label: '设置管理员'
-    }, {
-      id: 124,
-      label: '主机清单'
-    }],
+    activeIndex: "",
+    extendList: {},
+
     // islogin: false,
     token: null
   },
@@ -35,31 +36,63 @@ export default new Vuex.Store({
       state.token = token;
       sessionStorage.setItem('token', token)
     },
+    saveIndex(state, index) {
+      state.activeIndex = index;
+      sessionStorage.setItem('activeIndex', index)
+    },
     exitUser(state) {
       state.token = null;
       sessionStorage.removeItem('token')
+      sessionStorage.removeItem('userinfo')
 
+      state.userinfo = {};
+      state.setDAta = [];
+      sessionStorage.removeItem('exTend')
+      sessionStorage.removeItem('setD')
+      state.switchName = "";
+      sessionStorage.removeItem('switchName')
+      sessionStorage.removeItem('activeIndex')
+      sessionStorage.removeItem('Routerid')
+      state.parame = {
+        parkname: null,
+        parkid: null,
+        buildname: null,
+        buildid: null,
+        floorname: null,
+        floorid: null,
+        flooraddressId: null,
+        allAddress: null,
+        building_floorName: null,
+        inAddress: null,
+        roomname: null,
+        roomid: null,
+        roomaddressId: null
+      };
     },
-
     setStroge(state, stedate) {
       state.setDAta = stedate;
-      localStorage.setItem('setD', JSON.stringify(stedate))
+      sessionStorage.setItem('setD', JSON.stringify(stedate))
       // sessionStorage.setItem('setD', stedate)
     },
-    setRouterid(state, Routerid) {
-      state.parame = Routerid;
-      sessionStorage.setItem('Routerid', JSON.stringify(Routerid))
+    saveExtend(state, extend) {
+      state.extendList = extend;
+      sessionStorage.setItem('exTend', JSON.stringify(extend))
+    },
+    setRouterid(state, parames) {
+      state.parame = parames;
+      sessionStorage.setItem('Routerid', JSON.stringify(parames))
     },
 
-
+    switchname(state, Name) {
+      state.switchName = Name;
+      sessionStorage.setItem('switchName', Name)
+    },
     //用户信息
     saveUserinfo(state, userinfo) {
       state.userinfo = userinfo;
       sessionStorage.setItem('userinfo', JSON.stringify(userinfo))
 
     }
-
-
   },
   actions: {
     // increment(

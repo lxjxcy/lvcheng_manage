@@ -8,9 +8,9 @@
         <el-form-item label="名称" prop='name'>
           <el-input v-model="formSearch.name" placeholder=""></el-input>
         </el-form-item>
-        <el-form-item label="编号" prop='roomNum'>
+       <!--  <el-form-item label="编号" prop='roomNum'>
           <el-input v-model="formSearch.roomNum" placeholder=""></el-input>
-        </el-form-item>
+        </el-form-item> -->
         <el-form-item label="管理员" prop='userName'>
           <el-input v-model="formSearch.userName" placeholder=""></el-input>
         </el-form-item>
@@ -23,14 +23,24 @@
       </el-form>
     </div>
     <div class="nav-middle">
-       <div class="l" style="font-size: 20px;font-weight: 400" v-if="this.$store.state.userinfo.userLevel==2||this.$store.state.userinfo.userLevel==3">
-        <span>{{this.$store.state.parame.floor_roomName}}</span>
+       <div class="l" style="font-size: 20px;font-weight: 400" v-if="this.$store.state.userinfo.userLevel==2">
+        <span>{{this.$store.state.parame.buildname}}{{this.$store.state.parame.floorname}}</span>
         ---房间列表
       </div>
+       <div class="l" style="font-size: 20px;font-weight: 400" v-if="this.$store.state.userinfo.userLevel==3">
+        <span>{{this.$store.state.parame.floorname}}</span>
+        ---房间列表
+      </div>
+
+
+
+
+
+
       <ul  v-bind:class="classObject">
-        <li class="l" @click="addRoom()"><i class="el-icon-plus"></i>添加</li>
-        <li class="l" @click="change()"><i class="el-icon-edit"></i>修改</li> 
-        <li class="l" @click="administratored()"><i class="el-icon-setting"></i>设置管理员</li>
+        <li class="l" @click="addRoom()"  v-if="this.$store.state.extendList.addAuthor==1"><i class="el-icon-plus"></i>添加</li>
+        <li class="l" @click="change()"  v-if="this.$store.state.extendList.changeAuthor==1"><i class="el-icon-edit"></i>修改</li> 
+        <li class="l" @click="administratored()"  v-if="this.$store.state.extendList.deleteAuthor==1"><i class="el-icon-setting"></i>设置管理员</li>
       </ul>
       <changeRoom ref="mychild" @refreshList="getroomlist" @clearselect="clear"></changeRoom>
       <addroom ref="myaddchild" @refreshList="getroomlist" @clearselect="clear"></addroom>
@@ -47,7 +57,7 @@
         style="width: 100%"
        
         tooltip-effect="dark"
-        height="380"
+        height="408"
         border>
        <!--  <el-table-column
           type="selection"
@@ -60,13 +70,15 @@
         </el-table-column>
         <el-table-column
           prop="roomNum"
-          label="房间编号"
-          width="100">
+          label="序号"
+          width="55"
+          align="center">
         </el-table-column>
         <el-table-column
           prop="name"
           label="房间名称"
-          width="120">
+         
+          align="center">
          <template slot-scope="scope">
           <el-button @click="goEquimentlist(scope.row.name,scope.row.id,scope.row.addressId)" type="text" size="small">{{scope.row.name}}</el-button>
         </template>
@@ -74,22 +86,25 @@
         <el-table-column
           prop="deviceNum"
           label="设备数量"
-          width="180">
+         
+          align="center">
         </el-table-column>
         <el-table-column
           prop="inAddress"
           label="所在位置"
-          width="200">
+         
+          align="center">
         </el-table-column>
         <el-table-column
           prop="userName"
           label="管理员"
-          width="180">
+         
+          align="center">
         </el-table-column>
         <el-table-column
           prop="userMobile"
           label="联系电话"
-         >
+          align="center">
         </el-table-column>
       </el-table>
       <div class="block">
@@ -148,34 +163,63 @@ import changeRoom from "../../../components/changeRoom.vue"
           roomList: []
         }
       },
+        beforeMount(){
+        if(this.$store.state.userinfo.userLevel==2){
+          this.$store.commit('saveIndex',"2-2")
+        }
+         if(this.$store.state.userinfo.userLevel==3){
+          this.$store.commit('saveIndex',"3-2")
+        }
+         if(this.$store.state.userinfo.userLevel==4){
+          this.$store.commit('saveIndex',"4-2")
+        }
+        
+     },
       mounted(){
         var that=this;
         if(that.$store.state.userinfo.userLevel==2||that.$store.state.userinfo.userLevel==3){
           that.classObject.r=true;
-          var obj=[]
-          var obj1= {
-            id:that.$store.state.parame.floor_roomId,
-            addressId:that.$store.state.parame.addressId
-          };
-          obj.push(obj1)
-          that.paramRoom.addressIdList=obj
-          that.formSearch.addressIdList=obj
-        }else{
-            var list2=that.$store.state.userinfo.addrList;
-            var list1=that.$store.state.userinfo.manageScopeIdList;
-            var obj=[]
-            for(var i=0;i<list1.length;i++){
-                var obj2={
-                  id:list1[i],
-                  addressId:list2[i]
-                }
-                console.log(obj2)
-                obj.push(obj2)
-            }
-             that.paramRoom.addressIdList=obj;
-             that.formSearch.addressIdList=obj;  
-                     
+          // var obj=[]
+          // var obj1= {
+          //   id:that.$store.state.parame.floor_roomId,
+          //   addressId:that.$store.state.parame.addressId
+          // };
+          // obj.push(obj1)
+          // that.paramRoom.addressIdList=obj
+          // that.formSearch.addressIdList=obj
         }
+
+         
+         if(that.$store.state.parame.floorid==null&&that.$store.state.parame.flooraddressId==null){
+           that.paramRoom.addressIdList=null
+          that.formSearch.addressIdList=null
+         }else{
+              var obj=[]
+              var obj1= {
+                id:that.$store.state.parame.floorid,
+                addressId:that.$store.state.parame.flooraddressId
+              };
+              obj.push(obj1)
+              that.paramRoom.addressIdList=obj
+              that.formSearch.addressIdList=obj
+         }
+      
+        // // else{
+        //     var list2=that.$store.state.userinfo.addrList;
+        //     var list1=that.$store.state.userinfo.manageScopeIdList;
+        //     var obj=[]
+        //     for(var i=0;i<list1.length;i++){
+        //         var obj2={
+        //           id:list1[i],
+        //           addressId:list2[i]
+        //         }
+        //         console.log(obj2)
+        //         obj.push(obj2)
+        //     }
+        //      that.paramRoom.addressIdList=obj;
+        //      that.formSearch.addressIdList=obj;  
+                     // 
+        // }
         that.getroomlist()        
       },
       methods: {
@@ -184,9 +228,13 @@ import changeRoom from "../../../components/changeRoom.vue"
           var that=this;
           that.axios.post("/SmartHomeTrade/room/selectRoomCount",that.paramRoom).then(function(res){
             if(res.data.code==0){
-              that.loading=false;
-              that.roomList=res.data.data.roomList;
-              that.total=res.data.data.count
+             
+              if(res.data.data!=null){
+                that.roomList=res.data.data.roomList;
+                that.total=res.data.data.count
+              }
+               that.loading=false;
+              
             }
 
           })
@@ -216,7 +264,26 @@ import changeRoom from "../../../components/changeRoom.vue"
         // 搜索
         onSubmit() {
           var that=this;
+            if(that.formSearch.name==''){
+              that.formSearch.name=null
+           }
+           if(that.formSearch.name==''){
+              that.formSearch.name=null
+           }
+           if(that.formSearch.roomNum==''){
+              that.formSearch.roomNum=null
+           }
+           if(that.formSearch.userName==''){
+              that.formSearch.userName=null
+           }
+          if(that.formSearch.name==null&&that.formSearch.roomNum==null&&that.formSearch.userName==null){
+            that.getroomlist()
+            return;
+          }
+
           that.loading=true
+
+         
           that.axios.post("/SmartHomeTrade/room/selectRoomCount",that.formSearch).then(function(res){
             if(res.data.code==0){
               that.loading=false;
@@ -234,49 +301,70 @@ import changeRoom from "../../../components/changeRoom.vue"
             that.formSearch.name= null,
             that.formSearch.roomNum=null,
             that.formSearch.userName=null,
-        this.getroomlist()
+        that.getroomlist()
       },
-         // 情况选中
+            // 情况选中
          clear(){
-         this.$refs.multipleTable.clearSelection();
+         this.templateRadio="";
        },
+
 
     // 跳转到指定房间的设备列表页
        goEquimentlist(roomName,roomId,roomaddressId){
+        var that=this;
+         if(this.$store.state.extendList.equipment==0){
+            that.$message.warning("您还没有设备管理权限")
+          return
+        }
       // alert(this.$store.state.parame.garden_buildNmae)
-            if(this.$store.state.userinfo.userLevel==2||this.$store.state.userinfo.userLevel==3){
-               var param={
-                build_floorName:this.$store.state.parame.build_floorName,
-                build_floorId:this.$store.state.parame.build_floorId,
-                floor_roomId:this.$store.state.parame.floor_roomId,
-                floor_roomName:this.$store.state.parame.floor_roomName,
-                room_equimentName:this.$store.state.parame.floor_roomName+roomName,
-                room_equimentId:roomId,
-                addressId:this.$store.state.parame.addressId,
-                roomaddressId:roomaddressId
-              }
-            }else{
-                var param={
-                  build_floorName:this.$store.state.parame.build_floorName,
-               build_floorId:this.$store.state.parame.build_floorId,
-                floor_roomId:this.$store.state.parame.floor_roomId,
-                floor_roomName:this.$store.state.parame.floor_roomName,
-                room_equimentName:roomName,
-                room_equimentId:roomId,
-                addressId:this.$store.state.parame.addressId,
-                roomaddressId:roomaddressId
-              }
+            // if(this.$store.state.userinfo.userLevel==2||this.$store.state.userinfo.userLevel==3){
+            //    var param={
+            //     build_floorName:this.$store.state.parame.build_floorName,
+            //     build_floorId:this.$store.state.parame.build_floorId,
+            //     floor_roomId:this.$store.state.parame.floor_roomId,
+            //     floor_roomName:this.$store.state.parame.floor_roomName,
+            //     room_equimentName:this.$store.state.parame.floor_roomName+roomName,
+            //     room_equimentId:roomId,
+            //     addressId:this.$store.state.parame.addressId,
+            //     roomaddressId:roomaddressId
+            //   }
+            // }else{
+            //     var param={
+            //       build_floorName:this.$store.state.parame.build_floorName,
+            //    build_floorId:this.$store.state.parame.build_floorId,
+            //     floor_roomId:this.$store.state.parame.floor_roomId,
+            //     floor_roomName:this.$store.state.parame.floor_roomName,
+            //     room_equimentName:roomName,
+            //     room_equimentId:roomId,
+            //     addressId:this.$store.state.parame.addressId,
+            //     roomaddressId:roomaddressId
+            //   }
              
-            }      
-              this.$store.commit('setRouterid',param)
-              if(this.$store.state.userinfo.userLevel==2){
-                this.$router.push('/park/floorList/roomList/equimentList')
+            // } 
+             var parame={
+                  parkname: that.$store.state.parame.parkname,
+                  parkid: that.$store.state.parame.parkid,
+                  buildname: that.$store.state.parame.buildname,
+                  buildid: that.$store.state.parame.buildid,
+                  floorname: that.$store.state.parame.floorname,
+                  floorid: that.$store.state.parame.floorid,
+                  allAddress:that.$store.state.parame.allAddress,
+                  flooraddressId: that.$store.state.parame.flooraddressId,
+                  building_floorName: that.$store.state.parame.building_floorName,
+                  roomname: roomName,
+                  roomid: roomId,
+                  roomaddressId: roomaddressId
+                };
+            that.$store.commit('setRouterid',parame)
+
+              if(that.$store.state.userinfo.userLevel==2){
+                that.$router.push('/park/floorList/roomList/equimentList')
               }
-               if(this.$store.state.userinfo.userLevel==3){
-                this.$router.push('/building/roomList/equimentList')
+               if(that.$store.state.userinfo.userLevel==3){
+                that.$router.push('/building/roomList/equimentList')
               }
-               if(this.$store.state.userinfo.userLevel==4){
-                this.$router.push('/floor/equimentList')
+               if(that.$store.state.userinfo.userLevel==4){
+                that.$router.push('/floor/equimentList')
               }
               
             },
@@ -292,7 +380,7 @@ import changeRoom from "../../../components/changeRoom.vue"
               var changparam={
                   name:that.templateSelection.name,
                   addressId:that.templateSelection.addressId,
-                  id:that.multipleSelecttemplateSelectionion.id
+                  id:that.templateSelection.id
               }
             
               this.$refs.mychild.parentHandleclick(changparam);
@@ -311,15 +399,17 @@ import changeRoom from "../../../components/changeRoom.vue"
             });
           }else {
              var manageScopeId=[];
-          manageScopeId.push(this.templateSelection.id)
+            manageScopeId.push(this.templateSelection.id)
            
            
               var param={
                action:5,
                adrressId: this.templateSelection.addressId,
-               manageScopeIdList: this.templateSelection.id,
-             }         
-              this.$refs.mysetchild.getAdminList(param);
+               manageScopeIdList: manageScopeId,
+               userLevel:5
+             }  
+             var uuid=this.templateSelection.userUuid               
+              this.$refs.mysetchild.getAdminList(param,uuid);
 
           }
         },

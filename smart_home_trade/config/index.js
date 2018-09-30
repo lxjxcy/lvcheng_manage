@@ -11,7 +11,7 @@ module.exports = {
         assetsPublicPath: '/',
         proxyTable: {
             '/SmartHomeTrade': {
-                target: 'http://192.168.1.205:8009',
+                target: 'http://platform.qthome.com:8009', // target: 'http://10.0.1.6:8009', //   target: 'http://192.168.1.205:8009',
                 changeOrigin: true,
                 pathRewrith: {
                     '^/SmartHomeTrade': '/SmartHomeTrade'
@@ -19,6 +19,7 @@ module.exports = {
             },
         },
         // Various Dev Server settings
+
         host: 'localhost', // can be overwritten by process.env.HOST
         port: 8080, // can be overwritten by process.env.PORT, if port is in use, a free one will be determined
         autoOpenBrowser: false,

@@ -7,18 +7,8 @@
           :before-close="addhandleClose">
           <div class="add" ref="myadd">
             <el-form label-width="100px" :model="addB" ref="addB" :rules="rules">
-              <el-form-item label="大楼名称" prop="buildingName" style="position: relative;">
-                <el-input v-model="addB.buildingName" placeholder="请输入大楼名称"></el-input> 
-              </el-form-item>
-              <el-form-item label="所属园区"  prop="yardName">
-                <el-select v-model="addB.yardName" placeholder="请选择园区" @change="getparkInfo">
-                  <el-option
-                    v-for="item in yardsList"
-                    :key="item.yardId"
-                    :label="item.yardName"
-                    :value="item.yardId">
-                  </el-option>
-                </el-select>
+              <el-form-item label="大楼名称" prop="buildingName" style="position: relative;" ref="loginName">
+                <el-input v-model="addB.buildingName" @focus="removeValid('loginName')" placeholder="请输入大楼名称"></el-input> 
               </el-form-item>
               <el-form-item label="添加楼层" prop="addfloor">
                 <el-switch v-model="addfloor" @change="addbuildCahgne()"></el-switch>
@@ -32,7 +22,7 @@
                   :key="floorNameList.key"
                 >
                   <el-input v-model="floorNameList.floorName" class="roominput"></el-input>
-                  <span style="padding: 12px 10px;cursor: pointer" @click.prevent="remove_buildName(floorNameList)">
+                  <span style="padding: 12px 4%;cursor: pointer" @click.prevent="remove_buildName(floorNameList)">
                     <i class="icon iconfont">&#xe504;</i>
                   </span>
                 </el-form-item>
@@ -43,19 +33,20 @@
             </div>
           </div>
           <span slot="footer" class="dialog-footer">
-            <el-button type="primary" @click="add_build('addB')">确定</el-button>
+            <el-button type="primary" @click="add_build('addB')"  v-loading.fullscreen.lock="fullscreenLoading" element-loading-text="正在提交" element-loading-background="rgba(0, 0, 0, 0)">确定</el-button>
           </span>
         </el-dialog>
 	</div>
 </template>
 <script>
-import axios from "axios"
+// import axios from "axios"
 export default {
 	name: 'addBuild',
    data() {
    	return{
    		addGarden:false,
    		 getParklist:[],
+        fullscreenLoading:false,
         showparkinfo:false,
    		  addB:{
           buildingName:'',
@@ -73,14 +64,14 @@ export default {
           }],
         },
          rules: {
-          yardName: [
-            {  required: true,message: '园区名称不能为空'}
-          ],
           buildingName: [
-            {  required: true,message: '大楼不能为空'}
-          ]
+            {  required: true,message: '大楼名称不能为空'}
+          ],
+          // buildingName: [
+          //   {  required: true,message: '大楼不能为空'}
+          // ]
         },
-         yardsList: [],
+         // yardsList: [],
         createOperator:''
 
    	}
@@ -91,48 +82,52 @@ export default {
       addgarden(){
         var that=this;
         that.addGarden=true;
-        var param={
-          action:1,
-          noPage:1,
-          yardIdList:that.$store.state.userinfo.manageScopeIdList
-        }
-         axios.post("/SmartHomeTrade/garden/selectMyYards",param).then(function(res){
-          if(res.data.code==0){
-            that.yardsList=res.data.data.yardsList;
-          }
+        // var param={
+        //   action:1,
+        //   noPage:1,
+        //   yardIdList:that.$store.state.userinfo.manageScopeIdList
+        // }
+        //  that.axios.post("/SmartHomeTrade/garden/selectMyYards",param).then(function(res){
+        //   if(res.data.code==0){
+        //     that.yardsList=res.data.data.yardsList;
+        //   }
 
-          })
+        //   })
       },
-        // 获取园区信息
-        getparkInfo(value){
-          var that=this;
-          that.addB.yardId=value;
-          let obj={};
-          obj = this.yardsList.find((item)=>{ 
-             return item.yardId === value;
-          });
-          that.addB.yardName=obj.yardName;
-          console.log(that.addB.yardName+","+that.addB.yardId)
-        },
+        // // 获取园区信息
+        // getparkInfo(value){
+        //   var that=this;
+        //   that.addB.yardId=value;
+        //   let obj={};
+        //   obj = this.yardsList.find((item)=>{ 
+        //      return item.yardId === value;
+        //   });
+        //   that.addB.yardName=obj.yardName;
+        //   console.log(that.addB.yardName+","+that.addB.yardId)
+        // },
  //提交添加园区信息
   add_build(addB){
         var that=this;
 
     that.$refs[addB].validate((valid) => {
           if (valid) {
+            that.fullscreenLoading=true;
                var getbuildingNameList=[]
                 getbuildingNameList.push(that.addB.buildingName)
 
                var floorNameList1=[]
                   for(var i=0;i<that.addfloorList.floorNameList.length;i++){
-                    floorNameList1.push(that.addfloorList.floorNameList[i].floorName)
+                    if(that.addfloorList.floorNameList[i].floorName!=""){
+                      floorNameList1.push(that.addfloorList.floorNameList[i].floorName)
+                    }
+                    
                   }
               if(that.addfloor&&floorNameList1!=[]){
                
                
                  var addparamGb={
-                  yardId:that.addB.yardId,
-                  yardName:that.addB.yardName,
+                  yardId:that.$store.state.parame.parkid,
+                  yardName:that.$store.state.parame.parkname,
                   buildingNameList:getbuildingNameList,
                   floorList:floorNameList1,
                   createOperator:that.$store.state.userinfo.userMobile
@@ -140,8 +135,8 @@ export default {
 
               }else{
                  var addparamGb={
-                  yardId:that.addB.yardId,
-                  yardName:that.addB.yardName,
+                  yardId:that.$store.state.parame.parkid,
+                  yardName:that.$store.state.parame.parkname,
                   buildingNameList:getbuildingNameList,
                   createOperator:that.$store.state.userinfo.userMobile
                  }
@@ -149,7 +144,8 @@ export default {
 
               }
 
-              axios.post('/SmartHomeTrade//block/insertBlock',addparamGb).then(function (res) {
+              that.axios.post('/SmartHomeTrade//block/insertBlock',addparamGb).then(function (res) {
+                that.fullscreenLoading=false;
               //   if(res.data.code==0){
               //     that.$refs[addB].resetFields();
               // }
@@ -184,6 +180,10 @@ export default {
           }
         });
       },
+         // 获取焦点清空验证提示
+        removeValid(formName){
+          this.$refs[formName].clearValidate();
+        },
 
 
         // 改变新增大楼按钮
@@ -232,6 +232,11 @@ export default {
           this.$emit('clearselect');
          this.addfloor=false;
          this.resetaddG('addB')
+         this.addfloorList={
+          floorNameList: [{
+            floorName: ''
+          }],
+        }
       },
        resetaddG(addB) {
         this.$refs[addB].resetFields();
@@ -251,14 +256,14 @@ export default {
 </script>
 <style scoped>
   .add{
-    padding-right: 0.53rem;
+    padding-right: 10%;
      height: 350px;
     overflow:hidden;
     overflow-y:auto;
   }
 
   .roominput{
-    width:160px !important;
+    width:70% !important;
   }
   .sibmit{
     /*position: absolute;*/
