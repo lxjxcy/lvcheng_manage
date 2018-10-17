@@ -7,11 +7,13 @@
 		  :before-close="handleClose">
 		  <div class="modelContain">		  
 			    <div class="selectUser" v-if="sectionlist!=[]">
+			    	 <!-- default-expand-all -->
 					<el-tree
 					  :data="sectionlist"
 					  show-checkbox
-					  default-expand-all
+					 :default-expanded-keys="userIdlist"
 					  node-key="ucUserId"
+					   :default-checked-keys="userIdlist"
 					  ref="tree"
 					  highlight-current
 					  :props="defaultProps">
@@ -35,7 +37,8 @@ export default{
 			addresslist:[],
 			sectionlist:[],//部门信息
 			ucUserlist:[],
-			deviceIdName:[],
+			userIdlist:[],
+			// deviceIdName:[],
 			 input:'',
 			 defaultProps: {
 		          children: 'appUserInfoList',
@@ -49,22 +52,43 @@ export default{
 		 // 区域授权弹框
 		getAuthrization(e,q){
           this.addresslist=e;
-          this.deviceIdName=q,
-       // console.log(this.deviceId)
-			this.opendialog=true;
-			this.getDepinfo()
+          // this.deviceIdName=q,
+          this.userIdlist=q;
+          debugger
+		  this.opendialog=true;
+		  this.getDepinfo(q)
 		},
-
-
 		//获取部门下的用户信息
-		getDepinfo(){
+		getDepinfo(q){
 	    	var that=this;
-	    	that.axios.post("/SmartHomeTrade/department/selectDepartmentByMobile",{
-	    		createUser:that.$store.state.userinfo.userMobile,
-	    	}).then(function(res){
+	    	 var param={
+		          createUser:that.$store.state.userinfo.userMobile,
+		          action:2
+		        }
+	    	that.axios.post("/SmartHomeTrade/appUser/selectDptUser",param).then(function(res){
 	    		if(res.data.code==0){
 	    			if(res.data.data!=null){
-	    				that.sectionlist=res.data.data.dptList
+	    				that.sectionlist=res.data.data.dptUserList;
+	    				var userlist=res.data.data.dptUserList;
+		              for(var i=0;i<userlist.length;i++){
+		                userlist[i].name=userlist[i].buildingName;
+		                userlist[i].appUserInfoList=userlist[i].dptList;
+
+		              }
+		              var userlist=userlist;
+		              for(var j=0;j<userlist.length;j++){
+		              	for(var k=0;k<userlist[j].appUserInfoList.length;k++){
+		              		for(var d=0;d<userlist[j].appUserInfoList[k].appUserInfoList.length;d++){
+		              			for(var w=0;w<q.length;w++){
+		              				if(q[w]==userlist[j].appUserInfoList[k].appUserInfoList[d].ucUserId){
+		              					userlist[j].appUserInfoList[k].appUserInfoList[d].disabled=true;
+		              				}
+		              			}
+		              		}
+		              	}
+		              }
+		              that.sectionlist=userlist;
+		             
 	    			}
 	    		}
 	    	})
@@ -78,6 +102,19 @@ export default{
 			 var arr=list.filter((element)=> String(element))
 			debugger
 			 var arr=list.filter(element=>element!= null)
+
+
+			 for(var i=0;i<arr.length;i++){
+
+	    		
+	    			for(var j=0;j<that.userIdlist.length;j++){
+	    				if(arr[i]==that.userIdlist[j]){
+	    					 arr.splice(i, 1)
+	    				}
+
+	    			}
+	    		}
+
 			if(that.$store.state.userinfo.userLevel==2){
 
              var param={

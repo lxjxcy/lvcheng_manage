@@ -144,11 +144,11 @@
         //选中
         handleSelectionChange(val) {
           this.multipleSelection = val;
-          console.log(val)
+        
         },
         handleSelectionChange2(val) {
           this.multipleSelection = val;
-          console.log(val)
+          
         },
         onSubmit() {
           var that=this;
@@ -168,7 +168,7 @@
           }
           that.loading=false;
           that.axios.post("/SmartHomeTrade/block/selectBlockCount",that.formSearch).then(function(res){
-            console.log(res)            
+                      
             if(res.data.code==0){
               that.loading=false;
               that.blockList=res.data.data.HostList;

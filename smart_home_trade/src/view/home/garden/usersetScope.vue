@@ -71,7 +71,7 @@
 		     							delete treeList[i].manageList
 		     						}
 		     						that.treeList=treeList;
-		     						console.log(that.treeList)	     						
+		     						   						
 		     					}
 
 		     			}else{
@@ -174,7 +174,7 @@
 	                      id:list1[i],
 	                      addressId:list2[i]
 	                    }
-	                    console.log(obj2)
+	                   
 	                    obj.push(obj2)
 	                }
 	                var param={
@@ -250,7 +250,7 @@
 		     						}
 
 		     						that.treeList=treeList;
-		     						console.log(that.treeList)	     						
+		     							     						
 		     					}
 
 		     			}else{
@@ -270,7 +270,7 @@
 		     			if(res.data.code==0){
 		     					if(res.data.data!=null){
 		     						// that.treeList=res.data.data.bList;
-		     						// console.log(that.gdList)	  
+		     						
 		     						var treeList=res.data.data.bList;
 		     						for(var i=0;i<treeList.length;i++){
 		     							for(var j=0;j<treeList[i].manageList.length;j++){
@@ -304,7 +304,7 @@
 		     			if(res.data.code==0){
 		     					if(res.data.data!=null){
 		     						// that.treeList=res.data.data.fList;
-		     						// console.log(that.gdList)	 
+		     						
 		     						var treeList=res.data.data.fList;
 		     						for(var i=0;i<treeList.length;i++){
 		     							for(var j=0;j<treeList[i].manageList.length;j++){
@@ -500,7 +500,7 @@
 			                      manageScopeId:list1[i],
 			                      adrressId:null,
 			                    }
-			                    console.log(obj2)
+			                 
 			                    obj.push(obj2)
 			                }	
 			                      		
@@ -541,7 +541,7 @@
 		                      manageScopeId:list1[i],
 		                      adrressId:list1[i]
 		                    }
-		                    console.log(obj2)
+		                   
 		                    obj.push(obj2)
 		                }		
 		                   		
@@ -593,7 +593,7 @@
 		                      manageScopeId:list1[i],
 		                      adrressId:list2[i]
 		                    }
-		                    console.log(obj2)
+		                   
 		                    obj.push(obj2)
 		                }	
 		                 	 		        		
@@ -643,7 +643,7 @@
 		                      manageScopeId:list1[i],
 		                      adrressId:list2[i]
 		                    }
-		                    console.log(obj2)
+		                  
 		                    obj.push(obj2)
 		                }	
 		                      		

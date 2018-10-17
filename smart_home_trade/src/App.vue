@@ -175,15 +175,28 @@ body .el-table th.gutter{
 
   /*表格*/
   .top-nav{
-    height:45px;
+    /*min-height:45px;*/
+    overflow: hidden;
     font-size: 16px;
     /*line-height: 0.6rem;*/
     border-bottom: 2px solid #2fc0fb ;
     margin-bottom: 10px;
     /*background: #f0f0f0;*/
     padding-top:8px;
-    padding-bottom: 45px;
+    /*padding-bottom: 45px;*/
   }
+
+  .top-nav .el-input__icon{
+  position: absolute !important;
+  right:20px !important;
+}
+.top-nav .el-select>.el-input{
+  width:200px !important;
+
+}
+.top-nav .el-form-item{
+  margin-bottom: 8px !important;
+}
 
   .el-button--small, .el-button--small.is-round{
     padding:4.5px 15px;

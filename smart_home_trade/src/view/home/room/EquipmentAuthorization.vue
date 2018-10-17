@@ -64,6 +64,7 @@ import adressAuth from "../../../components/adressAuth"
     data() {
       return {
         addresslist:[],
+        userIdlist:[],
         
         url:"",
          defaultProps: {
@@ -140,7 +141,7 @@ import adressAuth from "../../../components/adressAuth"
          }
 
          that.axios.post(that.url,param).then((res)=>{
-              console.log(res)
+           
               if(res.data.data!=null){
                 if(res.data.data.deviceList.length==0){
                    that.addresslist=[]  
@@ -154,11 +155,6 @@ import adressAuth from "../../../components/adressAuth"
                 return
               }
             })     
-
-
-
-
-
          // debugger         
       },
       // 去重
@@ -168,7 +164,6 @@ import adressAuth from "../../../components/adressAuth"
           for (var i = 0; i<data.length; i++) {
             if(that.$store.state.userinfo.userLevel==2){
              var elem_ = data[i].blockId; 
-             
             }
             if(that.$store.state.userinfo.userLevel==3){
              var elem_ = data[i].floorId; 
@@ -195,7 +190,7 @@ import adressAuth from "../../../components/adressAuth"
 
 
 
-          console.log(result)
+       
           if(that.$store.state.userinfo.userLevel==2){    
               var addresslist=[{
               deviceBlock:that.$store.state.parame.parkname,
@@ -224,7 +219,7 @@ import adressAuth from "../../../components/adressAuth"
           addresslist[0].children=result   
            that.addresslist=addresslist;
          
-           debugger
+          
           
 
         
@@ -236,15 +231,18 @@ import adressAuth from "../../../components/adressAuth"
 
         // 授权
       add(){
+        
         var that=this
+         that.userIdlist=[]
          var listid=that.$refs.address.getCheckedKeys()
+
          if(listid.length==0){
           that.$message.warning("请选择授权区域")
          }else{
          var arr=listid.filter(element=>element!= null)
-         if(that.$store.state.userinfo.userLevel==5){
-
+       
          
+         if(that.$store.state.userinfo.userLevel==5){
             var list=[]
             var listname=that.$refs.address.getCheckedNodes()
             
@@ -258,15 +256,43 @@ import adressAuth from "../../../components/adressAuth"
 
               })
             }
-
-
-            that.$refs.mychild.getAuthrization(list);
-           
-            
-             
+            that.$refs.mychild.getAuthrization(list,that.userIdlist);             
           }else{
-            that.$refs.mychild.getAuthrization(arr);
+            if(arr.length==1){
+                if(that.$store.state.userinfo.userLevel==2){
+                  var param={
+                    blockId:arr[0],
+                    token:2,
+                  }
+               }
+               if(that.$store.state.userinfo.userLevel==3||that.$store.state.userinfo.userLevel==4){
+                var param={
+                    roomId:arr[0],
+                    token:3,
+                  }
+               }
+
+               that.axios.post("/SmartHomeTrade/appUser/selectAuthUser",param).then(res=>{
+                if(res.data.code==0){
+                  if(res.data.data!=null){
+                    that.userIdlist=res.data.data.userIdlist;
+                    console.log(that.userIdlist)
+                     that.$refs.mychild.getAuthrization(arr,res.data.data.userIdlist); 
+                  }  
+                }
+               })
+             }else{
+              that.$refs.mychild.getAuthrization(arr,that.userIdlist); 
+
+             }
+
+             
+ 
+
           }
+
+            
+          
            
        
         

@@ -139,7 +139,7 @@
         },
          getTemplateRow(index,row){                
         this.templateSelection = row;
-        console.log(this.templateSelection)
+        
        },
         handleSizeChange(val) {
         var that=this;

@@ -1,173 +1,3 @@
-<!-- <template>
-	<div class="changeappuser">
-		 <el-dialog
-          title="修改app账户"
-          :visible.sync="changeUser"
-          width="30%"
-          :before-close="handleClose">
-          <div class="changeUser" style="padding-right: 10%">
-            <el-form ref="changeformValidate" :model="changeformValidate" :rules="ruleValidate" :label-width="60">
-              <el-form-item label="姓名" :label-width="formLabelWidth" prop="name" ref="name">
-                <el-input v-model="changeformValidate.name" auto-complete="off" @focus="removeValid('name')" placeholder="请输入姓名"></el-input>
-              </el-form-item>
-              <el-form-item label="电话" :label-width="formLabelWidth" prop="userMobile" ref="userMobile">
-                <el-input v-model="changeformValidate.userMobile" auto-complete="off" @focus="removeValid('userMobile')"  placeholder="请输入电话" ></el-input>
-              </el-form-item>
-                 <el-form-item label="所属部门" prop="name" :label-width="formLabelWidth">
-	                <el-select v-model="addB.name" placeholder="请选择部门" @change="getUserLevel()" style="width:100%">
-	                  <el-option
-	                    v-for="item in dptList"
-	                    :key="item.dptId"
-	                    :label="item.name"
-	                    :value="item.dptId">
-	                  </el-option>
-	                </el-select>
-	            </el-form-item>
-
-            </el-form>
-          </div>
-          <span slot="footer" class="dialog-footer">
-              <el-button type="primary" @click="change_User('changeformValidate')"  v-loading.fullscreen.lock="fullscreenLoading" element-loading-text="正在提交" element-loading-background="rgba(0, 0, 0, 0)">确 定</el-button>
-            </span>
-        </el-dialog>
-	</div>
-</template>
-<script>
-// import axios from "axios"
-	export default{
-		name:"changeappuser",
-		data(){
-					  //手机号验证
-		      const userMobile = (rule, value, callback) => {
-		        if (value === '') {
-		          callback(new Error('手机号码不能为空'));
-		        }else if(!(/^1(3|4|5|7|8)\d{9}$/.test(value))||!/^(\(\d{3,4}\)|\d{3,4}-|\s)?\d{7,14}$/.test(value)){
-		          callback(new Error('请输入正确手机号'));
-		        }else {
-		          callback();
-		        }
-		      };
-		       //真实姓名验证
-		      const name = (rule, value, callback) => {
-		        if (value === '') {
-		          callback(new Error('真实姓名不能为空'));
-		        }else {
-		          callback();
-		        }
-		      };
-			return{
-				changeUser:false,
-				 formLabelWidth: '100px',
-				  fullscreenLoading:false,
-				 ruleValidate: {
-		          name: [
-		            { required: true,validator: name }
-		          ],
-		          userMobile: [
-		            { required: true,validator: userMobile, trigger: 'blur' }
-		          ],
-		        },
-		         changeformValidate:{
-			          ucUserId:'',
-			          name: '',
-			          userMobile: ''
-			        },
-			     addB:{
-			     	name:"",
-			     	Dname:"",
-			     	roomId:"",
-			     	dptId:"",
-
-			     }
-			}
-		},
-		methods:{
-			updataUser(e){
-				var that=this
-				that.changeUser=true;
-				that.changeformValidate=e;
-				that.addB.name=e.departmentName;
-				that.addB.dptId=e.departmentId;
-				that.axios.post("/SmartHomeTrade/department/selectDepartmentByMobile",{
-			          createUser:that.$store.state.userinfo.userMobile,
-			        }).then(function(res){
-			        	if(res.data.code==0){
-			        		that.dptList=res.data.data.dptList
-			        	}
-			        })
-
-			},
-			// 提交修改信息
-			 change_User(changeformValidate){
-		        var that=this;
-		        that.$refs[changeformValidate].validate((valid) => {
-		          if (valid) {
-		          	that.fullscreenLoading=true;
-		           that.axios.post('/SmartHomeTrade/appUser/updateAppUserInfo',that.changeformValidate).then(function (res) {
-		           	that.fullscreenLoading=false;
-		                  console.log(res)
-		                  if(res.data.code==0){
-		                  	that.$message({
-				                type: 'success',
-				                message: res.data.message
-						        });
-				              that.$emit('refreshList');
-				              that.$emit('clearselect');
-				              that.changeUser=false;
-		                  }else{
-		                  	that.$message({
-				                type: 'error',
-				                message: res.data.message
-						     });
-		                  	 that.changeUser=false;
-
-		                  }
-		              
-		            })
-		          } else {
-		            console.log('error submit!!');
-		            return false;
-		          }
-		        });
-		      },
-		         // 获取焦点清空验证提示
-	      removeValid(formName){
-	      	this.$refs[formName].clearValidate();
-	      },
-	          // 获取部门信息
-	      getUserLevel(e){
-	      	console.log(e)
-	      
-	      	var that=this;
-	      	that.addB.departmentId=e;
-	      	for(var i=0;i<that.dptList.length;i++){
-	      		if(that.dptList[i].dptId==e){
-	      			that.addB.roomId=that.dptList[i].roomId,
-	      			that.addB.Dname=that.dptList[i].name
-	      		}
-	      	}
-
-
-	      },
-
-
-
-
-			   //关闭弹框
-		     handleClose(done) {
-		        done();
-		          // this.$emit('clearselect');
-		        
-		        // this.resetaddUser("addformValidate")
-
-		      },
-
-		}
-	}
-</script> -->
-
-
-
 
 <template>
 	<div class="addAppuser">
@@ -307,8 +137,9 @@
 			          roomId:'',
 			          ucUserId:"",
 			          departmentId:'',
-			          userAddressId:'',
-			          authCreateUser:null,    
+			        
+			          authCreateUser:null, 
+			          userAddressId:"", //用户地址id
 			        },
 			        listNextAdmin:[],
 			        dptList:[],
@@ -340,13 +171,6 @@
 	    	getchangeAppuser(e){
 	    		var that=this;
 	    		that.dialogVisible=true;
-	    		  // var param={
-		       //      ucUserId:this.templateSelection.ucUserId,
-		       //      name: this.templateSelection.name,
-		       //      userMobile: this.templateSelection.userMobile,
-		       //      departmentName:this.templateSelection.departmentName,
-		       //      departmentId:this.templateSelection.departmentId
-		       //    }
 		       var aradrespList=e.aradrespList;
 		       debugger
 		       var authCreateUser=[]
@@ -363,7 +187,8 @@
 			          userMobile:e.userMobile,
 			          addressId_name:e.departmentName,
 			          departmentId:e.departmentId,
-			          authCreateUser:authCreateUser,    
+			          authCreateUser:authCreateUser, 
+			          userAddressId:e.userAddressId  
 			        };
 			      
 
@@ -371,7 +196,7 @@
 				     that.axios.post("/SmartHomeTrade/department/selectDepartmentByMobile",{
 			          createUser:that.$store.state.userinfo.userMobile,
 			        }).then(function(res){
-			        	// console.log(res)
+			        	
 			        	if(res.data.code==0){
 			        		var dptList=res.data.data.dptList;
 			        		for(var i=0;i<dptList.length;i++){
@@ -384,7 +209,7 @@
 
 			        		}
 			        		that.dptList=dptList
-			        		console.log(that.dptList)
+			        	
 			        	}
 			        })
 			        debugger
@@ -392,8 +217,6 @@
 
 
 
-			        // 用户
-			        // 用户
 			       // 用户
 			        //   if(that.$store.state.userinfo.userLevel==2){
 			        //   	var beScopeId=that.$store.state.parame.parkid;
@@ -409,7 +232,7 @@
 				       	// beScopeId:beScopeId
 				       }
 				        that.axios.post("/SmartHomeTrade/user/selectAllCreateUser",userParams).then(function (res) {
-		               console.log(res)
+		             
 		              if(res.data.code==0){
 		                if(res.data.data!=null){
 		                   that.listNextAdmin =res.data.data.listNextAdmin;		                   
@@ -440,13 +263,13 @@
 	      },
 	      // 获取部门信息
 	      getUserLevel(e){
-	      	console.log(e)
+	      	
 	      	var that=this;
 	      	that.addformValidate.departmentId=e;
 
 	      	for(var i=0;i<that.dptList.length;i++){
 	      		if(that.dptList[i].dptId==e){
-	      			that.addformValidate.userAddressId=that.dptList[i].addressId
+	      			// that.addformValidate.userAddressId=that.dptList[i].addressId
 	      			that.addformValidate.roomId=that.dptList[i].roomId
 	      		}
 	      	}
@@ -461,7 +284,9 @@
 		          		ucUserId:that.addformValidate.ucUserId,
 		          		departmentId:that.addformValidate.departmentId,
 		          		loginName:that.addformValidate.loginName,
-		          		authCreateUser:that.addformValidate.authCreateUser
+		          		authCreateUser:that.addformValidate.authCreateUser,
+		          		userAddressId:that.addformValidate.userAddressId,
+		          		userMobile:that.addformValidate.userMobile
 		          	}
 		          	that.axios.post("/SmartHomeTrade/appUser/updateAppUserInfo",param).then(function(res){
 		          		that.fullscreenLoading=false;
@@ -485,7 +310,7 @@
 
 		           
 		          } else {
-		            console.log('error submit!!');
+		          
 		            return false;
 		          }
 		        });

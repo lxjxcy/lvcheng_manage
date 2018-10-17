@@ -50,12 +50,20 @@ export default{
 		//获取部门下的用户信息
 		getDepinfo(){
 	    	var that=this;
-	    	that.axios.post("/SmartHomeTrade/department/selectDepartmentByMobile",{
+	    	that.axios.post("/SmartHomeTrade/appUser/selectDptUser",{
 	    		createUser:that.$store.state.userinfo.userMobile,
+	    		action:2
 	    	}).then(function(res){
 	    		if(res.data.code==0){
 	    			if(res.data.data!=null){
-	    				that.sectionlist=res.data.data.dptList
+	    				// that.sectionlist=res.data.data.dptUserList;
+			    	  var userlist=res.data.data.dptUserList;
+		              for(var i=0;i<userlist.length;i++){
+		                userlist[i].name=userlist[i].buildingName;
+		                userlist[i].appUserInfoList=userlist[i].dptList;
+
+		              }
+		              that.sectionlist=userlist;
 	    			}
 	    		}
 	    	})
@@ -64,7 +72,7 @@ export default{
      // 添加授权弹框
 		getAuthrization(e){
       this.deviceparam=e;
-       // console.log(this.deviceId)
+      
 			this.opendialog=true;
 			this.getDepinfo()
 		},
@@ -93,6 +101,8 @@ export default{
 				if(res.data.code==0){
 					that.$message.success(res.data.message)
 					that.$emit('refreshList');
+					 that.$emit('reload');
+					 that.$emit('clearselect');
 					that.opendialog=false;
 				}else{
 					that.$message.error(res.data.message)
@@ -101,7 +111,9 @@ export default{
 		},
 		handleClose(done) {
             done();
-            that.$emit('clearselect');
+            this.$emit('clearselect');
+            this.$emit('refreshList');
+            this.$emit('reload');
 
 
       }

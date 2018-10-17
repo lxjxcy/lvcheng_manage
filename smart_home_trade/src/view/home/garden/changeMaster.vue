@@ -128,7 +128,7 @@
 	            that.changeparam.templateName=that.changedynamicValidateForm.masterplateName;
 	            that.changeparam.id=that.multipleSelection[0].id;
 	            that.axios.post("/SmartHomeTrade/template/updateTemplate",that.changeparam).then(function (res) {
-	              console.log(res)
+	            
 	              that.$message({
 	                type: 'success',
 	                message: res.data.message
@@ -138,7 +138,7 @@
 	              that.$refs[changedynamicValidateForm].resetFields();
 	            })
 	          } else {
-	            console.log('error submit!!');
+	          
 	            return false;
 	          }
 	        });

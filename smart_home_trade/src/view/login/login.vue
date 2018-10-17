@@ -14,12 +14,10 @@
                 <span class="boxpic">
                   <img src="../../assets/用户.png" style="width:25px;height:25px;padding:0;">
                 </span>
-                <!-- <i class="icon iconfont l" style='position: absolute;left:-37px'>&#xe636;</i> -->
                 <el-input type="text" v-model="loginForm.loginName"  class="l" @focus="removeValid('loginName')" placeholder="请输入用户名"></el-input>
               </el-form-item>
 
               <el-form-item label="" prop="password"  ref="password" class="my-username">
-                <!-- <i class="icon iconfont l" style='position: absolute;left:-37px'>&#xe611;</i> -->
                  <span class="boxpic">
                     <img src="../../assets/锁子.png" style="width:25px;height:25px;padding:0;">
                  </span>
@@ -34,7 +32,7 @@
                 <span v-model="imgUrl" class="check" style="position: absolute;right:0" @click="getImg()"><img :src="imgUrl" alt="" ></span>
               </el-form-item>
               <el-form-item>
-                <el-button type="primary" @click="submitForm('loginForm')" >登录</el-button>
+                <el-button type="primary" @click="submitForm('loginForm')" :loading="logining">登录</el-button>
               </el-form-item>
             </el-form>
              
@@ -52,6 +50,7 @@ import md5 from 'js-md5';
       data() {
         return {
             iflook:"",
+            logining:false,
         note: {
           backgroundImage: "url(" + require("../../assets/back.png") + ") ",
           backgroundPosition: "center center",
@@ -126,6 +125,7 @@ import md5 from 'js-md5';
           // });         
           that.$refs[loginForm].validate((valid) => {
             if (valid) {
+              that.logining=true;
               var loginForm={
                 loginName:that.loginForm.loginName,
                 password:that.password,
@@ -134,8 +134,10 @@ import md5 from 'js-md5';
              
              
 
-            axios.post('/SmartHomeTrade/user/loginUser',loginForm).then(function (res) {              
+            axios.post('/SmartHomeTrade/user/loginUser',loginForm).then(function (res) {  
+            that.logining=false;            
                 if(res.data.code==0){
+
                  
                   // that.$set(that.$store.state, 'islogin',true)
                  console.log(res.data.data.user)        

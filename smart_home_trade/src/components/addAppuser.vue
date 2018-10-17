@@ -12,7 +12,6 @@
               <el-form-item label="用户名" :label-width="formLabelWidth" prop="loginName" ref="loginName">
                 <el-input v-model="addformValidate.loginName" @focus="removeValid('loginName')" auto-complete="off" placeholder="请输入用户名"></el-input>
               </el-form-item>
-
               <!-- <el-form-item label="密码" :label-width="formLabelWidth" prop="password" ref="password">
                 <el-input type="password" v-model="addformValidate.password"  auto-complete="off" style="width:220px" placeholder="请输入6-20位数字,字母或符号" @focus="removeValid('password')"></el-input>
               </el-form-item>
@@ -24,7 +23,7 @@
                 <el-input v-model="addformValidate.userMobile" @focus="removeValid('userMobile')" auto-complete="off"  placeholder="请输入电话"></el-input>
               </el-form-item>
 
-              <el-form-item label="所属部门" prop="Dname" :label-width="formLabelWidth">
+              <el-form-item label="所属部门" prop="dptId" :label-width="formLabelWidth">
                 <el-select v-model="addformValidate.dptId"  @change="getUserLevel" style="width:100%" placeholder="请选择部门">
                   <el-option
                     v-for="item in dptList"
@@ -50,9 +49,6 @@
 					    </el-option>
 					</el-select>
 	          </el-form-item> 
-
-             
-
              <!--  <el-form-item label="邮箱" :label-width="formLabelWidth" prop="userEmail" ref="userEmail">
                 <el-input v-model="addformValidate.userEmail" @focus="removeValid('userEmail')" auto-complete="off" style="width:220px" placeholder="请输入邮箱"></el-input>
               </el-form-item>
@@ -63,7 +59,6 @@
           <span slot="footer" class="dialog-footer">
                   <el-button type="primary" @click="addappuser('addformValidate')"  v-loading.fullscreen.lock="fullscreenLoading" element-loading-text="正在提交" element-loading-background="rgba(0, 0, 0, 0)">确 定</el-button>
            </span>
-
         </el-dialog>
 		
 	</div>
@@ -128,25 +123,24 @@
 		      //   }
 		      // };
 	      return {
-	        dialogVisible: false,
-	        fullscreenLoading:false,
+	        dialogVisible: false,//弹框
+	        fullscreenLoading:false,//提交加载
 	         formLabelWidth: '100px',
-		      	   addformValidate: {
-			          loginName: '',
+		      	   addformValidate: {//添加app用户
+			          loginName: '',//用户名
 			          // password: '',
-			          name:'',
-			          userMobile:'',
+			          name:'',//姓名
+			          userMobile:'',//电话
 			          // userEmail:'',
-			          Dname:'',
-			          dptId:"",
-			          roomId:'',
-			          departmentId:'',
-			          userAddressId:'',
-			          authCreateUser:null,    
+			          Dname:'',//部门名称
+			          dptId:"",//部门id
+			          roomId:'',//房间id
+			          departmentId:'',//部门id
+			          userAddressId:'',//地址id
+			          authCreateUser:null, // 可见用户list
 			        },
-			        listNextAdmin:[],
-			        dptList:[],
-			        url:"",
+			        listNextAdmin:[],//用户管理数据
+			        dptList:[],//部门数据
 			        ruleValidate: {
 			          loginName: [
 			            { required: true,validator: loginName, trigger: 'blur' }
@@ -171,10 +165,11 @@
 	       };
 	    },
 	    methods: {
+	    	// 添加app用户弹框弹出
 	    	getaddAppuser(){
 	    		var that=this;
 	    		that.dialogVisible=true;
-	    		// 部门
+	    		// 获取部门列表
 				   that.axios.post("/SmartHomeTrade/department/selectDepartmentByMobile",{
 			          createUser:that.$store.state.userinfo.userMobile,
 			        }).then(function(res){
@@ -182,17 +177,15 @@
 			        		var dptList=res.data.data.dptList;
 			        		for(var i=0;i<dptList.length;i++){
 			        			if(dptList[i].adrScope!=null){
-			        					dptList[i].addressId_name=dptList[i].name+"      ("+dptList[i].adrScope+")"
+			        					dptList[i].addressId_name=dptList[i].name+"  ("+dptList[i].adrScope+")"
 			        			}else{
 			        				dptList[i].addressId_name=dptList[i].name
 			        			}
-			        		
-
 			        		}
 			        		that.dptList=dptList
 			        	}
 			        })
-			        // 用户
+			        // 获取用户
 			          if(that.$store.state.userinfo.userLevel==2){
 			          	var beScopeId=that.$store.state.parame.parkid;
 			          }
@@ -202,59 +195,42 @@
 			          if(that.$store.state.userinfo.userLevel==4){
 			          	var beScopeId=that.$store.state.parame.floorid;
 			          }
-			       var userParams={
-			       	createUser:that.$store.state.userinfo.userMobile,
-			       	beScopeId:beScopeId
-			       }
-				    // if(that.$store.state.userinfo.userLevel==2){
-			     //      that.axios.post("/SmartHomeTrade/user/selectYardNxUser",{
-			     //      	createUser:that.$store.state.userinfo.userMobile,
-			     //      	action:2,
+				       var userParams={
+				       	createUser:that.$store.state.userinfo.userMobile,
+				       	beScopeId:beScopeId,
+				       	 token:2,
+				       }
+				        that.axios.post("/SmartHomeTrade/user/selectNextAdmin",userParams).then(function (res) {
+			              
+			              if(res.data.code==0){
+			                if(res.data.data!=null){
+			                   that.listNextAdmin =res.data.data.listNextAdmin;		                   
+			             
+			                }
 
-			     //      }).then(function (res) {
-			     //          console.log(res)
-			     //          that.listNextAdmin =res.data.data.userList;
-			     //        })
-			     //    }else if(that.$store.state.userinfo.userLevel==3||that.$store.state.userinfo.userLevel==4){
-			            // that.axios.post("/SmartHomeTrade/user/selectNextAdmin",userParams).then(function (res) {
-			            //   console.log(res)
-			            //   that.listNextAdmin =res.data.data.listNextAdmin;
-			            // })
-			        // }
-			        that.axios.post("/SmartHomeTrade/user/selectNextAdmin",userParams).then(function (res) {
-		               console.log(res)
-		              if(res.data.code==0){
-		                if(res.data.data!=null){
-		                   that.listNextAdmin =res.data.data.listNextAdmin;		                   
-		             
-		                }
-
-		              }else{
-		                // that.$message.error(res.data.message)
-		              } 
-		            })
-
-	    		
-
-	    			
+			              }else{
+			                that.$message.error(res.data.message)
+			              } 
+			            })	    			
 	        },	
 
-		       //关闭弹框
+		 //关闭弹框
 	      handleClose(done) {
 	        done();
-	         this.$emit('clearselect');
+	        this.$emit('clearselect');
 	        this.resetaddUser("addformValidate")
-	       
-
-
 	      },
-	      // 获取焦点清空验证提示
+	       // 关闭添加弹框初始化弹框内容
+	       resetaddUser(addformValidate) {
+	        this.$refs[addformValidate].resetFields();
+	      },
+	      //获取焦点清除验证提示
 	      removeValid(formName){
 	      	this.$refs[formName].clearValidate();
 	      },
-	      // 获取部门信息
+	      // 获取选择的部门信息
 	      getUserLevel(e){
-	      	console.log(e)
+	      
 	      	var that=this;
 	      	that.addformValidate.departmentId=e;
 	      	for(var i=0;i<that.dptList.length;i++){
@@ -263,12 +239,12 @@
 	      			that.addformValidate.roomId=that.dptList[i].roomId
 	      		}
 	      	}
-
 	      },
+	      // 提交
 	      addappuser(addformValidate){
 	      	var that=this;
 	      	that.$refs[addformValidate].validate((valid) => {
-		          if (valid) {
+		        if (valid) {
 		          	that.fullscreenLoading=true;
 		          	var param={
 		          	  loginName: that.addformValidate.loginName,
@@ -281,7 +257,6 @@
 			          userAddressId:that.addformValidate.userAddressId,
 			          createUser:that.$store.state.userinfo.userMobile,
 			          authCreateUser:that.addformValidate.authCreateUser
-
 		          	}
 		          	that.axios.post("/SmartHomeTrade/appUser/insertAppUser",param).then(function(res){
 		          		that.fullscreenLoading=false;
@@ -296,26 +271,17 @@
 		          			that.$message.error(res.data.message);
 		          		}
 
-		          	})
-
-
-
-
-		           
-		          } else {
-		            console.log('error submit!!');
+		          	})         
+		        } else {
 		            return false;
-		          }
-		        });
+		        }
+		    });
 
-	      },
+	    },
 
-      // 关闭添加弹框清空
-       resetaddUser(addformValidate) {
-        this.$refs[addformValidate].resetFields();
-      },
-        }
-	}
+     
+    }
+}
 </script>
 <style>
 	

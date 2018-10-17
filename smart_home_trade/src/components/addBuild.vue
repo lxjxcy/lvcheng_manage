@@ -8,21 +8,24 @@
           <div class="add" ref="myadd">
             <el-form label-width="100px" :model="addB" ref="addB" :rules="rules">
               <el-form-item label="大楼名称" prop="buildingName" style="position: relative;" ref="loginName">
-                <el-input v-model="addB.buildingName" @focus="removeValid('loginName')" placeholder="请输入大楼名称"></el-input> 
+                <el-input v-model="addB.buildingName" @focus="removeValid('loginName')" placeholder="请输入大楼名称（6个字符以内）"></el-input> 
               </el-form-item>
               <el-form-item label="添加楼层" prop="addfloor">
                 <el-switch v-model="addfloor" @change="addbuildCahgne()"></el-switch>
               </el-form-item>
             </el-form>
              <div class="addB" v-if="addfloor">
-              <el-form :model="addfloorList" ref="addfloorList" label-width="100px" class="demo-dynamic">
+
+              <el-form :model="addfloorList" ref="addfloorList" label-width="100px" class="demo-dynamic"  :rules="rules">
                 <el-form-item
                   v-for="(floorNameList, index) in addfloorList.floorNameList"
                   :label="'楼层' + (index+1)"
                   :key="floorNameList.key"
+                 
+
                 >
-                  <el-input v-model="floorNameList.floorName" class="roominput"></el-input>
-                  <span style="padding: 12px 4%;cursor: pointer" @click.prevent="remove_buildName(floorNameList)">
+                  <el-input v-model="floorNameList.floorName" class="roominput" placeholder="楼层名称不能超过6个字符"></el-input>
+                  <span style="padding: 12px 1.5%;cursor: pointer" @click.prevent="remove_buildName(floorNameList)">
                     <i class="icon iconfont">&#xe504;</i>
                   </span>
                 </el-form-item>
@@ -43,88 +46,91 @@
 export default {
 	name: 'addBuild',
    data() {
+       //大楼名称
+          const buildingName = (rule, value, callback) => {
+            if (value === '') {
+              callback(new Error('大楼名称不能为空'));
+            }else if(!(/^\S{1,6}$/.test(value))){
+              callback(new Error('请输入6位之内的非空字符串'));
+
+            }else {
+              callback();
+            }
+          };
+          //  //大楼名称
+          // const floorName = (rule, value, callback) => {
+          //   if (value === '') {
+          //     callback(new Error('楼层名称不能为'));
+          //   }else if(!(/^\S{1,6}$/.test(value))){
+          //     callback(new Error('请输入6位之内的非空字符串'));
+
+          //   }else {
+          //     callback();
+          //   }
+          // };
    	return{
-   		addGarden:false,
-   		 getParklist:[],
-        fullscreenLoading:false,
-        showparkinfo:false,
-   		  addB:{
-          buildingName:'',
-          yardName:'',
-          yardId:'',
+   		addGarden:false,//弹框   		
+        fullscreenLoading:false,//提交加载
+   		  addB:{//添加大楼
+          buildingName:'',//大楼名称
+          yardName:'',//园区名称
+          yardId:'',//园区id
         },
          formLabelWidth: '100px',
-         addfloor: false,
-         parkList: [],//省
-        // citylist:[],//市
-        // regionlist:[],//区域
-        addfloorList: {
+         addfloor: false,//添加楼层    
+        addfloorList: {//楼层列表
           floorNameList: [{
             floorName: ''
           }],
         },
          rules: {
           buildingName: [
-            {  required: true,message: '大楼名称不能为空'}
-          ],
-          // buildingName: [
-          //   {  required: true,message: '大楼不能为空'}
-          // ]
+            {  required: true,validator: buildingName, trigger: 'blur'}
+          ],        
         },
-         // yardsList: [],
-        createOperator:''
+
 
    	}
 
    },
    methods:{
-       //添加大楼时获取园区接口
+       //添加大楼弹出
       addgarden(){
         var that=this;
         that.addGarden=true;
-        // var param={
-        //   action:1,
-        //   noPage:1,
-        //   yardIdList:that.$store.state.userinfo.manageScopeIdList
-        // }
-        //  that.axios.post("/SmartHomeTrade/garden/selectMyYards",param).then(function(res){
-        //   if(res.data.code==0){
-        //     that.yardsList=res.data.data.yardsList;
-        //   }
-
-        //   })
       },
-        // // 获取园区信息
-        // getparkInfo(value){
-        //   var that=this;
-        //   that.addB.yardId=value;
-        //   let obj={};
-        //   obj = this.yardsList.find((item)=>{ 
-        //      return item.yardId === value;
-        //   });
-        //   that.addB.yardName=obj.yardName;
-        //   console.log(that.addB.yardName+","+that.addB.yardId)
-        // },
- //提交添加园区信息
+ //提交
   add_build(addB){
-        var that=this;
 
+    var that=this;
+   
     that.$refs[addB].validate((valid) => {
           if (valid) {
-            that.fullscreenLoading=true;
+            
                var getbuildingNameList=[]
                 getbuildingNameList.push(that.addB.buildingName)
 
                var floorNameList1=[]
                   for(var i=0;i<that.addfloorList.floorNameList.length;i++){
-                    if(that.addfloorList.floorNameList[i].floorName!=""){
+                    if(that.addfloorList.floorNameList[i].floorName!=""||that.addfloorList.floorNameList[i].floorName!=null){
                       floorNameList1.push(that.addfloorList.floorNameList[i].floorName)
-                    }
-                    
+                    }   
                   }
-              if(that.addfloor&&floorNameList1!=[]){
-               
-               
+
+
+              var floorNameList1=floorNameList1.filter((element,index,self)=>element!='')
+                  for(var j=0;j<floorNameList1.length;j++){
+                    if(!(/^\S{1,6}$/.test(floorNameList1[j]))){
+                      that.$message.error("楼层名称不能大于6个字符")
+                     
+                      return;
+                    }
+                  }
+                 
+
+
+              var floorNameList1=floorNameList1.filter((element,index,self)=>self.indexOf(element) === index)
+              if(that.addfloor&&floorNameList1!=[]){   
                  var addparamGb={
                   yardId:that.$store.state.parame.parkid,
                   yardName:that.$store.state.parame.parkname,
@@ -143,13 +149,13 @@ export default {
 
 
               }
-
-              that.axios.post('/SmartHomeTrade//block/insertBlock',addparamGb).then(function (res) {
+              that.fullscreenLoading=true;
+              that.axios.post('/SmartHomeTrade/block/insertBlock',addparamGb).then(function (res) {
                 that.fullscreenLoading=false;
               //   if(res.data.code==0){
               //     that.$refs[addB].resetFields();
               // }
-                console.log(res)
+             
                 if(res.data.code==0){
                    that.$message({
                       type: 'success',
@@ -158,11 +164,7 @@ export default {
                     that.$emit('refreshList');
                     that.addfloor=false;
                     that.addGarden=false; 
-                     that. addfloorList={
-                      floorNameList: [{
-                        floorName: ''
-                      }],
-                    };
+                   that.$emit('reload');
                      that.$refs[addB].resetFields();
                     
                  }else{
@@ -175,7 +177,7 @@ export default {
                    
               })            
           } else {
-            console.log('error submit!!');
+           
             return false;
           }
         });
@@ -185,10 +187,21 @@ export default {
           this.$refs[formName].clearValidate();
         },
 
+        //判断楼层是否为空
+        ifnone(addfloorList){
+        this.$refs[addfloorList].validate((valid) => {
+          if (valid) {
+            alert('submit!');
+          } else {
+            console.log('error submit!!');
+            return false;
+          }
+        });
+        },
+
 
         // 改变新增大楼按钮
-      addbuildCahgne(){
-       
+      addbuildCahgne(){     
         if(this.addfloor){
           this.$nextTick(function(){
               this.$refs.myadd.scrollTop=150
@@ -213,31 +226,15 @@ export default {
           
         });
       },
-       //删除大楼input框
-      remove_buildName(item) {
-        var index = this.addfloorList.floorNameList.indexOf(item)
-        if (index !== -1) {
-          this.addfloorList.floorNameList.splice(index, 1)
-        }
-      },
-      //新增大楼input框
-      add_buildName() {
-        this.addfloorList.floorNameList.push({
-          
-        });
-      },
      // 关闭弹框
       addhandleClose(done,){
          done()
           this.$emit('clearselect');
          this.addfloor=false;
          this.resetaddG('addB')
-         this.addfloorList={
-          floorNameList: [{
-            floorName: ''
-          }],
-        }
+        this.$emit('reload');
       },
+      // 清空弹框数据
        resetaddG(addB) {
         this.$refs[addB].resetFields();
       },
@@ -263,7 +260,7 @@ export default {
   }
 
   .roominput{
-    width:70% !important;
+    width:82.5% !important;
   }
   .sibmit{
     /*position: absolute;*/

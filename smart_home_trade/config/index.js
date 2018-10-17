@@ -11,7 +11,7 @@ module.exports = {
         assetsPublicPath: '/',
         proxyTable: {
             '/SmartHomeTrade': {
-                target: 'http://platform.qthome.com:8009', // target: 'http://10.0.1.6:8009', //   target: 'http://192.168.1.205:8009',
+                target: 'http://192.168.1.205:8009', //target: 'http://platform.qthome.com:8009', //target: 'http://192.168.1.205:8009', //  // target: 'http://10.0.1.6:8009' //  // target: 'http://platform.qthome.com:8009', //  //
                 changeOrigin: true,
                 pathRewrith: {
                     '^/SmartHomeTrade': '/SmartHomeTrade'
@@ -26,7 +26,6 @@ module.exports = {
         errorOverlay: true,
         notifyOnErrors: true,
         poll: false, // https://webpack.js.org/configuration/dev-server/#devserver-watchoptions-
-
         // Use Eslint Loader?
         // If true, your code will be linted during bundling and
         // linting errors and warnings will be shown in the console.

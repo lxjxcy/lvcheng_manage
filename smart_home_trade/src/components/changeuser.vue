@@ -89,7 +89,7 @@
 		          	that.fullscreenLoading=true;
 		           that.axios.post('/SmartHomeTrade/user/updateNextAdmin',that.changeformValidate).then(function (res) {
 		           	that.fullscreenLoading=false;
-		                  console.log(res)
+		                 
 		                  if(res.data.code==0){
 		                  	that.$message({
 				                type: 'success',
@@ -110,7 +110,7 @@
 		              
 		            })
 		          } else {
-		            console.log('error submit!!');
+		          
 		            return false;
 		          }
 		        });

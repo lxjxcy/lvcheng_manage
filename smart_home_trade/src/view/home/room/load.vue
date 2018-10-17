@@ -19,7 +19,12 @@
 	             <div style="font-size: 12px;margin:10px 0"><span style="width:100px;display: inline-block;text-align: right">
 	             	<span style="color: red">*</span>
 	             提示：</span>只能上传.xls文件,且文件不能为空</div>
-			 	<el-form-item label="文件" prop="fileList">
+			 	<el-form-item label="文件"
+			 	 :rules="[
+			      { required: true, message: '文件不能为空', },
+			    
+			    ]" 
+			 	>
 			 		<!-- <el-checkbox-group v-model="fileList"></el-checkbox-group> -->
 			 		 <el-upload
 						  class="upload-demo"
@@ -35,8 +40,7 @@
 						  :auto-upload="false"
 						 >
 						  <el-button slot="trigger" size="small" type="primary">选取文件</el-button>
-						   <el-button  size="small" type="primary" @click="exportdata()" style="margin-left:10%;">下载模板</el-button>
-						 
+						   <el-button  size="small" type="primary" @click="exportdata()" style="margin-left:10%;">下载模板</el-button>						 
 						</el-upload>
 			 		
 			 	</el-form-item>
@@ -112,9 +116,7 @@
 			          buildingName: [
 			            { required: true,message: '部门不能为空' }
 			          ],
-			          //  fileList: [
-			          //   { required: true,message: '部文件不能为空' }
-			          // ],
+			          
 			      },
 			
 		     
@@ -160,12 +162,12 @@
 			          	action:2,
 
 			          }).then(function (res) {
-			              console.log(res)
+			            
 			              that.listNextAdmin =res.data.data.userList;
 			            })
 			        }else if(that.$store.state.userinfo.userLevel==3||that.$store.state.userinfo.userLevel==4){
 			            that.axios.post("/SmartHomeTrade/user/selectNextAdmin",userParams).then(function (res) {
-			              console.log(res)
+			             
 			              that.listNextAdmin =res.data.data.listNextAdmin;
 			            })
 			        }
@@ -191,15 +193,14 @@
 
 			},
 			 handleClose(done) {
-			 	this.$emit('refreshList');	            	
-              done();
-              this.resetlo("addB")
+			  this.$emit('refreshList');	            	
+             
+              // this.resetlo("addB")
+               this.$emit('reload');
+			  this.listNextAdmin=[]
+			   done();
             },
 
-             // 关闭添加弹框清空
-		       resetlo(addB) {
-		        this.$refs[addB].resetFields();
-		      },
             getBuildId(value){
 	    		this.parkAddress=value;
 	    		for(var i=0;i<this.blockList.length;i++){
@@ -213,7 +214,7 @@
 	    	},
            // 获取部门信息
 	      // getUserLevel(e){
-	      // 	console.log(e)
+	
 	      
 	      // 	var that=this;
 	      // 	that.addB.departmentId=e;
@@ -250,7 +251,7 @@
 		           if (valid) {
 		          	 that.$refs.upload.submit();
 		          } else {
-		            console.log('error submit!!');
+		           
 		            return false;
 		          }
 		        });
@@ -259,12 +260,12 @@
 		      handleRemove(file, fileList) {
 		      	this.fileList=[]
 
-		        console.log(file, fileList);
+		       
 
 		      },
 		      handlePreview(file) {
 		      	this.fileList=["1"]
-		        console.log(file);
+		       
 
 
 		      },
@@ -316,7 +317,11 @@
 				            if(res.data.code==0){
 				            	
 				            	that.$message.success(res.data.message)
-				            	that.resetlo("addB")
+				            	 that.$emit('refreshList');
+				            	that.dialogVisible=false;
+				            	// that.resetlo("addB")
+				            	that.$emit('reload');
+				            	that.listNextAdmin=[]
 				            }else{
 				            	that.$message.error(res.data.message)
 
@@ -324,7 +329,8 @@
 				    })
 				},
 		      handleExceed(files, fileList) {
-		        this.$message.warning(`当前限制选择 3 个文件，本次选择了 ${files.length} 个文件，共选择了 ${files.length + fileList.length} 个文件`);
+		      	
+		        this.$message.warning(`当前限制选择 1个文件`);
 		      },
 		      beforeRemove(file, fileList) {
 		        return this.$confirm(`确定移除 ${ file.name }？`);

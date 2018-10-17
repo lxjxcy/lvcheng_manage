@@ -71,9 +71,8 @@ export default {
 
 
 			var extendslist = listparam;
-			// console.log(extendslist)
+
 			for (var a = 0; a < extendslist.length; a++) {
-				console.log(extendslist[a])
 
 				if (extendslist[a].id == 2) {
 					buildingManagement = 1

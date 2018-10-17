@@ -23,25 +23,20 @@
       <ul >
         <!-- 添加 -->
         <li class="l" @click="createUser()"  v-if="this.$store.state.userinfo.userLevel==1||(this.$store.state.userinfo.userLevel==2&&this.$store.state.extendList.parkAdduser==1)||(this.$store.state.userinfo.userLevel==3&&this.$store.state.extendList.buildAdduser==1)||(this.$store.state.userinfo.userLevel==4&&this.$store.state.extendList.floorAdduser==1)"><i class="el-icon-plus" ></i>添加</li>
+
         <!--修改-->
-
-
         <li class="l"  @click="change()"  v-if="this.$store.state.userinfo.userLevel==1||(this.$store.state.userinfo.userLevel==2&&this.$store.state.extendList.parkChangeuser==1)||(this.$store.state.userinfo.userLevel==3&&this.$store.state.extendList.buildChangeuser==1)||(this.$store.state.userinfo.userLevel==4&&this.$store.state.extendList.floorChangeuser==1)"><i class="el-icon-edit" ></i>修改</li>
         <!--删除-->
-
-
-
       <!--   <li class="l"  @click="deleted()" v-if="this.$store.state.userinfo.userLevel==1||(this.$store.state.userinfo.userLevel==2&&this.$store.state.extendList.parkDeleteuser==1)||(this.$store.state.userinfo.userLevel==3&&this.$store.state.extendList.buildDeleteuser==1)||(this.$store.state.userinfo.userLevel==4&&this.$store.state.extendList.floorDeleteuser==1)"><i class="el-icon-close" ></i>删除</li> -->
 
-
-
+      <!-- 设置权限 -->
         <li class="l"  @click="setAccess()" v-if="this.$store.state.userinfo.userLevel==1||(this.$store.state.userinfo.userLevel==2&&this.$store.state.extendList.parkSetaccess==1)||(this.$store.state.userinfo.userLevel==3&&this.$store.state.extendList.buildSetaccess==1)||(this.$store.state.userinfo.userLevel==4&&this.$store.state.extendList.floorSetaccess==1)"><i class="el-icon-setting"></i>设置权限</li>
       </ul>
         <adduser ref="mychild" @refreshList="getUserlist" @clearselect="clear"></adduser>
         <changeuser ref="mychangechild" @refreshList="getUserlist" @clearselect="clear"></changeuser>
         <usersetScope ref="mysetScope" @refreshList="getUserlist" @clearselect="clear"></usersetScope>
-         <userlookScope ref="mylookScope" @refreshList="getUserlist" @clearselect="clear"></userlookScope>
-          <usersetAccess ref="mysetAccess" @refreshList="getUserlist" @clearselect="clear"></usersetAccess>
+        <userlookScope ref="mylookScope" @refreshList="getUserlist" @clearselect="clear"></userlookScope>
+        <usersetAccess ref="mysetAccess" @refreshList="getUserlist" @clearselect="clear"></usersetAccess>
 
     </div>
     <div class="main-table">
@@ -94,7 +89,7 @@
         <el-table-column
           label="管辖范围"
            align="center">
-          <template slot-scope="scope">
+          <template slot-scope="scope" style="text-align: center">
             <el-button @click="lookScope(scope.row)" type="text" size="small">查看</el-button>
             <el-button @click="setScope(scope.row)" type="text" size="small">设置</el-button>
           </template>
@@ -136,30 +131,24 @@
     },
     data() {
       return {
-         fullscreenLoading: false,
-        templateRadio:'',
-         templateSelection:{},
-        total:0,
-        userParams:{
+        templateRadio:'',//选中
+         templateSelection:{},//选中的这条数据
+        total:0,//总页数
+        userParams:{//获取管理员列表参数
           pageSize:10,
           currentPage:1,
           createUser:'',
            beScopeId:null,
-        },
-        multipleSelection: [],     
-        loading: true,
-   
-        userLevelv:0,
-
-        formSearch: {
+        },   
+        loading: true,//加载 
+        formSearch: {//搜索
           name: null,
           userMobile:null,
           createUser:'',
           loginName:null,
           beScopeId:null,
-
         },
-        listNextAdmin: []
+        listNextAdmin: []//管理员数据
       }
     },
     mounted(){
@@ -196,42 +185,21 @@
       // 获取用户列表
       getUserlist(){
         var that=this;
-        // if(that.$store.state.userinfo.userLevel==2){
-        //   that.axios.post("/SmartHomeTrade/user/selectYardNxUser",that.userParams).then(function (res) {
-        //       console.log(res)
-        //       if(res.data.code==0){
-        //         that.loading=false;
-        //         if(res.data.data!=null){
-        //            that.listNextAdmin =res.data.data.userList;
-                   
-        //            that.total=res.data.data.count;
-        //         }
-
-        //       }else{
-        //         that.$message.error(res.data.message)
-        //       }
-             
-        //     })
-        // }else{
-            that.axios.post("/SmartHomeTrade/user/selectNextAdmin",that.userParams).then(function (res) {
-               console.log(res)
-              if(res.data.code==0){
-                that.loading=false;
-                if(res.data.data!=null){
-                   that.listNextAdmin =res.data.data.listNextAdmin;
-                   
-                   that.total=res.data.data.Count;
-                }
-
-              }else{
-                that.$message.error(res.data.message)
-              }
+          that.axios.post("/SmartHomeTrade/user/selectNextAdmin",that.userParams).then(function (res) {
             
-            })
-        // }
-        
+            if(res.data.code==0){
+              that.loading=false;
+              if(res.data.data!=null){
+                 that.listNextAdmin =res.data.data.listNextAdmin;
+                 
+                 that.total=res.data.data.Count;
+              }
 
-       
+            }else{
+              that.$message.error(res.data.message)
+            }
+          
+          })  
       },
 
       //每页显示多少条
@@ -247,19 +215,15 @@
         that.userParams.currentPage=val;
         that.getUserlist()
       },
-      // handleSelectionChange(val) {
-      //   this.multipleSelection = val;
-      //   console.log(val)
-      // },
+     // 选中
        getTemplateRow(index,row){                
         this.templateSelection = row;
-        console.log(this.templateSelection)
+       
        },
       //关闭弹框
       handleClose(done) {
         done();
       },
-
       // 添加用户
       createUser(){
           this.$refs.mychild.addloginUser();
@@ -268,10 +232,8 @@
       //查询
       onSubmit() {
         var that=this;
-        if(that.formSearch.name==""){
-         
-          that.formSearch.name=null
-         
+        if(that.formSearch.name==""){       
+          that.formSearch.name=null        
         }
          if(that.formSearch.userMobile==""){
           that.formSearch.userMobile=null
@@ -281,19 +243,7 @@
         }
         if(that.formSearch.name!=null||that.formSearch.userMobile!=null||that.formSearch.loginName!=null){
           that.loading=true;
-          console.log(that.formSearch);
-          // if(that.$store.state.userinfo.userLevel==2){
-          //     that.axios.post('/SmartHomeTrade/user/selectYardNxUser',that.formSearch).then(function (res) {        
-          //     if(res.data.code==0){
-          //       if(res.data.data!=null){
-          //        that.listNextAdmin=res.data.data.userList;
-          //         that.loading=false
-          //       }
-          //     }else{
-          //       that.$message.error(res.data.message)
-          //     }
-          //   })
-          // }else{
+         
               that.axios.post('/SmartHomeTrade/user/selectNextAdminByNmOrMobile',that.formSearch).then(function (res) {        
               if(res.data.code==0){
                 if(res.data.data!=null){
@@ -304,24 +254,16 @@
                 that.$message.error(res.data.message)
               }
             })
-
-        // }
-          
         }else{
            that.getUserlist()
-
         }
       },
       //清空查询
       resetForm() {
         var that=this;
-        that.formSearch.name=null,
-          
-          that.formSearch.userMobile=null,
-           that.formSearch.loginName=null,
-
-
-        
+        that.formSearch.name=null,         
+        that.formSearch.userMobile=null,
+        that.formSearch.loginName=null,  
         that.getUserlist()
       },
  
@@ -361,7 +303,6 @@
             cancelButtonText: '取消',
             type: 'warning'
           }).then(() => {
-
             //发送ajax
             that.axios.post('/SmartHomeTrade/user/deleteAdmin',{
               uuid:that.templateSelection.uuid
@@ -371,8 +312,6 @@
                 message: res.data.message
               });
               that.getUserlist()
-
-
             })
 
           }).catch(() => {
@@ -403,7 +342,7 @@
               message: '请选择用户'
             });
           }else {
-            console.log(this.templateSelection.uuid)
+           
             var param={
               userId:this.templateSelection.uuid,
               userLevel:this.templateSelection.userLevel
@@ -415,32 +354,19 @@
 
           }
         },
-        // 加载设置管理员
-        setloading(){
-           this.fullscreenLoading = true;
-        },
-         // 设置管理员成功
-        clearloading(){
-           this.fullscreenLoading = false;
-        },
-        // 查看管辖范围
+
+        //查看管辖范围
         lookScope(row){
-
-
         if(this.$store.state.userinfo.userLevel==1||(this.$store.state.userinfo.userLevel==2&&this.$store.state.extendList.parkSetaccess==1)||(this.$store.state.userinfo.userLevel==3&&this.$store.state.extendList.buildSetaccess==1)||(this.$store.state.userinfo.userLevel==4&&this.$store.state.extendList.floorSetaccess==1)){
             this.$refs.mylookScope.getopen(row);
-
           }else{
-             that.$message.warning("您还没有权限")
-              return
-          }
-
-
-          
+            that.$message.warning("您还没有权限")
+            return
+          }     
         },
     // 设置管辖范围
-    setScope(row){
-      console.log(row)
+        setScope(row){
+     
        if(this.$store.state.userinfo.userLevel==1||(this.$store.state.userinfo.userLevel==2&&this.$store.state.extendList.parkSetaccess==1)||(this.$store.state.userinfo.userLevel==3&&this.$store.state.extendList.buildSetaccess==1)||(this.$store.state.userinfo.userLevel==4&&this.$store.state.extendList.floorSetaccess==1)){
             this.$refs.mysetScope.getopen(row);
             

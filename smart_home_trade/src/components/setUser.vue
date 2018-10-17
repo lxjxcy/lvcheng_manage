@@ -7,7 +7,7 @@
               :before-close="handleClose"
             >
               <!-- @open="onOpen" -->
-              <div class="set">
+              <div class="set"> 
 
                     <el-table
                       :data="adminList"
@@ -102,22 +102,33 @@
         }
         that.templateRadio=v;
 
-				var param={
-					userMobile:that.$store.state.userinfo.userMobile
-				}
-				that.axios.post("/SmartHomeTrade/user/selectCreateAdmin",param).then(function(res){
+           if(that.$store.state.userinfo.userLevel==2){
+                  var beScopeId=that.$store.state.parame.parkid;
+                }
+                if(that.$store.state.userinfo.userLevel==3){
+                  var beScopeId=that.$store.state.parame.buildid;
+                }
+                if(that.$store.state.userinfo.userLevel==4){
+                  var beScopeId=that.$store.state.parame.floorid;
+                }
+                
+
+               var userParams={
+                createUser:that.$store.state.userinfo.userMobile,
+                token:2,
+                beScopeId:beScopeId,
+               }
+				that.axios.post("/SmartHomeTrade/user/selectNextAdmin",userParams).then(function(res){
 					if(res.data.code==0){
             var list=[]
-            for(var i=0;i<res.data.data.adminList.length;i++){
+            for(var i=0;i<res.data.data.listNextAdmin.length;i++){
              
-              if(e.userLevel==res.data.data.adminList[i].userLevel){
-                console.log(res.data.data.adminList[i].userLevel)
-                list.push(res.data.data.adminList[i])
+              if(e.userLevel==res.data.data.listNextAdmin[i].userLevel){
+                console.log(res.data.data.listNextAdmin[i].userLevel)
+                list.push(res.data.data.listNextAdmin[i])
               }
-
             }
 						that.adminList=list
-
 						that.administrator=true;
 					}
 				})
@@ -199,7 +210,7 @@
 
 <style scope>
 .set{
-  /*padding-right: 0.53rem;*/
+
      height: 300px;
     overflow:hidden;
     overflow-y:auto;

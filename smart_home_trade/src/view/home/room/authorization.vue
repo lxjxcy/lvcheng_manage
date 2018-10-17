@@ -34,6 +34,7 @@
       <ul>
        
         <changeAuthor ref="mychangechild" @refreshList="getAuthrizationlist"></changeAuthor>
+         <lookDeviceInfo ref="mylookchild" @refreshList="getAuthrizationlist"></lookDeviceInfo>
         
         <li class="l" @click="change()"><i class="iconfont">&#xe645;</i>修改</li>
          <!-- v-if="this.$store.state.userinfo.userLevel==5&&this.$store.state.extendList.movequement==1" -->
@@ -70,24 +71,7 @@
         </el-table-column>
         
         
-        <el-table-column
-          prop="userDcRequest"
-          label="授权设备"
-           align="center"
-           width="271">
-           <template slot-scope="scope">
-            <el-dropdown class="outlook">
-              <span class="el-dropdown-link">
-                查看<i class="el-icon-arrow-down el-icon--right"></i>
-              </span>
-              <el-dropdown-menu slot="dropdown" class="look" placement="bottom">
-                <el-dropdown-item v-for="(item,index) in scope.row.userDcRequest"  :key="index">{{index+1}},{{item.deviceName}}</el-dropdown-item>
-               
-              </el-dropdown-menu>
-            </el-dropdown>
-            <!-- <span v-for="(item,index) in scope.row.userDcRequest"  :key="index">{{index+1}},{{item.deviceName}},</span> -->
-           </template>
-        </el-table-column>
+       
         
         <el-table-column
           prop="userDcRequest"
@@ -103,6 +87,27 @@
           prop="userMobile"
           label="授权人手机号"
            align="center">
+        </el-table-column>
+
+         <el-table-column
+          prop="userDcRequest"
+          label="授权设备"
+           align="center"
+           width="271">
+           <template slot-scope="scope">
+             <el-button @click="lookInfo(scope.row)" type="text" size="small">查看</el-button>
+
+            <!-- <el-dropdown class="outlook">
+              <span class="el-dropdown-link">
+                查看<i class="el-icon-arrow-down el-icon--right"></i>
+              </span>
+              <el-dropdown-menu slot="dropdown" class="look" placement="bottom">
+                <el-dropdown-item v-for="(item,index) in scope.row.userDcRequest"  :key="index">{{index+1}},{{item.deviceName}}</el-dropdown-item>
+               
+              </el-dropdown-menu>
+            </el-dropdown> -->
+            <!-- <span v-for="(item,index) in scope.row.userDcRequest"  :key="index">{{index+1}},{{item.deviceName}},</span> -->
+           </template>
         </el-table-column>
       </el-table>
       <div class="block">
@@ -124,10 +129,12 @@
 
 <script>
 import changeAuthor from "../../../components/changeAuthor"
+import lookDeviceInfo from "../../../components/lookDeviceInfo"
   export default {
     name: "authorization",
     components:{
-      changeAuthor
+      changeAuthor,
+      lookDeviceInfo
     },
     
     data() {
@@ -213,12 +220,12 @@ import changeAuthor from "../../../components/changeAuthor"
       },
       // handleSelectionChange(val) {
       //   this.multipleSelection = val;
-      //   console.log(val)
+     
       // },
            //查询
         onSubmit() {
           var that=this;
-          console.log(that.formSearch)
+          
           if(that.formSearch.name==''){
             that.formSearch.name=null
           }
@@ -265,6 +272,9 @@ import changeAuthor from "../../../components/changeAuthor"
          this.$refs.mychangechild.getopen(param)
         }
       },
+      lookInfo(row){
+        this.$refs.mylookchild.opendialog(row)
+      },
       // 删除
       delet(){
          var that=this;
@@ -274,7 +284,7 @@ import changeAuthor from "../../../components/changeAuthor"
             cancelButtonText: '取消',
             type: 'warning'
           }).then(() => {
-            console.log(that.templateSelection.userDcRequest)
+           
             var list=[]
             for(var i=0;i<that.templateSelection.userDcRequest.length;i++){
               list.push(that.templateSelection.userDcRequest[i].deviceId)
@@ -311,7 +321,7 @@ import changeAuthor from "../../../components/changeAuthor"
       },
       getTemplateRow(index,row){                
       this.templateSelection = row;
-      console.log(this.templateSelection)
+    
      },
     },
   }

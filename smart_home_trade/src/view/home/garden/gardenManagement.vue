@@ -3,13 +3,9 @@
 
     <div class="top-nav">
       <el-form :inline="true" :model="formSearch" ref="formSearch" class="demo-form-inline">
-      <!--   <el-form-item label="编号"  prop="gardenNum">
-          <el-input v-model="formSearch.gardenNum" placeholder=""></el-input>
-        </el-form-item> -->
         <el-form-item label="名称"  prop="yardName">
           <el-input v-model="formSearch.yardName" placeholder=""></el-input>
         </el-form-item>
-
         <el-form-item label="管理员"  prop="userName">
           <el-input v-model="formSearch.userName" placeholder=""></el-input>
         </el-form-item>
@@ -27,15 +23,19 @@
         <li class="l"  @click="addpark()"><i class="el-icon-plus"></i>添加</li>
       <!--修改园区-->
         <li class="l" @click="change()"><i class="el-icon-edit"></i>修改</li>
+        <!-- 设置管理员 -->
         <li class="l" @click="administratored()"><i class="el-icon-setting"></i>设置管理员</li>
+
          <changePark ref="mychild" @refreshList="getlist" @clearselect="clear"></changePark>
-        <addPark ref="myaddchild" @refreshList="getlist" @clearselect="clear"></addPark>
+         <addPark  v-if="hackReset" ref="myaddchild" @refreshList="getlist" @clearselect="clear" @reload="reloadcom"></addPark>
          <setUser ref="mysetchild" @refreshList="getlist" @clearselect="clear"></setUser>
       </ul>
 
     </div>
-    <div class="main-table">
 
+
+
+    <div class="main-table">
       <el-table
         :data="yardsList"
         ref="multipleTable"
@@ -117,29 +117,16 @@
 
     data() {
       return {
-      templateRadio:'',
-      templateSelection:{},
-        total:0,
-        loading:true,
-        params:{
+        hackReset:true,
+      templateRadio:'',//单选
+      templateSelection:{},//选择的这条数据信息
+        total:0,//总页数
+        loading:true,//加载
+        params:{//获取园区列表参数
           action:1,
           pageSize:10,
           currentPage:1
         },
-        addG:{
-          yardId:null,
-           yardName:"",
-          provinceName:'',
-          provinceId:'',
-          cityName:"",
-          cityId:'',
-          areaName:'',
-          areaId:'',
-          detailAddress:'',
-        },
-         addbuild: false,
-        addaddressid:'',//地址合并
-
         rules: {
           yardName: [
             {  required: true,message: '园区名称不能为空'}
@@ -159,44 +146,26 @@
         },
         
         openid:0,
-        multipleSelection: [],
         formLabelWidth: '100px',
-        addGarden:false,
-        addBuild:false,
-        changeGarden:false,
-        administrator:false,
-        formSearch: {//搜索
+        formSearch: {//搜索参数
           action:1,
-          gardenNum:null,
           yardName:null,
           userName:null,
         },
-        // setadmin:{
-        //   id:'',
-        //   userId:''
-        // },
-        // listUser: [],
-        yardsList: [],
+        yardsList: [],//园区数据列表
         createOperator:''
       }
     },
     mounted(){
-       this.$store.commit('saveIndex',"1-1")
-
-    this.getlist()       
+       this.$store.commit('saveIndex',"1-1")       
         this.createOperator=this.$store.state.userinfo.userMobile
+        this.getlist() 
     },
-    // filters: {
-    //   userlevelStop: function (val) {
-    //     return val== 1 ? 'admin' : val == 2? '园区管理员' :val == 3? '大楼管理员' : val == 4? '楼层管理员' : val == 5? '房间管理员':""
-    //   },
-    // },
     methods: {
-      //  获取列表
+      //  获取园区列表
       getlist(){
-        var that=this
-       
-       that.axios.post('/SmartHomeTrade/garden/selectGdCount',that.params).then(function (res) {
+        var that=this  
+        that.axios.post('/SmartHomeTrade/garden/selectGdCount',that.params).then(function (res) {
             if(res.data.code==0){
               if(res.data.data!=null){
                   that.total=res.data.data.count
@@ -204,17 +173,11 @@
               }else{
                 that.yardsList=[]
               }
-                 that.loading=false
-              
+                 that.loading=false             
             }else{
               that.$message.error(res.data.message)
-            }
-         
+            }         
         })
-      },
-      // 添加园区
-      addpark(){
-         this.$refs.myaddchild.addgarden();
       },
       //每页显示多少条
       handleSizeChange(val) {
@@ -229,35 +192,37 @@
         that.params.currentPage=val;
         that. getlist()
       },
-      // //选中
-      // handleSelectionChange(val) {
-      //   this.multipleSelection = val;
-      //   console.log(val)
-      // },
+        // 添加园区
+      addpark(){
+
+
+       
+         this.$refs.myaddchild.addgarden();
+      },
+
+        // 刷新组件
+       reloadcom(){
+        this.hackReset = false
+      this.$nextTick(() => {
+      this.hackReset = true
+      })
+       },
+       //选中
        getTemplateRow(index,row){                
         this.templateSelection = row;
-        console.log(this.templateSelection)
+      
        },
-
-      // handleSelectionChange2(val) {
-      //   this.multipleSelection2 = val;
-      //   console.log(val)
-      // },
       //查询
       onSubmit() {
-        var that=this;
-        if(that.formSearch.gardenNum==""){
-          that.formSearch.gardenNum=null
-        }
+        var that=this;       
         if(that.formSearch.yardName==""){
           that.formSearch.yardName=null
         }
-        if(that.formSearch.userName==null==""){
+        if(that.formSearch.userName==''){
           that.formSearch.userName=null
         }
-
-        if(that.formSearch.gardenNum==null&&that.formSearch.yardName==null&&that.formSearch.userName==null){
-            that.getlist()
+        if(that.formSearch.yardName==null&&that.formSearch.userName==null){
+          that.getlist()          
           return;
         }
         that.loading=true
@@ -266,7 +231,7 @@
           that.loading=false
         })
       },
-      //清空查询
+      //清空查询框
       resetForm() {
         var that=this;
         that.formSearch={
@@ -277,30 +242,11 @@
         }
         that.getlist()
       },
-         // 情除选中
+      // 取消选中
       clear(){
-         this.templateRadio="";
-         
-       },
-      //关闭弹框
-      // handleClose(done) {
-      //   done()
-
-      // },
-      // addhandleClose(done,){
-      //    done()
-      //    this.addbuild=false;
-      //    this.resetaddG('addG')
-      // },
-      //  resetaddG(addG) {
-      //   this.$refs[addG].resetFields();
-      // },
-      // sethandleClose(done){
-      //   this.$refs.listUser.clearSelection()
-      //   done()
-      // },
-    
-      //修改园区框显示
+         this.templateRadio="";      
+       },   
+      //修改园区
       change(){
         var that=this;
         if(that.templateRadio==''){
@@ -319,7 +265,6 @@
       },
       //  设置管理员
       administratored(){
-
         var that=this;
         if(that.templateRadio==''){
           that.$message({

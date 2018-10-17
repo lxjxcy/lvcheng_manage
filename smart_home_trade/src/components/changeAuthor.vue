@@ -52,7 +52,7 @@
 	    methods:{
 	    	getopen(e){
 	    		var that=this;
-	    		console.log(e.userDcRequest)
+	    	
 	    		that.devicelist=e.userDcRequest
 
 
@@ -64,7 +64,7 @@
 					        obj[e.userDcRequest[i].roomId] = true;
 					     }
 					  }
-		          	    console.log(result);
+		          	   
 		          	   
 		          		for(var j=0;j<result.length;j++){
 		          			 var result2 = [];
@@ -80,8 +80,7 @@
 		          			
 		          		}
 		          		that.userDcRequest=result
-		          		console.log(result)
-		          		
+		          	
 
 
 
@@ -97,7 +96,7 @@
 	    	
 	    		
 	    		that.dialogVisible=true;
-	    		// // console.log(e.userDcRequest)
+	    		
 	    		that.param.ucUserId=e.ucUserId;
 	    		// that.userDcRequest=e.userDcRequest;
 	    		
@@ -119,8 +118,8 @@
 	    		var that=this;
 	    			    		
 	    		var lists=that.$refs.tree.getCheckedKeys()
-	    		console.log(lists)
-	    		console.log(that.devicelist)
+	    	
+	    		
 
 
 	    		 var arr=lists.filter(element=>element!= null)
@@ -129,7 +128,7 @@
 	    		// that.param.deviceIdList=lists;
 	    		for(var i=0;i<arr.length;i++){
 
-	    			console.log(arr[i])
+	    		
 	    			for(var j=0;j<that.devicelist.length;j++){
 	    				if(arr[i]==that.devicelist[j].deviceId){
 	    					 listid.splice(j, 1)
@@ -137,7 +136,7 @@
 
 	    			}
 	    		}
-	    		console.log(listid)
+	    		
 	    		debugger
 	    		
 	    		var listids=[]

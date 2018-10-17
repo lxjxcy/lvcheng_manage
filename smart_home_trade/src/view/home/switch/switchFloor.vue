@@ -16,11 +16,12 @@
 		data(){
 			return{
 				floorList:[],
-				titleName:""
+				titleName:"",
+				username:"",
 			}
 		},
 		mounted(){
-			
+			this.username=this.$store.state.userinfo.loginName
 				this.getmyfloorlist()
 			
 			
@@ -45,6 +46,25 @@
 				}
 		          that.axios.post("/SmartHomeTrade/floor/selectMyFloor",param).then(function(res){
 		            if(res.data.code==0){
+		            	if(res.data.data==null){
+		            		// that.$message.warning("您还没有管辖范围")
+		            		// that.$message.warning("您还没有管辖范围")
+						    that.$confirm('您还没有管辖范围, 请先设置', '提示', {
+					          confirmButtonText: '确定',
+					           showCancelButton:false,
+					          closeOnClickModal:false,
+					          showClose:false,
+					          type: 'warning'
+					        }).then(() => {
+					           that.$router.push({name:'login',params:{username:that.username}})
+					           return;
+					        }).catch(() => {
+					          // that.$message({
+					          //   type: 'info',
+					          //   message: '已取消删除'
+					          // });          
+					        });
+		            	}
 		            	that.floorList=res.data.data.floorList
 		            	that.titleName=res.data.data.floorList[0].name;
 		            	if(that.$store.state.switchName==''){
@@ -75,7 +95,7 @@
 			},
 			
            getvalue(value){
-           	console.log(value)
+           
            	var that=this;
            	 that.$store.commit('switchname',value.name)
            	    var parame={

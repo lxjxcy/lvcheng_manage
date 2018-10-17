@@ -44,7 +44,7 @@
 	    },
 	     methods: {
 	     	getopen(e){
-	     		console.log(e)
+	     		
 	     		var that=this;
 	     		this.dialogVisible=true;
 	     		that.userId=e.userId;
@@ -55,7 +55,7 @@
 	     		var permission = []
 	     		var checkedpermission=[]  			
 					for (var i = 0; i < res.data.data.permissionList.length; i++) {
-						console.log(res.data.data.permissionList[i].sonJdtionList[0])
+						
 						permission.push(res.data.data.permissionList[i].sonJdtionList[0])	
 					}
 					// console.log(permission)

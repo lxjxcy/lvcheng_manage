@@ -5,7 +5,7 @@
 </template> -->
 <template>
   <div class="myEquipment">
-    <div class="top-nav" v-bind:class="classObject">
+    <div class="top-nav">
        <el-form :inline="true" :model="formSearch" class="demo-form-inline ">
         <el-form-item label="设备名称" class="formpark">
           <el-input v-model="formSearch.name" placeholder=""></el-input>
@@ -13,17 +13,61 @@
         <el-form-item label="设备类型" class="formpark">
           <el-input v-model="formSearch.typeName" placeholder=""></el-input>
         </el-form-item>
-         <el-form-item label="所在大楼" v-if="this.$store.state.userinfo.userLevel==2" class="formpark">
+
+
+
+         <!-- <el-form-item label="所在大楼" v-if="this.$store.state.userinfo.userLevel==2" class="formpark">
           <el-input v-model="formSearch.deviceBlock" placeholder=""></el-input>
+        </el-form-item> -->
+        <el-form-item label="所在大楼" v-if="this.$store.state.userinfo.userLevel==2" class="formpark">
+          <el-select v-model="build.buildingId" style="width:92%" @change="getBuildinfo">
+              <el-option
+                v-for="item in blockList"
+                :key="item.buildingId"
+                :label="item.buildingName"
+                :value="item.buildingId"
+               >
+              </el-option>
+          </el-select>
         </el-form-item>
-         <el-form-item label="所在楼层" v-if="this.$store.state.userinfo.userLevel==2||this.$store.state.userinfo.userLevel==3" class="formpark floorform">
-          <el-input v-model="formSearch.deviceFloor" placeholder=""></el-input>
-
+        <el-form-item label="所在楼层" v-if="this.$store.state.userinfo.userLevel==2||this.$store.state.userinfo.userLevel==3" class="formpark floorform">
+          <el-select v-model="floor.id" style="width:92%" @change="getFloorinfo">
+              <el-option
+                v-for="item in floorList"
+                :key="item.id"
+                :label="item.name"
+                :value="item.id"
+               >
+              </el-option>
+          </el-select>
         </el-form-item>
-
          <el-form-item label="所在房间" class="formpark roomform">
-          <el-input v-model="formSearch.deviceRoom" placeholder=""></el-input>
+          <el-select v-model="room.id" style="width:92%" @change="getRoominfo">
+              <el-option
+                v-for="item in roomList"
+                :key="item.id"
+                :label="item.name"
+                :value="item.id"
+               >
+              </el-option>
+          </el-select>
         </el-form-item>
+
+
+
+         <!-- <el-form-item label="所在楼层" v-if="this.$store.state.userinfo.userLevel==2||this.$store.state.userinfo.userLevel==3" class="formpark floorform">
+          <el-input v-model="formSearch.deviceFloor" placeholder=""></el-input>
+        </el-form-item> -->
+
+       <!--   <el-form-item label="所在房间" class="formpark roomform">
+          <el-input v-model="formSearch.deviceRoom" placeholder=""></el-input>
+        </el-form-item> -->
+
+
+       <!--  <el-form-item label="设备状态">
+          <el-input v-model="deviceAddress.deviceState" placeholder=""></el-input>
+        </el-form-item> -->
+
          <el-form-item  class="formpark">
           <el-button type="primary" @click="onSubmit" >查询</el-button>
         </el-form-item>
@@ -38,7 +82,8 @@
     <div class="nav-middle">
       <ul>
         <li class="l"  @click="eAuthorization()"></i>设备授权</li>
-        <authorizationEq ref="mychild" @refreshList="getequipmentlist"  @clearselect="clear"></authorizationEq>
+        <authorizationEq ref="mychild" @refreshList="getequipmentlist"  @clearselect="clear" v-if="hackReset" @reload="reloadcom"></authorizationEq>
+        <openClose ref="myopenchild" @refreshList="getequipmentlist"  @clearselect="clear"></openClose>
 
 
 
@@ -108,11 +153,14 @@
         <el-table-column
           label="操作"
            align="center">
-          <template slot-scope="scope">
+          <template slot-scope="scope" style="text-align: center">
 
-            <el-button size="small" type="text" @click="switchChange(scope.row)">
+            <div style="display: inline-block;width:80px;">
+              <el-button class="opend" style="padding:0;border:0;color:#009fff;background: #fff;font-size: 12px;cursor: pointer" @click="switchChange(scope.row)">
               {{scope.row | equipmentStop}}
             </el-button>
+              
+            </div>
 
             <el-button @click="lookInfo(scope.row)" type="text" size="small"> 查看</el-button>
           </template>
@@ -167,11 +215,16 @@
 
 <script>
 // import axios from "axios"
+import openClose from "./openClose.vue"
   export default {
     name: "myEquipment",
+     components:{
+         openClose
+    },
 
     data() {
       return {
+        hackReset:true,
           templateRadio:'',
         templateSelection:{},
         total:0,
@@ -187,6 +240,7 @@
           pageSize:10,
           currentPage:1,         
         },
+        deviceState:'',
          parkparam:{
         	yardId:null,
         },
@@ -215,59 +269,94 @@
         formation:{
           equipmentid:"SB002",
 
-        }
+        },
+        deviceAddress:{
+          deviceState:'',
+         
+        },
+        floor:{
+          id:"",
+        },
+        room:{
+          id:""
+        },
+        build:{
+          buildingId:"",
+
+        },
+        blockList:[],
+        floorList:[],
+        roomList:[],
       }
     },
 
 
     filters: {
       equipmentStop: function (val) {
-        console.log(val)
+       
           if(val.type==1||val.type==4){
 
             return val.mainStatus == 1? '关闭' : val.mainStatus == 2 ? '开启' : '';
           }
+          
+           
+                    
       },
     },
-
-    // beforeMount(){
-    //     if(this.$store.state.userinfo.userLevel==2){
-    //       this.$store.commit('saveIndex',"2-6")
-    //     }
-    //      if(this.$store.state.userinfo.userLevel==3){
-    //       this.$store.commit('saveIndex',"3-2")
-    //     }
-    //      if(this.$store.state.userinfo.userLevel==4){
-    //       this.$store.commit('saveIndex',"4-2")
-    //     }   
-    //  },
 
     mounted(){
         var that=this;
          if(that.$store.state.userinfo.userLevel==2){
           that.$store.commit('saveIndex',"2-6")
-          that.url="/SmartHomeTrade/device/yardAdUserDeviceList"
+          that.url="/SmartHomeTrade/device/yardAdUserDeviceList";
+          that.axios.post("/SmartHomeTrade/device/yardAdUserDeviceList",{
+            yardId:that.$store.state.parame.parkid,
+            action:3,
+          }).then(function(res){
+            that.blockList=res.data.data.blockList;
+
+          })
          
 
 
         }
          if(that.$store.state.userinfo.userLevel==3){
           that.$store.commit('saveIndex',"3-6")
-           that.url="/SmartHomeTrade/device/blockAdUserDeviceList"
+           that.url="/SmartHomeTrade/device/blockAdUserDeviceList";
+           that.axios.post("/SmartHomeTrade/device/yardAdUserDeviceList",{
+            blockId:that.$store.state.parame.buildid,
+            action:4,
+          }).then(function(res){
+            that.floorList=res.data.data.floorList;
+            
+          })
           
         }
          if(that.$store.state.userinfo.userLevel==4){
           that.$store.commit('saveIndex',"4-6")
-           that.url="/SmartHomeTrade/device/floorAdUserDeviceList"
+           that.url="/SmartHomeTrade/device/floorAdUserDeviceList";
+           that.axios.post("/SmartHomeTrade/device/yardAdUserDeviceList",{
+             floorId:that.$store.state.parame.floorid,
+            action:5,
+          }).then(function(res){
+            that.roomList=res.data.data.roomList;
+            
+          })
          
-        }   
+        }
+
+
+
+
+
+
         that.getequipmentlist()        
       },
     methods: {
       // 获取设备列表
       getequipmentlist(){
         var that=this;
-        console.log(that.equipmentParam)
+      
         var equipmentParam={
             pageSize:that.equipmentParam.pageSize,
             currentPage:that.equipmentParam.currentPage
@@ -295,7 +384,6 @@
          	var param=Object.assign(equipmentParam,floorparam)
           
          }
-
          that.axios.post(that.url,param).then(function(res){
      		if(res.data.code==0){
      			if(res.data.data!=null){
@@ -313,6 +401,65 @@
          })
          
       },
+
+
+
+
+      // 选择大楼
+      getBuildinfo(value){
+        debugger
+         var that=this;
+         let obj = {};  
+        obj = that.blockList.find((item)=>{ 
+        return item.buildingId === value;
+        });  
+        that.formSearch.deviceBlock=obj.buildingName;
+        that.axios.post("/SmartHomeTrade/device/yardAdUserDeviceList",{
+            blockId:value,
+            action:4,
+        }).then(function (res) {
+          that.floorList=res.data.data.floorList;
+          that.formSearch.deviceFloor='';
+          that.formSearch.deviceRoom='';
+          that.floor.id="";          
+          that.roomList=[]      
+        })
+
+      },
+      // 选择楼层
+      getFloorinfo(value){
+         var that=this;
+         let obj = {};  
+        obj = that.floorList.find((item)=>{ 
+        return item.id === value;
+        });  
+        that.formSearch.deviceFloor=obj.name;
+        that.axios.post("/SmartHomeTrade/device/yardAdUserDeviceList",{
+            floorId:value,
+            action:5,
+        }).then(function (res) {
+          that.roomList=res.data.data.roomList;
+          that.formSearch.deviceRoom=''; 
+           that.room.id="";              
+        })
+      },
+      // 选择房间
+      getRoominfo(value){
+          var that=this;
+         let obj = {};  
+        obj = that.roomList.find((item)=>{ 
+        return item.id === value;
+        });  
+        that.formSearch.deviceRoom=obj.name;
+
+      },
+      // 刷新组件
+       reloadcom(){
+        this.hackReset = false
+      this.$nextTick(() => {
+      this.hackReset = true
+      })
+       },
      // 每页几条
         handleSizeChange(val) {
         var that=this;
@@ -364,7 +511,7 @@
                }
               var param=Object.assign(parkparam,formSearch)
               that.Search(param)
-               console.log(that.equipmentParam)
+              
              
           }
            if(that.$store.state.userinfo.userLevel==3){
@@ -419,14 +566,141 @@
              that.formSearch.typeName=null, 
              that.formSearch.deviceBlock=null,   
              that.formSearch.deviceRoom=null,   
-             that.formSearch.deviceFloor=null,  
+             that.formSearch.deviceFloor=null,
+             that.build.buildingId="";  
+             that.floor.id="";
+              that.room.id="";  
             that.getequipmentlist()
         },
          //  转换状态
-      mainStatus: function (row, column) {
-        if(row.type==1||row.type==4){
-           return row.mainStatus == 1? '开启' : row.mainStatus == 2? '关闭' : row.mainStatus == 3? '停':""
-        }
+      mainStatus: function (val, column) {
+        // if(row.type==1||row.type==4){
+        //    return row.mainStatus == 1? '开启' : row.mainStatus == 2? '关闭' : row.mainStatus == 3? '停':""
+        // }
+
+              let state=val.state
+              let content=''
+              if(state.onlineState==='ONLINE'||state.online==='true'){
+                content='在线'
+              }else if(state.onlineState!=='ONLINE'||state.online==='false'){
+                return '离线'
+              }
+              //灯和插座
+              if(val.type===1||val.type===2){
+                if(state.main==='1'){
+                  content='开'
+                }
+                else if(state.main==='2'){
+                  content='关'
+                }
+              }
+
+              // //门锁
+              // if (h.type === 3) {
+              //   if (state.main==='1') {
+              //     content='开'
+              //   }else{
+              //     content='关'
+              //   }
+              // }
+              //窗帘电机
+              if (state.motorPos || val.type===4) {
+                switch (state.main) {
+                  case '2' :
+                    content= '关'
+                    break
+                  case '1' :
+                    content= '开'
+                    break
+                  case '3' :
+                    content= '开'
+                    break
+                  default:
+                    return
+                }
+              }
+              //布尔传感器---人体传感器/烟感传感器/燃气传感器/水浸报警器
+              if (val.type === 5) {
+                if (state.dismantle == 'true') {
+                  return '防拆报警'
+                }
+                else if (state.lowPower == 'true') {
+                  return '低电量报警'
+                }
+                else if (state.probeFalloff == 'true') {
+                  return '探头脱落报警'
+                }
+                else {
+                  return '警戒'
+                }
+              }
+              //数值传感器---温度/湿度/光照
+              if (val.type === 6) {
+                if (state.num) {
+                  if (val.subType == '17') {
+                    return state.num + '℃'
+                  } else if (val.subType == '18') {
+                    return state.num + '%RH'
+                  } else if (val.subType == '19') {
+                    return state.num + 'lux'
+                  }
+                }
+              }
+              //报警器
+              if (val.type === 21) {
+                if (state.alarm==='true') {
+                  content='报警中'
+                }else{
+                  content='警戒'
+                }
+              }
+              //红外设备
+              if (val.type === 23) {
+
+              }
+              //呼叫面板
+              if (val.type === 25) {
+                if (state.on === 'true') {
+                  return '报警'
+                } else {
+                  return '警戒'
+                }
+              }
+              //中央空调
+              // if (h.type === 27) {
+              //   if (state.main === '1') {
+              //     return '开'
+              //   }else{
+              //     return '关'
+              //   }
+              // }
+
+              // if (h.type === 27) {
+              //   if (state.online === 'true') {
+              //     return '在线'
+              //   }else{
+              //     return '离线'
+              //   }
+              // }
+              //情景面板
+              if (val.type === 29) {
+                if (!val.operateType) {
+                  return '未关联'
+                }
+              }
+              //快捷面板
+              if (val.type === 31) {
+
+              }
+              //门磁
+              if (val.type === 38) {
+                if (state.main === '1') {
+                  return '开'
+                }else{
+                  return '关'
+                }
+              }
+              return content
 
        
       },
@@ -434,7 +708,7 @@
       getTemplateRow(index,row){                
         this.templateSelection = row;
         debugger
-        console.log(this.templateSelection)
+       
        },
       //关闭设备信息框
       handleClose(done) {
@@ -482,80 +756,12 @@
               this.$message.info("抱歉,您没有操作设备的权限")
              return
            }
-          var that=this;
-          console.log(e.mainStatus)
 
-        
-
-          if(e.mainStatus==1){
-            var swit=false;
-            var clo="CLOSE"
-          }else{
-            var swit=true;
-             var clo="OPEN"
-          }         
-          if(e.type==1){
-            var param={
-            "on":swit
-            }
-             var Swiparam={
-              "command":"SwitchMain",
-              "argument":param,
-              }
-          }else if(e.type==4){
-             var param={
-            "opt":clo
-            }
-            var Swiparam={
-              "command":"SetMotorOption",
-              "argument":param,
-              }
-
-          } 
-
-         // 共同参数
-            var commparam={
-               userId: this.$store.state.userinfo.uuid,
-               deviceId:e.id,
-               userDeviceAuth:this.$store.state.userinfo.userDeviceAuth
-            }
-
-          var param = Object.assign(commparam, Swiparam);       
-          that.axios.post('/SmartHomeTrade/device/deviceSwitchOnFalse',param).then(function(res){
-            if(res.data.code==0){
-              that.getequipmentlist()
-
-            }else{
-              that.$message.error(res.data.message)
-            }
-
-          })
+          this.$refs.myopenchild.open(e);
+         
 
 
         },
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    
-     
-
     },
   }
 </script>
@@ -583,13 +789,21 @@
 .floorwap .formpark{
   margin-bottom: 0px;
 }
-/*.wap .rightch,.wap .rightre{
-  float: left;
-
+.opend:hover{
+  padding:4.5px 15px  !important;
+  color:#fff  !important;
+  background: #0ec07d  !important
 }
-.wap .rightch{
-  margin-right: 20%;
-}*/
+.opend:active{
+  padding:4.5px 15px  !important;
+  color:#fff  !important;
+  background: #0ec07d  !important
+}
+
+.opend{
+  
+}
+
 
 </style>
 

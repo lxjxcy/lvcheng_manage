@@ -19,12 +19,14 @@
 		data(){
 			return{
 				yardsList:[],
-				titleName:""
+				titleName:"",
+				username:"",
 			}
 		},
 		mounted(){
-			
+			this.username=this.$store.state.userinfo.loginName
 				this.getmyparklist()
+				
 			
 			
 		},
@@ -38,6 +40,25 @@
 				}
 		          that.axios.post("/SmartHomeTrade/garden/selectMyYards",param).then(function(res){
 		            if(res.data.code==0){
+		            	if(res.data.data.yardsList.length==0||res.data.data==null){
+		            		// that.$message.warning("您还没有管辖范围")
+						    that.$confirm('您还没有管辖范围, 请先设置', '提示', {
+					          confirmButtonText: '确定',
+					          showCancelButton:false,
+					          closeOnClickModal:false,
+					          showClose:false,
+					          type: 'warning'
+					        }).then(() => {
+					           that.$router.push({name:'login',params:{username:that.username}})
+					           return;
+					        }).catch(() => {
+					          that.$message({
+					            type: 'info',
+					            message: '已取消删除'
+					          });          
+					        });
+
+		            	}
 		            	that.yardsList=res.data.data.yardsList
 		            	// that.titleName=res.data.data.yardsList[0].areaName;
 		            	if(that.$store.state.switchName==''){
@@ -67,7 +88,7 @@
 			
            getvalue(value){
            	var that=this;
-           	console.log(value)
+           
            var parame={
 			      parkname: value.yardName,
 			      parkid: value.yardId,

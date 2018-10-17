@@ -73,7 +73,13 @@ import userAuthdevic from "../../../components/userAuthdevic"
         that.axios.post("/SmartHomeTrade/appUser/selectDptUser",param).then(function(res){
           if(res.data.code==0){
             if(res.data.data!=null){
-              that.userlist=res.data.data.dptUserList
+              var userlist=res.data.data.dptUserList;
+              for(var i=0;i<userlist.length;i++){
+                userlist[i].name=userlist[i].buildingName;
+                userlist[i].appUserInfoList=userlist[i].dptList;
+
+              }
+              that.userlist=userlist;
 
             }else{
               that.userlist=[]
@@ -106,11 +112,13 @@ import userAuthdevic from "../../../components/userAuthdevic"
         },
       // 添加授权
         add(){
-           var listid=this.$refs.user.getCheckedKeys()
+           var listid=this.$refs.user.getCheckedKeys()            
            if(listid.length==0){
             this.$message.warning("请选择授权用户")
            }else{
              var arr=listid.filter(element=>element!= null)
+      
+           // debugger
              
                 
                if(this.$store.state.userinfo.userLevel==2){

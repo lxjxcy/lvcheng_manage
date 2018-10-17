@@ -36,10 +36,10 @@
         <!-- 修改 -->
         <li class="l" @click="changeFloorName()" v-if="this.$store.state.extendList.changefloor==1"><i class="el-icon-edit"></i>修改</li>
         <!-- 设置管理 -->
-        <li class="l" @click="administratored()" v-if="this.$store.state.extendList.floorsetuser==1"><i class="el-icon-setting"></i>设置管理员</li>
+        <li class="l" @click="administratored()" v-if="this.$store.state.extendList.floorsetuser==1&&this.$store.state.userinfo.userLevel==3"><i class="el-icon-setting"></i>设置管理员</li>
       </ul>
       <changeFloor ref="mychild" @refreshList="getfloorList" @clearselect="clear"></changeFloor>
-       <addFloor ref="myaddchild" @refreshList="getfloorList" @clearselect="clear"></addFloor>
+       <addFloor ref="myaddchild" @refreshList="getfloorList" @clearselect="clear" v-if="hackReset" @reload="reloadcom"></addFloor>
         <setUser ref="mysetchild" @refreshList="getfloorList" @clearselect="clear"></setUser>
     </div>
     <div class="main-table">
@@ -132,6 +132,7 @@
   
       data() {
         return {
+          hackReset:true,
             templateRadio:'',
         templateSelection:{},
           loading:true,
@@ -205,7 +206,7 @@
                 }
                 
               }
-              console.log(res.data.data.blockList)
+            
             })
           },
       // 跳转到指定楼层的房间列表页
@@ -275,7 +276,14 @@
       },
         getTemplateRow(index,row){                
         this.templateSelection = row;
-        console.log(this.templateSelection)
+       
+       },
+              // 刷新组件
+       reloadcom(){
+        this.hackReset = false
+         this.$nextTick(() => {
+            this.hackReset = true
+         })
        },
         // handleSelectionChange(val) {
         //   this.multipleSelection = val;
@@ -302,7 +310,7 @@
            that.loading=true;
 
           that.axios.post("/SmartHomeTrade/floor/selectFloorCount",that.formSearch).then(function(res){
-            console.log(res.data.data.floorList)
+          
                 if(res.data.code==0){
                   if(res.data.data!=null){
                      that.floorList=res.data.data.floorList;

@@ -5,9 +5,6 @@
           <el-form-item label="大楼名称"  prop="yardName">
             <el-input v-model="formSearch.buildingName" placeholder=""></el-input>
           </el-form-item>
-        <!--   <el-form-item label="大楼编号"  prop="yardNblockNumame">
-            <el-input v-model="formSearch.blockNum" placeholder=""></el-input>
-          </el-form-item> -->
           <el-form-item label="管理员"  prop="userName">
             <el-input v-model="formSearch.userName" placeholder=""></el-input>
           </el-form-item>
@@ -21,16 +18,23 @@
            <el-button @click="resetForm('formSearch')">重置</el-button>
           </el-form-item>
         </el-form>
-       
       </div>
       <div class="nav-middle">
         <ul>
+          <!-- 添加 -->
           <li class="l" @click="addbuildings()" v-if="this.$store.state.extendList.addbuild==1"><i class="el-icon-plus"></i>添加</li>
+
+          <!-- 修改 -->
           <li class="l" @click="change()" v-if="this.$store.state.extendList.changebuild==1"><i class="el-icon-edit"></i>修改</li>
-          <li class="l" @click=" administratored()" v-if="this.$store.state.extendList.buildsetuser==1"><i class="el-icon-setting"></i>设置管理员</li>
-          <li class="l" @click="host()" v-if="this.$store.state.extendList.hostlist==1"><i class="el-icon-tickets"></i>主机清单</li>
+
+          <!-- 设置管理员 -->
+          <li class="l" @click=" administratored()" v-if="this.$store.state.extendList.buildsetuser==1&&this.$store.state.userinfo.userLevel==2"><i class="el-icon-setting"></i>设置管理员</li>
+
+          <!-- 主机清单 -->
+          <!-- <li class="l" @click="host()" v-if="this.$store.state.extendList.hostlist==1"><i class="el-icon-tickets"></i>主机清单</li> -->
+
           <changebuild ref="mychild" @refreshList="getBuildlist" @clearselect="clear"></changebuild>
-          <addBuild ref="myaddchild" @refreshList="getBuildlist" @clearselect="clear"></addBuild>
+          <addBuild ref="myaddchild" @refreshList="getBuildlist" @clearselect="clear"  v-if="hackReset" @reload="reloadcom"></addBuild>
           <setUser ref="mysetchild" @refreshList="getBuildlist" @clearselect="clear"></setUser>
         </ul>
 
@@ -45,10 +49,6 @@
           tooltip-effect="dark"
           height="408"
           border>
-         <!--  <el-table-column
-            type="selection"
-            width="50">
-          </el-table-column> -->
           <el-table-column label="" width="50">
           <template slot-scope="scope">
               <el-radio :label="scope.row.blockNum" v-model="templateRadio" @change.native="getTemplateRow(scope.$index,scope.row)">&nbsp</el-radio>
@@ -135,23 +135,23 @@
         },
       data() {
         return {
-          buildParams:{
+           hackReset:true,
+          buildParams:{//获取大楼列表参数
             pageSize:10,
             currentPage:1,
             yardIdList:[],
             action:1,
           },
-          templateRadio:'',
-        templateSelection:{},
-          total:0,
-          loading:true,
+          templateRadio:'',//选中
+        templateSelection:{},//选中的数据
+          total:0,//总页数
+          loading:true,//加载
           buildingN:'222',
           multipleSelection: [],
           multipleSelection2:[],
           formLabelWidth: '100px',
-          addBuilding:false,
           administrator:false,
-          formSearch: {
+          formSearch: {//搜索
             buildingName: null,
             yardName:null,
             blockNum:null,
@@ -161,7 +161,7 @@
           },
           add:'',
           blockList: [],
-          iftrue:'',
+         
         }
 
       },
@@ -180,8 +180,7 @@
     },
     watch: {
       listenshowpage1: function(a, b) {
-        console.log("修改前卫：" + a);
-         console.log("修改后为：" + b);
+      
         return 1;
        
       }
@@ -219,13 +218,17 @@
         that.getBuildlist()
       },
         //选中
-        // handleSelectionChange(val) {
-        //   this.multipleSelection = val;
-        //   console.log(val)
-        // },
+      
          getTemplateRow(index,row){                
         this.templateSelection = row;
-        console.log(this.templateSelection)
+      
+       },
+            // 刷新组件
+       reloadcom(){
+        this.hackReset = false
+         this.$nextTick(() => {
+            this.hackReset = true
+         })
        },
            // 情况选中
        clear(){
@@ -250,7 +253,7 @@
           }
            that.loading=true;
           that.axios.post("/SmartHomeTrade/block/selectBlockCount",that.formSearch).then(function(res){
-            console.log(res)            
+                   
             if(res.data.code==0){
               that.loading=false;
               that.blockList=res.data.data.blockList;

@@ -55,7 +55,7 @@
          <createDepartment ref="mycreatechild"  @refreshList="getApplist"  @clearselect="clear"></createDepartment>
       </ul>
     </div>
-     <load ref="myloadchild" @refreshList="getApplist"></load>
+     <load ref="myloadchild" @refreshList="getApplist" v-if="hackReset" @reload="reloadcom"></load>
     <div class="main-table">
 
       <el-table
@@ -143,6 +143,7 @@ import load from "./load.vue"
     data() {
       return {
          templateRadio:'',
+         hackReset:true,
         templateSelection:{},
         // multipleSelection: [],
         total:0,
@@ -211,6 +212,14 @@ import load from "./load.vue"
 
         })
       },
+         // 刷新组件
+       reloadcom(){
+        this.hackReset = false
+         this.$nextTick(() => {
+            this.hackReset = true
+         })
+       },
+       //
           //每页显示多少条
       handleSizeChange(val) {
         var that=this;
@@ -243,7 +252,7 @@ import load from "./load.vue"
             return;
           }
           that.axios.post("/SmartHomeTrade/appUser/selectUserByCreateUser",that.formSearch).then(function(res){
-            console.log(res)            
+            
             if(res.data.code==0){
               that.loading=false;
               if(res.data.data!=null){
@@ -271,7 +280,8 @@ import load from "./load.vue"
       },
          getTemplateRow(index,row){                
         this.templateSelection = row;
-        console.log(this.templateSelection)
+      
+      
        },
        // 创建部门
        createDepart(){
@@ -394,7 +404,6 @@ import load from "./load.vue"
         if(that.templateSelection.state==1){
            that.$message.info("该用户已恢复");
            return;
-
         }
         if(that.templateRadio!=''){
           that.$confirm('您确定要恢复该用户么?', '提示', {

@@ -17,11 +17,15 @@
 		data(){
 			return{
 				blockList:[],
-				titleName:""
+				titleName:"",
+				username:''
+
 			}
 		},
 		mounted(){
+			this.username=this.$store.state.userinfo.loginName
 			this.getmybuildlist()
+
 		},
 		methods:{
 			
@@ -33,6 +37,26 @@
 				}
 				that.axios.post("/SmartHomeTrade/block/selectMyBlock",param).then(function(res){
 		            if(res.data.code==0){
+		            	if(res.data.data==null){
+		            		
+		            		// that.$message.warning("您还没有管辖范围")
+		            		// that.$message.warning("您还没有管辖范围")
+						    that.$confirm('您还没有管辖范围, 请先设置', '提示', {
+					          confirmButtonText: '确定',
+					           showCancelButton:false,
+					          closeOnClickModal:false,
+					          showClose:false,
+					          type: 'warning'
+					        }).then(() => {
+					           that.$router.push({name:'login',params:{username:that.username}})
+					           return;
+					        }).catch(() => {
+					          // that.$message({
+					          //   type: 'info',
+					          //   message: '已取消删除'
+					          // });          
+					        });
+		            	}
 		            	that.blockList=res.data.data.blockList
 		            	that.titleName=res.data.data.blockList[0].buildingName
 		            	if(that.$store.state.switchName==''){

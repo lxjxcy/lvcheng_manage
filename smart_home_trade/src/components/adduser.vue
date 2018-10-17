@@ -185,7 +185,7 @@
 	
 			  //获取层级id
       getUserLevel(value){
-        console.log(value)
+     
         // this.userLevelv=value;
        
       },
@@ -241,7 +241,7 @@
 		             var param=Object.assign(userL,comparam)
 		            that.axios.post(that.url,param).then(function (res) {
 		            	that.fullscreenLoading=false;
-		              console.log(res.data.message)
+		            
 		              if(res.data.code==0){
 		              	 that.$message({
 		                type: 'success',
@@ -265,7 +265,7 @@
 
 		            })
 		          } else {
-		            console.log('error submit!!');
+		           
 		            return false;
 		          }
 		        });

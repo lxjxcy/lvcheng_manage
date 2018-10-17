@@ -57,11 +57,11 @@ export default{
             action:2
            } 
 			 that.axios.post("/SmartHomeTrade/device/yardAdUserDeviceList",param).then((res)=>{
-              console.log(res)
+             
               if(res.data.data!=null){
                 if(res.data.data.deviceList.length==0){
                    that.addresslist=[]  
-                    debugger
+                    
                 }else{
                   that.clearBoth(res.data.data.deviceList)                 
                 return

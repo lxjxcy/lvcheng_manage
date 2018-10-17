@@ -6,12 +6,16 @@
         <el-form-item label="设备名称">
           <el-input v-model="formSearch.name" placeholder=""></el-input>
         </el-form-item>
-       <!--  <el-form-item label="编号">
-          <el-input v-model="formSearch.deviceNum" placeholder=""></el-input>
-        </el-form-item> -->
          <el-form-item label="设备类型">
           <el-input v-model="formSearch.typeName" placeholder=""></el-input>
         </el-form-item>
+       <!--   <el-form-item label="设备状态">
+          <el-input v-model="deviceState" placeholder=""></el-input>
+        </el-form-item> -->
+
+
+
+
         <el-form-item>
           <el-button type="primary" @click="onSubmit">查询</el-button>
         </el-form-item>
@@ -23,7 +27,7 @@
 
     <div class="nav-middle">
        <div class="l" style="font-size: 20px;font-weight: 400" v-if="this.$store.state.userinfo.userLevel==2">
-        <span>{{this.$store.state.parame.buildname}}{{this.$store.state.parame.floorname}}{{this.$store.state.parame.roomname}}</span>
+        <span>{{this.$store.state.parame.buildname}}-{{this.$store.state.parame.floorname}}-{{this.$store.state.parame.roomname}}</span>
         ---设备列表
       </div>
        <div class="l" style="font-size: 20px;font-weight: 400" v-if="this.$store.state.userinfo.userLevel==3">
@@ -37,8 +41,8 @@
       <ul v-bind:class="classObject">
         <!-- <li class="l" @click="move = true" v-if="this.$store.state.userinfo.userLevel==5&&this.$store.state.extendList.movequement==1"><i class="el-icon-location-outline"></i>迁移设备</li> -->
         <li class="l"  @click="eAuthorization()" v-if="this.$store.state.userinfo.userLevel==5&&this.$store.state.extendList.quementAuthor==1"><i class="el-icon-edit-outline"></i>设备授权</li>
-        <authorizationEq ref="mychild" @refreshList="getequipmentlist"  @clearselect="clear"></authorizationEq>
-
+        <authorizationEq  ref="mychild" @refreshList="getequipmentlist"  @clearselect="clear" v-if="hackReset" @reload="reloadcom"></authorizationEq>
+        <openClose ref="myopenchild" @refreshList="getequipmentlist"  @clearselect="clear"></openClose>
 
 
       </ul>
@@ -55,10 +59,6 @@
         tooltip-effect="dark"
         height="404"
         border>
-       <!--  <el-table-column
-          type="selection"
-          width="50">
-        </el-table-column> -->
          <el-table-column label="" width="50">
           <template slot-scope="scope">
               <el-radio :label="scope.row.deviceNum" v-model="templateRadio" @change.native="getTemplateRow(scope.$index,scope.row)">&nbsp</el-radio>
@@ -87,15 +87,6 @@
           label="设备状态"
          :formatter="mainStatus"
            align="center">
-         <!--  <template slot-scope="scope">
-
-            <el-switch
-              v-model="scope.mainStatus"
-             disabled>
-            </el-switch>
-
-
-          </template> -->
         </el-table-column>
         <el-table-column
           prop="inAddress"
@@ -108,10 +99,12 @@
            align="center">
           <template slot-scope="scope">
 
-            <el-button size="small" type="text" @click="switchChange(scope.row)">
+            <div style="display: inline-block;width:80px;">
+              <el-button class="opend" style="padding:0;border:0;color:#009fff;background: #fff;font-size: 12px;cursor: pointer" @click="switchChange(scope.row)">
               {{scope.row | equipmentStop}}
             </el-button>
 
+            </div>
             <el-button @click="lookInfo(scope.row)" type="text" size="small"> 查看</el-button>
           </template>
         </el-table-column>
@@ -139,11 +132,8 @@
         <div class="getLnformation">
           <ul>
             <li>设备编号：{{equipmenInfo.id}}</li>
-            <!-- <li>主机厂商：{{equipmenInfo.providerName}}</li> -->
             <li>设备名称：{{equipmenInfo.name}}</li>
-            <!-- <li>官网名称：{{equipmenInfo}}</li> -->
             <li>设备类型：{{equipmenInfo.typeName}}</li>
-            <!-- <li>官网地址：{{equipmenInfo}}</li> -->
             <li v-if="equipmenInfo.mainStatus==1">设备状态 :开</li>
             <li v-if="equipmenInfo.mainStatus==2">设备状态 :关</li>
             <li>所属主机：{{equipmenInfo.hostId}}</li>
@@ -161,12 +151,18 @@
 
 <script>
 // import axios from "axios"
+import openClose from "../park/openClose.vue"
   export default {
     name: "equipment",
+       components:{
+         openClose
+    },
+
 
     data() {
       return {
           templateRadio:'',
+           hackReset:true,
         templateSelection:{},
         total:0,
         loading:true,
@@ -203,7 +199,7 @@
 
     filters: {
       equipmentStop: function (val) {
-        console.log(val)
+       
           if(val.type==1||val.type==4){
 
             return val.mainStatus == 1? '关闭' : val.mainStatus == 2 ? '开启' : '';
@@ -223,10 +219,8 @@
         }
           if(this.$store.state.userinfo.userLevel==5){
           this.$store.commit('saveIndex',"5-2")
-        }
-        
+        }        
      },
-
     mounted(){
         var that=this;
 
@@ -260,10 +254,8 @@
                that.deviceList=res.data.data.deviceList;
                that.total=res.data.data.count;  
             }
-            that.loading=false;
-                
+            that.loading=false;                
           }
-
         })
       },
      // 每页几条
@@ -304,6 +296,13 @@
             }
           })
         },
+    // 刷新组件
+       reloadcom(){
+        this.hackReset = false
+      this.$nextTick(() => {
+      this.hackReset = true
+      })
+       },
         // 清空查询
         resetForm() {
         var that=this;
@@ -313,10 +312,131 @@
             that.getequipmentlist()
         },
          //  转换状态
-      mainStatus: function (row, column) {
-        if(row.type==1||row.type==4){
-           return row.mainStatus == 1? '开启' : row.mainStatus == 2? '关闭' : row.mainStatus == 3? '停':""
-        }
+      mainStatus: function (val, column) {
+       
+              let state=val.state
+              let content=''
+              if(state.onlineState==='ONLINE'||state.online==='true'){
+                content='在线'
+              }else if(state.onlineState!=='ONLINE'||state.online==='false'){
+                return '离线'
+              }
+              //灯和插座
+              if(val.type===1||val.type===2){
+                if(state.main==='1'){
+                  content='开'
+                }
+                else if(state.main==='2'){
+                  content='关'
+                }
+              }
+
+              // //门锁
+              // if (h.type === 3) {
+              //   if (state.main==='1') {
+              //     content='开'
+              //   }else{
+              //     content='关'
+              //   }
+              // }
+              //窗帘电机
+              if (state.motorPos || val.type===4) {
+                switch (state.main) {
+                  case '2' :
+                    content= '关'
+                    break
+                  case '1' :
+                    content= '开'
+                    break
+                  case '3' :
+                    content= '开'
+                    break
+                  default:
+                    return
+                }
+              }
+              //布尔传感器---人体传感器/烟感传感器/燃气传感器/水浸报警器
+              if (val.type === 5) {
+                if (state.dismantle == 'true') {
+                  return '防拆报警'
+                }
+                else if (state.lowPower == 'true') {
+                  return '低电量报警'
+                }
+                else if (state.probeFalloff == 'true') {
+                  return '探头脱落报警'
+                }
+                else {
+                  return '警戒'
+                }
+              }
+              //数值传感器---温度/湿度/光照
+              if (val.type === 6) {
+                if (state.num) {
+                  if (val.subType == '17') {
+                    return state.num + '℃'
+                  } else if (val.subType == '18') {
+                    return state.num + '%RH'
+                  } else if (val.subType == '19') {
+                    return state.num + 'lux'
+                  }
+                }
+              }
+              //报警器
+              if (val.type === 21) {
+                if (state.alarm==='true') {
+                  content='报警中'
+                }else{
+                  content='警戒'
+                }
+              }
+              //红外设备
+              if (val.type === 23) {
+
+              }
+              //呼叫面板
+              if (val.type === 25) {
+                if (state.on === 'true') {
+                  return '报警'
+                } else {
+                  return '警戒'
+                }
+              }
+              //中央空调
+              // if (h.type === 27) {
+              //   if (state.main === '1') {
+              //     return '开'
+              //   }else{
+              //     return '关'
+              //   }
+              // }
+
+              // if (h.type === 27) {
+              //   if (state.online === 'true') {
+              //     return '在线'
+              //   }else{
+              //     return '离线'
+              //   }
+              // }
+              //情景面板
+              if (val.type === 29) {
+                if (!val.operateType) {
+                  return '未关联'
+                }
+              }
+              //快捷面板
+              if (val.type === 31) {
+
+              }
+              //门磁
+              if (val.type === 38) {
+                if (state.main === '1') {
+                  return '开'
+                }else{
+                  return '关'
+                }
+              }
+              return content
 
        
       },
@@ -324,7 +444,7 @@
       getTemplateRow(index,row){                
         this.templateSelection = row;
         debugger
-        console.log(this.templateSelection)
+      
        },
       //关闭设备信息框
       handleClose(done) {
@@ -348,7 +468,9 @@
         }else {
           var changparam={
                deviceId:that.templateSelection.id,
-               deviceName:that.templateSelection.name 
+               deviceName:that.templateSelection.name,
+               roomName:that.$store.state.parame.roomname,
+               roomId:that.$store.state.parame.roomid,
           }
              that.$refs.mychild.getAuthrization(changparam);
         }
@@ -369,56 +491,7 @@
               this.$message.info("抱歉,您没有操作设备的权限")
              return
            }
-          var that=this;
-          console.log(e.mainStatus)
-
-        
-
-          if(e.mainStatus==1){
-            var swit=false;
-            var clo="CLOSE"
-          }else{
-            var swit=true;
-             var clo="OPEN"
-          }         
-          if(e.type==1){
-            var param={
-            "on":swit
-            }
-             var Swiparam={
-              "command":"SwitchMain",
-              "argument":param,
-              }
-          }else if(e.type==4){
-             var param={
-            "opt":clo
-            }
-            var Swiparam={
-              "command":"SetMotorOption",
-              "argument":param,
-              }
-
-          } 
-
-         // 共同参数
-            var commparam={
-               userId: this.$store.state.userinfo.uuid,
-               deviceId:e.id,
-               userDeviceAuth:this.$store.state.userinfo.userDeviceAuth
-            }
-
-          var param = Object.assign(commparam, Swiparam);       
-          that.axios.post('/SmartHomeTrade/device/deviceSwitchOnFalse',param).then(function(res){
-            if(res.data.code==0){
-              that.getequipmentlist()
-
-            }else{
-              that.$message.error(res.data.message)
-            }
-
-          })
-
-
+          this.$refs.myopenchild.open(e);
         },
 
 
@@ -451,6 +524,16 @@
 .getLnformation{
   height:250px;
 
+}
+.opend:hover{
+  padding:4.5px 15px  !important;
+  color:#fff  !important;
+  background: #0ec07d  !important
+}
+.opend:active{
+  padding:4.5px 15px  !important;
+  color:#fff  !important;
+  background: #0ec07d  !important
 }
 
 </style>

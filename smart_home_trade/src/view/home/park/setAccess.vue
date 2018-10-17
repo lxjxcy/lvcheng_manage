@@ -496,9 +496,7 @@
       },
       methods:{
         getHalfCheckedNodes() {
-          // console.log(this.$refs.tree.getCheckedKeys());
-          console.log(this.$refs.tree.getCheckedNodes(false,true))
-           
+       
         },
         
 

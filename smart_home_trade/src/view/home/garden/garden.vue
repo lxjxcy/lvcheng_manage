@@ -61,8 +61,7 @@
         }else{
            this.show=false;
         }
-        // console.log(this.$store.state.userinfo)
-        // console.log(this.$store.state.userinfo.userLevel)
+     
 
       },
     }

@@ -5,10 +5,10 @@
         <li class="l listimg" @click="nowreload()"><img src="../../assets/userlogo.png"></li>
         <li class="l title" >{{message}}</li>
         <li class="l change">
-          <switchPark v-if="this.$store.state.userinfo.userLevel==2"></switchPark>
-          <switchRoom v-if="this.$store.state.userinfo.userLevel==5"></switchRoom>
-          <switchBuild v-if="this.$store.state.userinfo.userLevel==3"></switchBuild>
-          <switchFloor v-if="this.$store.state.userinfo.userLevel==4"></switchFloor>
+          <switchPark v-if="this.$store.state.userinfo.userLevel==2" v-bind:Name="username"></switchPark>
+          <switchRoom v-if="this.$store.state.userinfo.userLevel==5" v-bind:Name="username"></switchRoom>
+          <switchBuild v-if="this.$store.state.userinfo.userLevel==3" v-bind:Name="username"></switchBuild>
+          <switchFloor v-if="this.$store.state.userinfo.userLevel==4" v-bind:Name="username"></switchFloor>
          
         </li>
       </ul>
@@ -114,7 +114,7 @@
             }).then(function (res) {
               if(res.data.code==0){
 
-                console.log(res)
+               
               that.$message({
                 type: 'success',
                 message: res.data.message

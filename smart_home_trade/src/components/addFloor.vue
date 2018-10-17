@@ -8,7 +8,7 @@
           <div class="add" ref="myadd" style="padding-right: 10%">
             <el-form label-width="100px" :model="addF" ref="addF" :rules="rules">
               <el-form-item label="楼层名称" prop="name" style="position: relative;" ref="name">
-                <el-input v-model="addF.name" @focus="removeValid('name')" placeholder="请输入楼层名称"></el-input> 
+                <el-input v-model="addF.name" @focus="removeValid('name')" placeholder="请输入楼层名称(6个字符以内)"></el-input> 
               </el-form-item>
              <!--  <el-form-item label="所属大楼" prop="buildingName" v-if="this.$store.state.userinfo.userLevel==3">
                 <el-select v-model="addF.buildingName" placeholder="请选择大楼" @change="getparkInfo">
@@ -31,8 +31,8 @@
                   :label="'房间' + (index+1)"
                   :key="roomNameList.key"
                 >
-                  <el-input v-model="roomNameList.roomName" class="roominput"></el-input>
-                  <span style="padding: 12px 10px;cursor: pointer" @click.prevent="remove_buildName(roomNameList)">
+                  <el-input v-model="roomNameList.roomName" class="roominput" placeholder="房间名称不能超过6个字符"></el-input>
+                  <span style="padding: 12px 1.5%;cursor: pointer" @click.prevent="remove_buildName(roomNameList)">
                     <i class="icon iconfont">&#xe504;</i>
                   </span>
                 </el-form-item>
@@ -53,6 +53,16 @@
 export default {
   name: 'addFloor',
    data() {
+      const name = (rule, value, callback) => {
+            if (value === '') {
+              callback(new Error('楼层名称不能为空'));
+            }else if(!(/^\S{1,6}$/.test(value))){
+              callback(new Error('请输入6位之内的非空字符串'));
+
+            }else {
+              callback();
+            }
+          };
     return{
       addGarden:false,
        getParklist:[],
@@ -75,7 +85,7 @@ export default {
         },
          rules: {
           name: [
-            {  required: true,message: '园区名称不能为空'}
+            {  required: true,validator: name, trigger: 'blur'}
           ],
           buildingName: [
             {  required: true,message: '大楼名称不能为空'}
@@ -101,7 +111,7 @@ export default {
         //    that.axios.post("/SmartHomeTrade/block/selectMyBlock",param).then(function(res){
         //   if(res.data.code==0){
         //     that.blockList=res.data.data.blockList;
-        //     console.log(that.blockList)
+        //   
         //     }
         //   })
         // }else{
@@ -127,14 +137,24 @@ export default {
 
     that.$refs[addF].validate((valid) => {
           if (valid) {
-            that.fullscreenLoading=true;
+          
                var roomNameList1=[]
                   for(var i=0;i<that.addroomList.roomNameList.length;i++){
-                    if(that.addroomList.roomNameList[i].roomName!=""){
+                    if(that.addroomList.roomNameList[i].roomName!=""||that.addroomList.roomNameList[i].roomName!=null){
                       roomNameList1.push(that.addroomList.roomNameList[i].roomName)
-                    }
-                    
+                    } 
                   }
+                   var roomNameList1=roomNameList1.filter((element,index,self)=>element!='')
+                  for(var j=0;j<roomNameList1.length;j++){
+                    if(!(/^\S{1,6}$/.test(roomNameList1[j]))){
+                      that.$message.error("房间名称不能大于6个字符")
+                     
+                      return;
+                    }
+                  }
+                // var roomNameList1=that.addroomList.roomNameList.filter(element=>element!="")
+    
+                   var roomNameList1=roomNameList1.filter((element,index,self)=>self.indexOf(element) === index)
               if(that.addroom&&roomNameList1!=[]){
                  
                  var addparamGb={
@@ -150,7 +170,7 @@ export default {
                   
                  }
               }
-
+           that.fullscreenLoading=true;
              that.axios.post('/SmartHomeTrade/floor/insertFloor',addparamGb).then(function (res) {
               that.fullscreenLoading=false;
                 if(res.data.code==0){
@@ -161,11 +181,7 @@ export default {
                     that.$emit('refreshList');
                     that.addroom=false;
                     that.addGarden=false; 
-                     that.addroomList={
-                      roomNameList: [{
-                        roomName: ''
-                      }],
-                    };
+                    that.$emit('reload');
                      that.$refs[addF].resetFields();
                     
                  }else{
@@ -178,7 +194,6 @@ export default {
                    
               })            
           } else {
-            console.log('error submit!!');
             return false;
           }
         });
@@ -235,11 +250,7 @@ export default {
          this.addroom=false;
          this.resetaddG('addF')
           this.$emit('clearselect');
-           this.addroomList={
-          roomNameList: [{
-            roomName: ''
-          }],
-        }
+         this.$emit('reload');
       },
        resetaddG(addF) {
         this.$refs[addF].resetFields();
@@ -265,8 +276,8 @@ export default {
     overflow-y:auto;
   }
 
-  .roominput{
-    width:160px !important;
+ .roominput{
+    width:82.5% !important;
   }
   .sibmit{
     /*position: absolute;*/

@@ -24,12 +24,10 @@ export default {
   name: 'changePark',
    data() {
       return {
-        dialogVisible: false,
+        dialogVisible: false,//弹框
          formLabelWidth: '100px',
-          fullscreenLoading:false,
-        changeParkparam:{
-
-        },
+          fullscreenLoading:false,//提交加载
+          changeParkparam:{},
          rules: {
           detailAddress: [
             {  required: true,message: '园区地址不能为空'}
@@ -38,18 +36,21 @@ export default {
       }
     },
     methods: {
+      //关闭弹框
       handleClose(done) {
-            done();
-             this.$emit('clearselect');
+        done();
+         this.$emit('clearselect');
       },
+      // 修改框弹出
       parentHandleclick(e){
       	this.dialogVisible=true;
       	this.changeParkparam=e;
       },
-         // 获取焦点清空验证提示
-        removeValid(formName){
-          this.$refs[formName].clearValidate();
-        },
+      // 获取焦点清空验证提示
+      removeValid(formName){
+        this.$refs[formName].clearValidate();
+      },
+      // 提交
       dialogchang(changeParkparam){ 
       	var that=this;
       	that.$refs[changeParkparam].validate((valid) => {
@@ -80,6 +81,7 @@ export default {
 <style>
 .cdialogwidth{
   width:80%;
+  height:200px;
 }
 
 	

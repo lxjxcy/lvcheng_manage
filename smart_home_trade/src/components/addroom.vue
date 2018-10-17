@@ -44,6 +44,17 @@
 export default {
   name: 'addroom',
    data() {
+     //房间名称
+          const roomName = (rule, value, callback) => {
+            if (value === '') {
+              callback(new Error('房间名称不能为空'));
+            }else if(!(/^\S{1,6}$/.test(value))){
+              callback(new Error('请输入6位之内的非空字符串'));
+
+            }else {
+              callback();
+            }
+          };
     return{
       addGarden:false,
        getParklist:[],
@@ -59,7 +70,7 @@ export default {
          formLabelWidth: '100px',
          rules: {
           roomName: [
-            {  required: true,message: '房间名称不能为空'}
+            {  required: true,validator: roomName, trigger: 'blur'}
           ],
           
         },
@@ -189,7 +200,7 @@ export default {
                    
               })            
           } else {
-            console.log('error submit!!');
+         
             return false;
           }
         });

@@ -94,8 +94,7 @@
 
 		        this.$refs[adddynamicValidateForm].validate((valid) => {
 		          if (valid) {
-		            console.log(that.adddynamicValidateForm)
-		            console.log(that.adddynamicValidateForm.domains[0]);
+		          
 		            for(var i=0;i<that.adddynamicValidateForm.domains.length;i++){
 		              if(i==0){
 		                 that.addparam.oeTemplateName=that.adddynamicValidateForm.domains[i].value
@@ -132,7 +131,7 @@
 		            that.addparam.createUser=that.$store.state.userinfo.loginName;
 		            that.axios.post("/SmartHomeTrade/template/insertTemplate",that.addparam).then(function (res) {
 		            	if(res.data.code==0){
-			            	console.log(res)
+			            	
 			              that.$message({
 			                type: 'success',
 			                message: res.data.message
@@ -150,7 +149,7 @@
 		            
 		            })
 		          } else {
-		            console.log('error submit!!');
+		           
 		            return false;
 		          }
 		        });

@@ -232,14 +232,13 @@
 			     								
 			     							}			
 			     						}
-			     						console.log(tree)
+			     						
 			     						treeList=tree;
 			     						that.treeList=treeList;
 
 			     						// that.treeList=treeList;	     							
 		     						}		     						
-		     						debugger		     						
-		     						console.log(that.treeList)	     						
+		     							     						
 		     					}
 
 		     			}else{
@@ -282,14 +281,14 @@
 			     										tree.push(treeList[i].manageList[j])
 			     									}
 			     								}
-			     								console.log(treeList[i].manageList[j])
+			     								
 			     							}			
 			     						}
-			     						console.log(tree)
+			     						
 			     						treeList[0]["childen"]=tree;
 			     						that.treeList=treeList;
 		     						}
-		     						console.log(that.treeList)	     						
+		     					     						
 		     					}
 
 		     			}else{
@@ -326,10 +325,10 @@
 			     										tree.push(treeList[i].manageList[j])
 			     									}
 			     								}
-			     								console.log(treeList[i].manageList[j])
+			     								
 			     							}			
 			     						}
-			     						console.log(tree)
+			     						
 			     						treeList[0]["childen"]=tree;
 			     						that.treeList=treeList;
 		     						}
@@ -375,10 +374,10 @@
 			     										tree.push(treeList[i].manageList[j])
 			     									}
 			     								}
-			     								console.log(treeList[i].manageList[j])
+			     								
 			     							}			
 			     						}
-			     						console.log(tree)
+			     						
 			     						treeList[0]["childen"]=tree;
 			     						that.treeList=treeList;
 		     						}
@@ -452,9 +451,9 @@
 
 		     					that.treeList=[];
 		     					that.clearData=false
-		     					debugger
+		     				
 
-		     					console.log(that.treeList)
+		     					
 		     					return;
 		     				}
 		     				// alert("sss")
@@ -500,7 +499,7 @@
 	                      id:list1[i],
 	                      addressId:list2[i]
 	                    }
-	                    console.log(obj2)
+	                   
 	                    obj.push(obj2)
 	                }
 	                var param={
@@ -569,7 +568,7 @@
 	     		   })
 	           }
 
-	          // console.log(that.$refs.tree.getCheckedKeys())
+	         
 	     		
 	     		
 	     	},

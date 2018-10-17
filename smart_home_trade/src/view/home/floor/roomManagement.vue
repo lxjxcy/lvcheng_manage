@@ -24,7 +24,7 @@
     </div>
     <div class="nav-middle">
        <div class="l" style="font-size: 20px;font-weight: 400" v-if="this.$store.state.userinfo.userLevel==2">
-        <span>{{this.$store.state.parame.buildname}}{{this.$store.state.parame.floorname}}</span>
+        <span>{{this.$store.state.parame.buildname}}-{{this.$store.state.parame.floorname}}</span>
         ---房间列表
       </div>
        <div class="l" style="font-size: 20px;font-weight: 400" v-if="this.$store.state.userinfo.userLevel==3">
@@ -33,14 +33,10 @@
       </div>
 
 
-
-
-
-
       <ul  v-bind:class="classObject">
         <li class="l" @click="addRoom()"  v-if="this.$store.state.extendList.addAuthor==1"><i class="el-icon-plus"></i>添加</li>
         <li class="l" @click="change()"  v-if="this.$store.state.extendList.changeAuthor==1"><i class="el-icon-edit"></i>修改</li> 
-        <li class="l" @click="administratored()"  v-if="this.$store.state.extendList.deleteAuthor==1"><i class="el-icon-setting"></i>设置管理员</li>
+        <li class="l" @click="administratored()"  v-if="this.$store.state.extendList.roomsetuser==1&&this.$store.state.userinfo.userLevel==4"><i class="el-icon-setting"></i>设置管理员</li>
       </ul>
       <changeRoom ref="mychild" @refreshList="getroomlist" @clearselect="clear"></changeRoom>
       <addroom ref="myaddchild" @refreshList="getroomlist" @clearselect="clear"></addroom>
@@ -255,7 +251,7 @@ import changeRoom from "../../../components/changeRoom.vue"
       },
         getTemplateRow(index,row){                
         this.templateSelection = row;
-        console.log(this.templateSelection)
+    
        },
         // handleSelectionChange(val) {
         //   this.multipleSelection = val;

@@ -107,14 +107,14 @@
     mounted(){
        this.$store.commit('saveIndex',"1-3")
         this.getMasterplate()
-      console.log(this.tableData3)
+    
     },
     methods: {
       //获取模板列表
       getMasterplate(){
         var that=this;
         that.axios.post('/SmartHomeTrade/template/selectTemplate',that.setparam).then(function (res) {
-            console.log(res.data.data.listTemplateCount)
+           
             if(res.data.data==null){
               that.loading=false;
               return;
@@ -189,7 +189,7 @@
       // },
         getTemplateRow(index,row){                
         this.templateSelection = row;
-        console.log(this.templateSelection)
+       
        },
    
       // //查询
@@ -204,7 +204,7 @@
         this.$refs.mychild.getaddmodel();
       },
      
-      //点击修改
+      //修改
       change_model(){
         var that=this;
         if(that.templateRadio==''){
@@ -213,8 +213,6 @@
             message: '请选择要修改的模板'
           });
         }else {
-          // that.changedynamicValidateForm.domains=that.multipleSelection[0].hierarchical
-          // that.changedynamicValidateForm.masterplateName=that.multipleSelection[0].templateName;
           var param={
             hierarchical:that.templateSelection.hierarchical,
             templateName:that.templateSelection.templateName
@@ -222,11 +220,9 @@
            that.$refs.mychangechild.getchangeMaster(param);
           }
       },
-
       //删除
       deletem() {
-        var that=this;
-        console.log(that.templateSelection.id)
+        var that=this;      
         if(that.templateRadio!=''){
           that.$confirm('此操作将永久删除, 是否继续?', '提示', {
             confirmButtonText: '确定',
@@ -236,7 +232,7 @@
             that.axios.post("/SmartHomeTrade/template/deleteTemplate",{
               id:that.templateSelection.id
             }).then(function (res) {
-              console.log(res)
+             
               that.$message({
                 type: 'success',
                 message: res.data.message

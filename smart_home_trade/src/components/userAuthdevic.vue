@@ -62,7 +62,7 @@ export default{
             action:2
            }
 			 that.axios.post("/SmartHomeTrade/device/getDeviceList",param).then((res)=>{
-              console.log(res)
+             
               if(res.data.data!=null){
                 if(res.data.data.deviceList.length==0){
                    that.addresslist=[]  
