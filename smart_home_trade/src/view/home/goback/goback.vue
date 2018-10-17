@@ -1,13 +1,14 @@
 <template>
-	<div class="goBack">
+	<!-- <div class="goBack"> -->
 			<div class="goback" v-if="this.$store.state.userinfo.userLevel==2">
-			    <Breadcrumb separator=">">
+			    <Breadcrumb separator=">" >
 			        <span>当前位置：</span>
-			        <BreadcrumbItem to="/park/buildingManagement">首页</BreadcrumbItem>
+			        <BreadcrumbItem to="/park/buildingManagement"> <Icon type="ios-home-outline"></Icon>首页</BreadcrumbItem>
 			        <BreadcrumbItem>楼层列表</BreadcrumbItem>
 			    </Breadcrumb>
 		    </div>
-	</div>
+
+	<!-- </div> -->
 </template>
 <script>
 	 export default {

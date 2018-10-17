@@ -10,8 +10,9 @@
 					<el-tree
 					  :data="sectionlist"
 					  show-checkbox
-					  default-expand-all
 					  node-key="ucUserId"
+					   :default-expanded-keys="userIdList"
+					   :default-checked-keys="userIdList"
 					  ref="tree"
 					  highlight-current
 					  :props="defaultProps">
@@ -37,6 +38,7 @@ export default{
 			},
 			sectionlist:[],//部门信息
 			ucUserlist:[],
+			userIdList:[],
 			 input:'',
 			 defaultProps: {
 		          children: 'appUserInfoList',
@@ -48,7 +50,8 @@ export default{
 	},
 	methods:{
 		//获取部门下的用户信息
-		getDepinfo(){
+		getDepinfo(q){
+			debugger
 	    	var that=this;
 	    	that.axios.post("/SmartHomeTrade/appUser/selectDptUser",{
 	    		createUser:that.$store.state.userinfo.userMobile,
@@ -56,39 +59,83 @@ export default{
 	    	}).then(function(res){
 	    		if(res.data.code==0){
 	    			if(res.data.data!=null){
-	    				// that.sectionlist=res.data.data.dptUserList;
-			    	  var userlist=res.data.data.dptUserList;
+	    				that.sectionlist=res.data.data.dptUserList;
+	    				var userlist=res.data.data.dptUserList;
 		              for(var i=0;i<userlist.length;i++){
 		                userlist[i].name=userlist[i].buildingName;
 		                userlist[i].appUserInfoList=userlist[i].dptList;
 
 		              }
+		              var userlist=userlist;
+		              for(var j=0;j<userlist.length;j++){
+		              	for(var k=0;k<userlist[j].appUserInfoList.length;k++){
+		              		for(var d=0;d<userlist[j].appUserInfoList[k].appUserInfoList.length;d++){
+		              			for(var w=0;w<q.length;w++){
+		              				if(q[w]==userlist[j].appUserInfoList[k].appUserInfoList[d].ucUserId){
+		              					userlist[j].appUserInfoList[k].appUserInfoList[d].disabled=true;
+		              				}
+		              			}
+		              		}
+		              	}
+		              }
 		              that.sectionlist=userlist;
+		             
 	    			}
 	    		}
 	    	})
 
 		},
+
+		// 用户回填
+		havauser(id){
+			var that=this;
+			that.axios.post("/SmartHomeTrade/device/selectUserIdByDeviceId",{
+				deviceId:id
+			}).then(res=>{
+				that.userIdList=res.data.data.userIdList;
+				this.getDepinfo(res.data.data.userIdList)
+
+			})
+
+		},
+
      // 添加授权弹框
 		getAuthrization(e){
       this.deviceparam=e;
       
 			this.opendialog=true;
-			this.getDepinfo()
+			this.havauser(e.deviceId)
+			
+			
+
+
+
+
+
+
+
+
+
 		},
 // 提交
 		sureadddialog(){			
 			var that=this;
 			
 			var list=this.$refs.tree.getCheckedKeys()
-			 var ucUserIdLists=[];	
-				 for(var i=0;i<list.length;i++){
-			 	if(list[i]!=null){
-			 		ucUserIdLists.push(list[i])
-			 	  }
-			   }				
+				
+			  var arr=list.filter(element=>element!= null)
+			 for(var i=0;i<arr.length;i++){
+
+	    		
+	    			for(var j=0;j<that.userIdList.length;j++){
+	    				if(arr[i]==that.userIdList[j]){
+	    					 arr.splice(i, 1)
+	    				}
+
+	    			}
+	    		}		
 			var param={
-				ucUserIdList:ucUserIdLists,
+				ucUserIdList:arr,
 				deviceId:that.deviceparam.deviceId,
 				deviceName:that.deviceparam.deviceName,	
 				roomName:that.deviceparam.roomName,

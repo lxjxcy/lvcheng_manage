@@ -161,6 +161,7 @@ img{
     font-size: 24px;
     color:$color;
     line-height: 45px;
+    height:45px;
   }
   .right{
     font-size: 14px;

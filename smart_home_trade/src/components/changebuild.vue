@@ -19,6 +19,17 @@
 export default {
   name: 'changebuild',
    data() {
+     //大楼名称
+          const buildingName = (rule, value, callback) => {
+            if (value === '') {
+              callback(new Error('大楼名称不能为空'));
+            }else if(!(/^\S{1,6}$/.test(value))){
+              callback(new Error('请输入6位之内的非空字符串'));
+
+            }else {
+              callback();
+            }
+          };
       return {
         dialogVisible: false,
          fullscreenLoading:false,
@@ -28,7 +39,7 @@ export default {
         },
          rules: {
           buildingName: [
-            {  required: true,message: '大楼名称不能为空'}
+            {  required: true,validator: buildingName}
           ],
         }
       };

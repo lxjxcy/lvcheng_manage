@@ -351,8 +351,13 @@ padding:10px 20px !important;
     margin-top:20px;
   }
   .goback{
-    background: #faf8f7;
-    line-height: 30px;
+    /*background: #faf8f7;*/
+    padding-top:7px;
+    /*line-height: 40px;*/
+    z-index: 222
+  }
+  .ivu-breadcrumb{
+    font-size: 14px !important;
   }
   /*.goback{*/
     /*height:25px;*/
