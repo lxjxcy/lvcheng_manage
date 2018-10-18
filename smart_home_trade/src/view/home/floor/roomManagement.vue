@@ -394,6 +394,13 @@ import changeRoom from "../../../components/changeRoom.vue"
               message: '请选择大楼要设置管理的房间'
             });
           }else {
+            if(that.templateSelection.userName!=null){
+              that.$message({
+              type: 'info',
+              message: '该房间已有管理员不能重复设置'
+            });
+            return;
+          }
              var manageScopeId=[];
             manageScopeId.push(this.templateSelection.id)
            

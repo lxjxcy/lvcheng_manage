@@ -341,6 +341,13 @@
               message: '请选择要设置管理员的大楼'
             });
           }else {
+            if(that.templateSelection.userName!=null){
+              that.$message({
+              type: 'info',
+              message: '该大楼已有管理员不能重复设置'
+            });
+            return;
+          }
              var manageScopeId=[];
           manageScopeId.push(this.templateSelection.buildingId)
            

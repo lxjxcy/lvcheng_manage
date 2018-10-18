@@ -76,17 +76,20 @@ export default{
 
 		              }
 		              var userlist=userlist;
-		              for(var j=0;j<userlist.length;j++){
-		              	for(var k=0;k<userlist[j].appUserInfoList.length;k++){
-		              		for(var d=0;d<userlist[j].appUserInfoList[k].appUserInfoList.length;d++){
-		              			for(var w=0;w<q.length;w++){
-		              				if(q[w]==userlist[j].appUserInfoList[k].appUserInfoList[d].ucUserId){
-		              					userlist[j].appUserInfoList[k].appUserInfoList[d].disabled=true;
-		              				}
-		              			}
-		              		}
-		              	}
+		              if(q.length>0){
+		              	for(var j=0;j<userlist.length;j++){
+			              	for(var k=0;k<userlist[j].appUserInfoList.length;k++){
+			              		for(var d=0;d<userlist[j].appUserInfoList[k].appUserInfoList.length;d++){
+			              			for(var w=0;w<q.length;w++){
+			              				if(q[w]==userlist[j].appUserInfoList[k].appUserInfoList[d].ucUserId){
+			              					userlist[j].appUserInfoList[k].appUserInfoList[d].disabled=true;
+			              				}
+			              			}
+			              		}
+			              	}
+			              }
 		              }
+		              
 		              that.sectionlist=userlist;
 		             
 	    			}

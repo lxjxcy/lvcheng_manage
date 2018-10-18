@@ -146,9 +146,8 @@
        },
 			// 确定提交
 			sureAdministrator(){
+
         // alert(this.templateRadio)
-
-
         var that=this;
          if(that.templateRadio==""||that.templateRadio==null){
            that.$message.error("请选择管理员");

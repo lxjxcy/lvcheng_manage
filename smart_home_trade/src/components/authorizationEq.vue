@@ -64,20 +64,25 @@ export default{
 		              for(var i=0;i<userlist.length;i++){
 		                userlist[i].name=userlist[i].buildingName;
 		                userlist[i].appUserInfoList=userlist[i].dptList;
-
 		              }
 		              var userlist=userlist;
-		              for(var j=0;j<userlist.length;j++){
-		              	for(var k=0;k<userlist[j].appUserInfoList.length;k++){
-		              		for(var d=0;d<userlist[j].appUserInfoList[k].appUserInfoList.length;d++){
-		              			for(var w=0;w<q.length;w++){
-		              				if(q[w]==userlist[j].appUserInfoList[k].appUserInfoList[d].ucUserId){
-		              					userlist[j].appUserInfoList[k].appUserInfoList[d].disabled=true;
-		              				}
-		              			}
-		              		}
-		              	}
+
+
+
+		              if(q.length>0){
+		              	for(var j=0;j<userlist.length;j++){
+			              	for(var k=0;k<userlist[j].appUserInfoList.length;k++){
+			              		for(var d=0;d<userlist[j].appUserInfoList[k].appUserInfoList.length;d++){
+			              			for(var w=0;w<q.length;w++){
+			              				if(q[w]==userlist[j].appUserInfoList[k].appUserInfoList[d].ucUserId){
+			              					userlist[j].appUserInfoList[k].appUserInfoList[d].disabled=true;
+			              				}
+			              			}
+			              		}
+			              	}
+			              }
 		              }
+		              
 		              that.sectionlist=userlist;
 		             
 	    			}
@@ -92,8 +97,14 @@ export default{
 			that.axios.post("/SmartHomeTrade/device/selectUserIdByDeviceId",{
 				deviceId:id
 			}).then(res=>{
-				that.userIdList=res.data.data.userIdList;
-				this.getDepinfo(res.data.data.userIdList)
+				if(res.data.data!=null){
+				  that.userIdList=res.data.data.userIdList;
+				  that.getDepinfo(res.data.data.userIdList)
+				}else{
+				   that.userIdList=[]
+				   that.getDepinfo([])
+				}
+				
 
 			})
 

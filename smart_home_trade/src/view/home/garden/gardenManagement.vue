@@ -272,6 +272,13 @@
             message: '请选择要设置管理员的园区'
           });
         }else {
+          if(that.templateSelection.userName!=null){
+              that.$message({
+              type: 'info',
+              message: '该园区已有管理员不能重复设置'
+            });
+            return;
+          }
           var manageScopeId=[];
           manageScopeId.push(that.templateSelection.yardId)
           var param={
