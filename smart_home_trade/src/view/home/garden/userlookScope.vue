@@ -170,9 +170,8 @@
 				  :data="treeList"
 				 
 				  node-key="id"
-				   :default-expanded-keys="checkedlist"
+				  default-expand-all
 				  ref="tree"
-				  :default-checked-keys="checkedlist"
 				  :props="defaultProps">
 			</el-tree>
 
@@ -275,6 +274,7 @@
 	                  floorAdrIdList:obj
 	                }
 	              that.axios.post("/SmartHomeTrade/floor/selectManageFloor",param).then(function(res){
+
 		     			if(res.data.code==0){
 		     				if(res.data.data==null){
 		     					that.treeList=[]
@@ -294,6 +294,7 @@
 	     		   })
 	     		}
 	     		if(that.$store.state.userinfo.userLevel==4){
+	     			that.dialogVisible=true;
 	     			 var param={
 		            	roomListId:e.manageScopeIdList,
 		            	adrIdList:e.addrList,
@@ -304,8 +305,6 @@
 		     				// alert("sss")
 		     				if(res.data.data==null){
 		     					that.treeList=[]
-		     					
-
 		     					return;
 		     				}
 	     					if(res.data.data!=null){
@@ -314,11 +313,7 @@
 	     							childen:tree,
 	     							name:that.$store.state.parame.floorname
 	     						}]
-	     					
-	     						that.treeList=treeList
-	     						
-	     						
-	     														
+	     						that.treeList=treeList	     														
 	     					}
 		     			}
 	     		   })

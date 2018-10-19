@@ -372,8 +372,8 @@
               message: '请选择要设置管理员的的楼层'
             });
           }else {
-            if(that.templateSelection.userName!=null){
-              that.$message({
+            if(this.templateSelection.userName!=null){
+              this.$message({
               type: 'info',
               message: '该楼层已有管理员不能重复设置'
             });
