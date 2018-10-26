@@ -1,11 +1,12 @@
 <template>
 	<div class="authorizationEq">
 		<el-dialog
-		  title="授权设备"
+		  title="授权用户"
 		  :visible.sync="opendialog"
 		  width="30%"
 		  :before-close="handleClose">
-		  <div class="modelContain">		  
+		  <div class="modelContain" v-loading="pictLoading" element-loading-background="#fff"
+         element-loading-text="加载数据中......">		  
 			    <div class="selectUser" v-if="sectionlist!=[]">
 					<el-tree
 					  :data="sectionlist"
@@ -15,6 +16,7 @@
 					   :default-checked-keys="userIdList"
 					  ref="tree"
 					  highlight-current
+					  empty-text="没有匹配的app用户"
 					  :props="defaultProps">
 					</el-tree>
 			    </div>
@@ -31,7 +33,9 @@ export default{
 	data(){
 		return{
 			opendialog:false,
+			pictLoading:true,
 			 fullscreenLoading:false,
+			 buildId:'',
 			title:"sss",
 			deviceparam:{
 
@@ -51,15 +55,16 @@ export default{
 	methods:{
 		//获取部门下的用户信息
 		getDepinfo(q){
-			debugger
+			
 	    	var that=this;
 	    	that.axios.post("/SmartHomeTrade/appUser/selectDptUser",{
 	    		createUser:that.$store.state.userinfo.userMobile,
 	    		action:2
 	    	}).then(function(res){
+	    		that.pictLoading=false;
 	    		if(res.data.code==0){
 	    			if(res.data.data!=null){
-	    				that.sectionlist=res.data.data.dptUserList;
+	    				// that.sectionlist=res.data.data.dptUserList;
 	    				var userlist=res.data.data.dptUserList;
 		              for(var i=0;i<userlist.length;i++){
 		                userlist[i].name=userlist[i].buildingName;
@@ -81,10 +86,14 @@ export default{
 			              		}
 			              	}
 			              }
-		              }
-		              
-		              that.sectionlist=userlist;
-		             
+		              }		              
+		               var buidlist=[]
+		              for(var d=0;d<userlist.length;d++){
+		              		if(userlist[d].buildingId==that.buildId){
+		              				buidlist.push(userlist[d])
+		              		}
+		              }		             
+		              that.sectionlist=buidlist;		             
 	    			}
 	    		}
 	    	})
@@ -99,6 +108,7 @@ export default{
 			}).then(res=>{
 				if(res.data.data!=null){
 				  that.userIdList=res.data.data.userIdList;
+				  debugger
 				  that.getDepinfo(res.data.data.userIdList)
 				}else{
 				   that.userIdList=[]
@@ -112,10 +122,17 @@ export default{
 
      // 添加授权弹框
 		getAuthrization(e){
-      this.deviceparam=e;
-      
+			this.buildId=e.blockId;
+			 
+      this.deviceparam={
+      	      deviceId:e.id,
+               deviceName:e.name,
+               roomName:e.roomName,
+               roomId:e.roomId,
+      };
+      debugger
 			this.opendialog=true;
-			this.havauser(e.deviceId)
+			this.havauser(e.id)
 			
 			
 
@@ -133,18 +150,31 @@ export default{
 			var that=this;
 			
 			var list=this.$refs.tree.getCheckedKeys()
+
 				
 			  var arr=list.filter(element=>element!= null)
-			 for(var i=0;i<arr.length;i++){
 
-	    		
+			  var arr=list.filter(element=>element!= null)
+			 if(arr.length==0){
+			 	that.$message.warning("请选择一个用户")
+			  	return;
+			  }		
+			 for(var i=0;i<arr.length;i++){
 	    			for(var j=0;j<that.userIdList.length;j++){
 	    				if(arr[i]==that.userIdList[j]){
 	    					 arr.splice(i, 1)
 	    				}
 
 	    			}
-	    		}		
+	    		}
+	    		if(arr.length==0&&that.userIdList.length!=0){
+	    		  	debugger
+			  	that.$emit('refreshList');
+					 that.$emit('reload');
+					 that.$emit('clearselect');
+					that.opendialog=false;
+			  	return;
+			  }		
 			var param={
 				ucUserIdList:arr,
 				deviceId:that.deviceparam.deviceId,
@@ -153,6 +183,7 @@ export default{
 				roomId:that.deviceparam.roomId,
 				createUser:that.$store.state.userinfo.userMobile,
 			}
+			debugger
 			that.fullscreenLoading=true;
 			that.axios.post("/SmartHomeTrade/appUser/deviceAuthorization",param).then(function(res){
 				that.fullscreenLoading=false;

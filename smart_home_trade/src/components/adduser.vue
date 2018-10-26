@@ -22,7 +22,6 @@
                <el-form-item label="电话" :label-width="formLabelWidth" prop="userMobile" ref="userMobile">
                 <el-input v-model="addformValidate.userMobile" @focus="removeValid('userMobile')" auto-complete="off" placeholder="请输入电话"></el-input>
               </el-form-item>
-
               <el-form-item label="管理层级" prop="userLevel2" :label-width="formLabelWidth" v-if="this.$store.state.userinfo.userLevel==1">
                 <el-select v-model="addformValidate.userLevel2"  @change="getUserLevel" style="width:100%">
                   <el-option label="园区管理员" value="2"></el-option>

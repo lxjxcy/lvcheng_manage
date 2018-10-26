@@ -2,14 +2,14 @@
   <div class="authorization">
     <div class="goBack">
       <div class="goback">
-          <Breadcrumb separator=">">
-              <span>当前位置：</span>
-              <BreadcrumbItem to="/park/authorManagement/user" v-if="this.$store.state.userinfo.userLevel==2">授权管理</BreadcrumbItem>
-               <BreadcrumbItem to="/building/authorManagement/user" v-if="this.$store.state.userinfo.userLevel==3">授权管理</BreadcrumbItem>
-                <BreadcrumbItem to="/floor/authorManagement/user" v-if="this.$store.state.userinfo.userLevel==4">授权管理</BreadcrumbItem>
-                 <BreadcrumbItem to="/room/authorManagement/user" v-if="this.$store.state.userinfo.userLevel==5">授权管理</BreadcrumbItem>
-              <BreadcrumbItem>授权信息列表</BreadcrumbItem>
-          </Breadcrumb>
+          <span style="font-size: 14px;position: relative;top:-2px;">当前位置：</span>
+          <el-breadcrumb separator-class="el-icon-arrow-right" style="display: inline-block">
+            <el-breadcrumb-item :to="{ path: '/park/authorManagement/user' }"  v-if="this.$store.state.userinfo.userLevel==2">授权管理</el-breadcrumb-item>
+             <el-breadcrumb-item :to="{ path: '/building/authorManagement/user' }"  v-if="this.$store.state.userinfo.userLevel==3">授权管理</el-breadcrumb-item>
+              <el-breadcrumb-item :to="{ path: '/floor/authorManagement/user' }"  v-if="this.$store.state.userinfo.userLevel==4">授权管理</el-breadcrumb-item>
+               <el-breadcrumb-item :to="{ path: '/room/authorManagement/user' }"  v-if="this.$store.state.userinfo.userLevel==5">授权管理</el-breadcrumb-item>
+            <el-breadcrumb-item>授权信息列表</el-breadcrumb-item>
+          </el-breadcrumb>
         </div>
     </div>
 

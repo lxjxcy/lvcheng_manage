@@ -51,16 +51,26 @@
           align="center">
         </el-table-column>
       </el-table>
-      <div class="block">
+       <div class="block" v-if="!startSearch">
         <el-pagination
           @size-change="handleSizeChange"
           @current-change="handleCurrentChange"
           :page-sizes="[10, 20, 30, 40]"
-          :page-size="100"
+          :page-size="10"
           layout="total, sizes, prev, pager, next, jumper"
           :total="total">
         </el-pagination>
+      
       </div>
+       <div class="block" v-if="startSearch">
+          <el-pagination
+          @size-change="handleSizeChange"
+          @current-change="handleCurrentChange"       
+          :page-size="100"
+          layout="total, prev, pager, next"
+          :total="total">
+       </el-pagination>
+       </div>
 
     </div>
   </div>
@@ -73,6 +83,7 @@
       data() {
         return {
           total:0,//总页数
+          startSearch:false,
             templateRadio:'',//选中
           templateSelection:{},//选择的这条数据
           loading:true,//加载
@@ -143,11 +154,14 @@
           that.loading=true;             
           that.axios.post("/SmartHomeTrade/garden/selectMyYards",that.formSearch).then(function(res){
             if(res.data.code==0){
+              that.startSearch=true;
+              that.loading=false;  
                 if(res.data.data!=null){
                    that.yardsList=res.data.data.yardsList;
+                   that.total=res.data.data.yardsList.length;
                 }
              
-                that.loading=false;  
+                
                       
             }else{
               that.$message.error(res.data.data)
@@ -162,8 +176,11 @@
         // 清空查询
         resetForm() {
         var that=this;
-            that.formSearch.yardName= null,
-            that.formSearch.gardenNum=null,           
+            that.formSearch.yardName= null;
+            that.formSearch.gardenNum=null;
+            that.myParkparam.pageSize=10;
+           that.myParkparam.currentPage=1; 
+             that.startSearch=false;          
             that.getMyparklist()
         },
       },

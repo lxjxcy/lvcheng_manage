@@ -60,16 +60,26 @@
           align="center">
         </el-table-column>
       </el-table>
-      <div class="block">
+     <div class="block" v-if="!startSearch">
         <el-pagination
           @size-change="handleSizeChange"
           @current-change="handleCurrentChange"
-          :page-sizes="[10, 20, 30, 400]"
-          :page-size="100"
+          :page-sizes="[10, 20, 30, 40]"
+          :page-size="10"
           layout="total, sizes, prev, pager, next, jumper"
           :total="total">
         </el-pagination>
+      
       </div>
+       <div class="block" v-if="startSearch">
+          <el-pagination
+          @size-change="handleSizeChange"
+          @current-change="handleCurrentChange"       
+          :page-size="100"
+          layout="total, prev, pager, next"
+          :total="total">
+       </el-pagination>
+       </div>
 
     </div>
   </div>
@@ -81,6 +91,7 @@
       data() {
         return {
             templateRadio:'',
+            startSearch:false,
           templateSelection:{},
           total:0,
           loading:true,
@@ -121,6 +132,8 @@
                 that.total=res.data.data.count;
               }
              
+            }else{
+              that.$message.error(res.data.message)
             }
           })
 
@@ -158,16 +171,24 @@
            that.loading=true;             
           that.axios.post("/SmartHomeTrade/room/selectMyRoom",that.formSearch).then(function(res){
               if(res.data.code==0){
+                that.startSearch=true;
+                that.loading=false;  
               that.roomList=res.data.data.roomList;
-                that.loading=false;              
+              that.total=res.data.data.roomList.length;
+                            
+            }else{
+              that.$message.error(res.data.message)
             }
           })
         },
          // 清空查询
         resetForm() {
         var that=this;
-            that.formSearch.name= null,
-            that.formSearch.name=null,           
+            that.formSearch.name= null;
+            that.formSearch.name=null;
+            that.myRoomparam.pageSize=10;
+           that.myRoomparam.currentPage=1; 
+            that.startSearch=false;          
             that.getroomList()
         },
       },

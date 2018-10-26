@@ -11,7 +11,7 @@ module.exports = {
         assetsPublicPath: '/',
         proxyTable: {
             '/SmartHomeTrade': {
-                target: 'http://192.168.1.205:8009', //target: 'http://platform.qthome.com:8009', //target: 'http://192.168.1.205:8009', //  // target: 'http://10.0.1.6:8009' //  // target: 'http://platform.qthome.com:8009', //  //
+                target: 'http://192.168.1.205:8009', // //target: 'http://192.168.1.205:8009', //  // target: 'http://10.0.1.6:8009' //  // target: 'http://platform.qthome.com:8009', //  //
                 changeOrigin: true,
                 pathRewrith: {
                     '^/SmartHomeTrade': '/SmartHomeTrade'

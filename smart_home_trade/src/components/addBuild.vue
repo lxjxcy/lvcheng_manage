@@ -5,6 +5,18 @@
           :visible.sync="addGarden"
           width="30%"
           :before-close="addhandleClose">
+       <!--     <el-dialog
+                title="提示"
+                :visible.sync="dialogVisible"
+                width="20%"
+                :before-close="handleClose"
+                append-to-body>
+                <span>是否继续添加</span>
+                <span slot="footer" class="dialog-footer">
+                  <el-button @click="nogoon()">否</el-button>
+                  <el-button type="primary" @click="goon()">是</el-button>
+                </span>
+              </el-dialog> -->
           <div class="add" ref="myadd">
             <el-form label-width="100px" :model="addB" ref="addB" :rules="rules">
               <el-form-item label="大楼名称" prop="buildingName" style="position: relative;" ref="loginName">
@@ -69,7 +81,8 @@ export default {
           //   }
           // };
    	return{
-   		addGarden:false,//弹框   		
+   		addGarden:false,//弹框   	
+       // dialogVisible:false,	
         fullscreenLoading:false,//提交加载
    		  addB:{//添加大楼
           buildingName:'',//大楼名称
@@ -162,10 +175,13 @@ export default {
                       message: res.data.message
                     });
                     that.$emit('refreshList');
+                    // that.ifgoon()
+                    that.dialogVisible=true;
                     that.addfloor=false;
                     that.addGarden=false; 
-                   that.$emit('reload');
-                     that.$refs[addB].resetFields();
+                 
+                    
+
                     
                  }else{
                    that.$message({
@@ -213,7 +229,50 @@ export default {
         }
 
       },
+
+      // 继续添加
+      nogoon(){
+         this.addfloor=false;
+         this.addGarden=false; 
+          this.$refs[addB].resetFields();
+           // this.dialogVisible=false;
+             this.$emit('reload');
+          },
+      goon(){
+        this.addfloor=false;
+         this.addfloorList={//楼层列表
+          floorNameList: [{
+            floorName: ''
+          }],
+        }
+         this.$refs[addB].resetFields();
+
+          // this.dialogVisible=false;
+            // this.$emit('reload');
+            //  this.addGarden=true; 
+
+
+      },
+         ifgoon() {
+        this.$confirm('已添加成功，是否继续添加?', '提示', {
+          confirmButtonText: '是',
+           showClose:false,
+          cancelButtonText: '否',
+          type: 'success'
+        }).then(() => {
+          debugger
+            this.goon() 
+            return
+          
+        }).catch(() => {
+         debugger
+         this.nogoon()
+         return     
+        });
+      },
+
        //删除大楼input框
+     
       remove_buildName(item) {
         var index = this.addfloorList.floorNameList.indexOf(item)
         if (index !== -1) {

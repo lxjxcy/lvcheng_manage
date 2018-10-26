@@ -86,7 +86,7 @@
           align="center">
         </el-table-column>
       </el-table>
-      <div class="block">
+       <div class="block" v-if="!startSearch">
         <el-pagination
           @size-change="handleSizeChange"
           @current-change="handleCurrentChange"
@@ -95,7 +95,17 @@
           layout="total, sizes, prev, pager, next, jumper"
           :total="total">
         </el-pagination>
+      
       </div>
+       <div class="block" v-if="startSearch">
+          <el-pagination
+          @size-change="handleSizeChange"
+          @current-change="handleCurrentChange"       
+          :page-size="100"
+          layout="total, prev, pager, next"
+          :total="total">
+       </el-pagination>
+       </div>
 
     </div>
 
@@ -118,6 +128,7 @@
     data() {
       return {
         hackReset:true,
+        startSearch:false,
       templateRadio:'',//单选
       templateSelection:{},//选择的这条数据信息
         total:0,//总页数
@@ -227,13 +238,23 @@
         }
         that.loading=true
        that.axios.post('/SmartHomeTrade/garden/selectGdCount',that.formSearch).then(function (res) {
-          that.yardsList=res.data.data.yardsList;
-          that.loading=false
+        if(res.data.code==0){
+          that.startSearch=true;
+           that.loading=false;
+           if(res.data.data!=null){
+            that.yardsList=res.data.data.yardsList;
+            that.total=res.data.data.yardsList.length;
+           }
+        }
+          
+         
         })
       },
       //清空查询框
       resetForm() {
         var that=this;
+         that.params.pageSize=10;
+        that.params.currentPage=1;  
         that.formSearch={
           action:1,
           gardenNum:null,

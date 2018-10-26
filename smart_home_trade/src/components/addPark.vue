@@ -6,6 +6,7 @@
           width="30%"
           :before-close="addhandleClose">
           <div class="add" ref="myadd">
+           
             <el-form label-width="100px" :model="addG" ref="addG" :rules="rules">
 
                <el-form-item label="园区名称"  prop="yardName">
@@ -105,6 +106,7 @@ export default {
    data() {
    	return{
    		addGarden:false,//弹框
+     
        fullscreenLoading: false,//提交加载
    		 getParklist:[],//园区数据
         showparkinfo:false,//模糊查询园区数据显示
@@ -325,6 +327,7 @@ export default {
                         blockName: ''
                       }],
                     };
+                    
                  }else{
                    that.$message({
                       type: 'error',

@@ -7,11 +7,27 @@
           <el-input v-model="formSearch.name" placeholder=""></el-input>
         </el-form-item>
          <el-form-item label="设备类型">
-          <el-input v-model="formSearch.typeName" placeholder=""></el-input>
+           <el-select v-model="typeid" style="width:92%" @change="gettypeName">
+              <el-option
+                v-for="item in this.$store.state.typeList"
+                :key="item.typeid"
+                :label="item.typeName"
+                :value="item.typeid"
+               >
+              </el-option>
+          </el-select>
+          <!-- <el-input v-model="formSearch.typeName" placeholder=""></el-input> -->
         </el-form-item>
-       <!--   <el-form-item label="设备状态">
-          <el-input v-model="deviceState" placeholder=""></el-input>
-        </el-form-item> -->
+       <el-form-item label="设备状态">
+          <el-select v-model="value" placeholder="请选择" style="width:92%">
+            <el-option
+              v-for="item in Statuslist"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value">
+            </el-option>
+          </el-select>
+        </el-form-item>
 
 
 
@@ -24,7 +40,6 @@
           </el-form-item>
       </el-form>
     </div>
-
     <div class="nav-middle">
        <div class="l" style="font-size: 20px;font-weight: 400" v-if="this.$store.state.userinfo.userLevel==2">
         <span>{{this.$store.state.parame.buildname}}-{{this.$store.state.parame.floorname}}-{{this.$store.state.parame.roomname}}</span>
@@ -64,11 +79,15 @@
               <el-radio :label="scope.row.deviceNum" v-model="templateRadio" @change.native="getTemplateRow(scope.$index,scope.row)">&nbsp</el-radio>
           </template>
         </el-table-column>
-        <el-table-column
+         <el-table-column
           prop="deviceNum"
           label="序号"
           width="55"
-           align="center">
+           align="center" >
+            <template  slot-scope="scope">
+              <span v-if="!startSearch">{{scope.$index+(equipmentParam.currentPage - 1) * equipmentParam.pageSize + 1}} </span>
+               <span v-if="startSearch">{{scope.$index+1}}</span>
+            </template>
         </el-table-column>
         <el-table-column
           prop="name"
@@ -110,7 +129,7 @@
         </el-table-column>
 
       </el-table>
-      <div class="block">
+       <div class="block" v-if="!startSearch">
         <el-pagination
           @size-change="handleSizeChange"
           @current-change="handleCurrentChange"
@@ -119,7 +138,17 @@
           layout="total, sizes, prev, pager, next, jumper"
           :total="total">
         </el-pagination>
+      
       </div>
+       <div class="block" v-if="startSearch">
+          <el-pagination
+          @size-change="handleSizeChange"
+          @current-change="handleCurrentChange"       
+          :page-size="100"
+          layout="total, prev, pager, next"
+          :total="total">
+       </el-pagination>
+       </div>
 
     </div>
 
@@ -163,6 +192,7 @@ import openClose from "../park/openClose.vue"
       return {
           templateRadio:'',
            hackReset:true,
+           startSearch:false,
         templateSelection:{},
         total:0,
         loading:true,
@@ -181,14 +211,27 @@ import openClose from "../park/openClose.vue"
           addressIdList:[],
 
         },
+         typeid:null,
          classObject:{
               'r': false,
           },
+            Statuslist: [{
+          value: '1',
+          label: '开'
+        }, {
+          value: '2',
+          label: '关'
+        }, {
+          value: '3',
+          label: '停'
+        }, ],
+        value: null,//设备状态
         move:false,
         multipleSelection: [],
         getLnformation:false,
 
         deviceList: [],
+        deviceListall:[],
         formation:{
           equipmentid:"SB002",
 
@@ -223,7 +266,6 @@ import openClose from "../park/openClose.vue"
      },
     mounted(){
         var that=this;
-
         // that.$store.commit('saveIndex',"5-2")
         if(that.$store.state.userinfo.userLevel==2||that.$store.state.userinfo.userLevel==3||that.$store.state.userinfo.userLevel==4){
           that.classObject.r=true;
@@ -241,7 +283,8 @@ import openClose from "../park/openClose.vue"
               that.equipmentParam.addressIdList=obj
               that.formSearch.addressIdList=obj
          }
-        that.getequipmentlist()        
+        that.getequipmentlist()  
+        that.getequipmentlistall()          
       },
     methods: {
       // 获取设备列表
@@ -253,11 +296,37 @@ import openClose from "../park/openClose.vue"
             if(res.data.data!=null){
                that.deviceList=res.data.data.deviceList;
                that.total=res.data.data.count;  
+            }else{
+              that.deviceList=[]
+              that.total=0;
+               that.Statuslist=[]
             }
-            that.loading=false;                
+                           
           }
         })
       },
+      //,所有设备
+      getequipmentlistall(){
+        var that=this;
+        var equipmentP={
+          addressIdList:that.equipmentParam.addressIdList,
+          action:2,
+
+        }
+        that.axios.post("/SmartHomeTrade/device/getDeviceList",equipmentP).then(function(res){
+          // that.loading=false;
+          if(res.data.code==0){
+            if(res.data.data!=null){
+               that.deviceListall=res.data.data.deviceList;
+               // that.total=res.data.data.count;  
+            }
+            // that.loading=false;                
+          }
+        })
+
+      },
+
+
      // 每页几条
         handleSizeChange(val) {
         var that=this;
@@ -271,6 +340,22 @@ import openClose from "../park/openClose.vue"
         that.equipmentParam.currentPage=val;
         that.getequipmentlist()
       },
+      // 查询方法
+       mainStatusnull(){
+          var that=this;
+
+          var deviceList=[]
+                for(var i=0;i<that.deviceListall.length;i++){
+                  if(that.deviceListall[i].mainStatus==that.value){
+                    deviceList.push(that.deviceListall[i])
+                  }
+
+                }
+          that.deviceList=deviceList;
+          that.total=deviceList.length;
+
+        },
+
         //查询
         onSubmit() {
           var that=this;
@@ -283,19 +368,51 @@ import openClose from "../park/openClose.vue"
            if(that.formSearch.typeName==''){
             that.formSearch.typeName=null
           }
+          if(that.formSearch.deviceNum==null&&that.formSearch.name==null&&that.formSearch.typeName==null&&that.value!=null){
+            that.startSearch=true;
+             that.mainStatusnull()
+            return;
+          }
           if(that.formSearch.deviceNum==null&&that.formSearch.name==null&&that.formSearch.typeName==null){
              that.getequipmentlist()
             return;
           }
-           that.loading=true;             
+           that.loading=true;  
+                 
           that.axios.post("/SmartHomeTrade/device/getDeviceList",that.formSearch).then(function(res){
               if(res.data.code==0){
-              that.deviceList=res.data.data.deviceList;
-                that.loading=false;  
+                 that.loading=false; 
+                 that.startSearch=true;      
+                 if(that.value==null){
+                that.deviceList=res.data.data.deviceList;
+                that.total=res.data.data.deviceList.length;
+                return;
+                }
+                 var deviceList=[]
+                for(var i=0;i<res.data.data.deviceList.length;i++){
+                  if(res.data.data.deviceList[i].mainStatus==that.value){
+                    deviceList.push(res.data.data.deviceList[i])
+                  }
+
+                }
+                 that.deviceList=deviceList;
+                  that.total=deviceList.length;
+              // that.deviceList=res.data.data.deviceList;
+               
                       
             }
           })
         },
+          // 选择设备类型
+      gettypeName(value){
+         var that=this;
+         let obj = {};  
+        obj = that.$store.state.typeList.find((item)=>{ 
+        return item.typeid === value;
+        });  
+        that.formSearch.typeName=obj.typeName;
+
+      },
     // 刷新组件
        reloadcom(){
         this.hackReset = false
@@ -306,9 +423,16 @@ import openClose from "../park/openClose.vue"
         // 清空查询
         resetForm() {
         var that=this;
-            that.formSearch.deviceNum= null,
-            that.formSearch.name=null,
-             that.formSearch.typeName=null,                    
+            that.formSearch.deviceNum= null;
+            that.formSearch.name=null;
+             that.formSearch.typeName=null;
+              that.equipmentParam.pageSize=10;
+            that.equipmentParam.currentPage=1; 
+            that.value=null;
+            that.typeid=null;
+             that.startSearch=false; 
+
+
             that.getequipmentlist()
         },
          //  转换状态
@@ -466,12 +590,8 @@ import openClose from "../park/openClose.vue"
             message: '请选择要授权的设备'
           });
         }else {
-          var changparam={
-               deviceId:that.templateSelection.id,
-               deviceName:that.templateSelection.name,
-               roomName:that.$store.state.parame.roomname,
-               roomId:that.$store.state.parame.roomid,
-          }
+          var changparam=that.templateSelection
+              
              that.$refs.mychild.getAuthrization(changparam);
         }
         

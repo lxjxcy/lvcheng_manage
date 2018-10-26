@@ -103,16 +103,26 @@
           align="center">
         </el-table-column>
       </el-table>
-      <div class="block">
+      <div class="block" v-if="!startSearch">
         <el-pagination
           @size-change="handleSizeChange"
           @current-change="handleCurrentChange"
           :page-sizes="[10, 20, 30, 40]"
-          :page-size="100"
+          :page-size="10"
           layout="total, sizes, prev, pager, next, jumper"
           :total="total">
         </el-pagination>
+      
       </div>
+       <div class="block" v-if="startSearch">
+          <el-pagination
+          @size-change="handleSizeChange"
+          @current-change="handleCurrentChange"       
+          :page-size="100"
+          layout="total, prev, pager, next"
+          :total="total">
+       </el-pagination>
+       </div>
 
     </div>
 
@@ -134,6 +144,7 @@ import changeRoom from "../../../components/changeRoom.vue"
       data() {
         return {
           total:0,
+          startSearch:false,
           loading:true,
            templateRadio:'',
         templateSelection:{},
@@ -282,8 +293,10 @@ import changeRoom from "../../../components/changeRoom.vue"
          
           that.axios.post("/SmartHomeTrade/room/selectRoomCount",that.formSearch).then(function(res){
             if(res.data.code==0){
+              that.startSearch=true;
               that.loading=false;
               that.roomList=res.data.data.roomList;
+              that.total=res.data.data.roomList.length;
                that.$message.success(res.data.message)
               
             }else{
@@ -294,9 +307,12 @@ import changeRoom from "../../../components/changeRoom.vue"
            //清空查询
       resetForm(formSearch) {
         var that=this;
-            that.formSearch.name= null,
-            that.formSearch.roomNum=null,
-            that.formSearch.userName=null,
+            that.formSearch.name= null;
+            that.formSearch.roomNum=null;
+            that.formSearch.userName=null;
+              that.paramRoom.pageSize=10;
+            that.paramRoom.currentPage=1; 
+             that.startSearch=false;
         that.getroomlist()
       },
             // 情况选中

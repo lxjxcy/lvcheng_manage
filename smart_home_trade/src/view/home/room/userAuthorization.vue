@@ -11,7 +11,8 @@
         <li class="l" @click="authInfo()"><i class="iconfont">&#xe606;</i>授权信息</li>
       </ul>
     </div>
-    <div class="main-table userlist">
+    <div class="main-table userlist" v-loading="pictLoading" element-loading-background="#fff"
+         element-loading-text="加载数据中......">
       <el-tree
         :data="userlist"
         show-checkbox
@@ -45,6 +46,11 @@ import userAuthdevic from "../../../components/userAuthdevic"
     data() {
       return {
         userlist:[],
+        manageScopeIdList:[],
+        token:2,
+         regionList:[],
+
+        pictLoading:true,
          defaultProps: {
           children: 'appUserInfoList',
           label: 'name'
@@ -58,22 +64,67 @@ import userAuthdevic from "../../../components/userAuthdevic"
 
 
     mounted(){
-      
+      if(this.$store.state.userinfo.userLevel==2){
         
+            this.manageScopeIdList.push(this.$store.state.parame.parkid)
+            this.token=2
+         
+        }
+         if(this.$store.state.userinfo.userLevel==3){
+           this.manageScopeIdList.push(this.$store.state.parame.buildid)
+            this.token=3
+        
+        }
+         if(this.$store.state.userinfo.userLevel==4){
+           this.manageScopeIdList.push(this.$store.state.parame.floorid)
+            this.token=4
+         
+        }    
       this.getuserInfo()
     
     },
     methods: {
       getuserInfo(){
         var that=this;
-        var param={
+        if(that.$store.state.userinfo.userLevel==5){
+          var param={
           createUser:that.$store.state.userinfo.userMobile,
           action:2
+         }
+         that.url="/SmartHomeTrade/appUser/selectDptUser"
+        }else if(that.$store.state.userinfo.userLevel==4){
+
+        var param={
+          createUser:that.$store.state.userinfo.userMobile,
+          action:1,
+          token:that.token,
+          manageScopeIdList:that.manageScopeIdList,
+          addressId:that.$store.state.parame.flooraddressId
         }
-        that.axios.post("/SmartHomeTrade/appUser/selectDptUser",param).then(function(res){
+        that.url='/SmartHomeTrade/device/selectRegionByAdmin'
+        }else{
+           var param={
+          createUser:that.$store.state.userinfo.userMobile,
+          action:1,
+          token:that.token,
+
+          manageScopeIdList:that.manageScopeIdList,
+        }
+        that.url='/SmartHomeTrade/device/selectRegionByAdmin'
+
+        }
+
+
+
+        that.axios.post(that.url,param).then(function(res){
           if(res.data.code==0){
+            that.pictLoading=false;
             if(res.data.data!=null){
               var userlist=res.data.data.dptUserList;
+              if(that.$store.state.userinfo.userLevel!=5){
+                 that.regionList=res.data.data.regionList;
+              }
+             
               for(var i=0;i<userlist.length;i++){
                 userlist[i].name=userlist[i].buildingName;
                 userlist[i].appUserInfoList=userlist[i].dptList;
@@ -83,13 +134,10 @@ import userAuthdevic from "../../../components/userAuthdevic"
 
             }else{
               that.userlist=[]
-
             }
           }else{
             that.$message.error(res.data.message);
           }
-
-
         })
 
       },
@@ -117,18 +165,15 @@ import userAuthdevic from "../../../components/userAuthdevic"
             this.$message.warning("请选择授权用户")
            }else{
              var arr=listid.filter(element=>element!= null)
-      
-           // debugger
-             
-                
+             var regionList=this.regionList  
                if(this.$store.state.userinfo.userLevel==2){
-                this.$refs.mybuildchild.getAuthrization(arr);
+                this.$refs.mybuildchild.getAuthrization(arr,regionList);
                 }
                  if(this.$store.state.userinfo.userLevel==3){
-                  this.$refs.myfloorchild.getAuthrization(arr);
+                  this.$refs.myfloorchild.getAuthrization(arr,regionList);
                 }
                  if(this.$store.state.userinfo.userLevel==4){
-                  this.$refs.myroomchild.getAuthrization(arr);
+                  this.$refs.myroomchild.getAuthrization(arr,regionList);
                 }
                   if(this.$store.state.userinfo.userLevel==5){
                     this.$refs.mydevicechild.getAuthrization(arr);
@@ -145,6 +190,5 @@ import userAuthdevic from "../../../components/userAuthdevic"
   height: 400px;
   overflow:hidden;
   overflow-y:auto;
-
 }
 </style>

@@ -106,17 +106,26 @@
             align="center">
           </el-table-column>
         </el-table>
-        <div class="block">
+        <div class="block" v-if="!startSearch">
+        <el-pagination
+          @size-change="handleSizeChange"
+          @current-change="handleCurrentChange"
+          :page-sizes="[10, 20, 30, 40]"
+          :page-size="10"
+          layout="total, sizes, prev, pager, next, jumper"
+          :total="total">
+        </el-pagination>
+      
+      </div>
+       <div class="block" v-if="startSearch">
           <el-pagination
-            @size-change="handleSizeChange"
-            @current-change="handleCurrentChange"
-            :page-sizes="[10, 20, 30, 40]"
-            :page-size="100"
-            layout="total, sizes, prev, pager, next, jumper"
-            :total="total">
-          </el-pagination>
-        </div>
-
+          @size-change="handleSizeChange"
+          @current-change="handleCurrentChange"       
+          :page-size="100"
+          layout="total, prev, pager, next"
+          :total="total">
+       </el-pagination>
+       </div>
       </div>
 
 
@@ -136,6 +145,7 @@
       data() {
         return {
            hackReset:true,
+           startSearch:false,
           buildParams:{//获取大楼列表参数
             pageSize:10,
             currentPage:1,
@@ -252,12 +262,14 @@
             return;
           }
            that.loading=true;
+           
           that.axios.post("/SmartHomeTrade/block/selectBlockCount",that.formSearch).then(function(res){
                    
             if(res.data.code==0){
+              that.startSearch=true;
               that.loading=false;
               that.blockList=res.data.data.blockList;
-               that.total=res.data.count
+               that.total=res.data.data.blockList.length;
                that.$message.success(res.data.message);
             }else{
                that.$message.error(res.data.message);
@@ -267,10 +279,13 @@
     //清空查询
       resetForm() {
         var that=this;
-            that.formSearch.buildingName= null,
-            that.formSearch.yardName=null,
-            that.formSearch.blockNum=null,
-            that.formSearch.userName=null,
+            that.formSearch.buildingName= null;
+            that.formSearch.yardName=null;
+            that.formSearch.blockNum=null;
+            that.formSearch.userName=null;
+           that.buildParams.pageSize=10;
+           that.buildParams.currentPage=1; 
+            that.startSearch=false;
         that.getBuildlist()
       },
 

@@ -5,13 +5,15 @@
 		  :visible.sync="opendialog"
 		  width="30%"
 		  :before-close="handleClose">
-		  <div class="modelContain">
+		  <div class="modelContain" v-loading="pictLoading" element-loading-background="#fff"
+         element-loading-text="加载数据中......">
 		   <el-tree
 	        :data="addresslist"
 	        show-checkbox
 	        ref="addresslist"
 	        default-expand-all
 	        node-key="id"
+	        empty-text="该房间下没有设备"
 	        :props="defaultProps"
 	        >
 	      </el-tree>		  
@@ -30,6 +32,7 @@ export default{
 		return{
 			opendialog:false,
 			 fullscreenLoading:false,
+			 pictLoading:true,
 			  addresslist:[],
 
 			  ucUserIdList:[],
@@ -62,11 +65,12 @@ export default{
             action:2
            }
 			 that.axios.post("/SmartHomeTrade/device/getDeviceList",param).then((res)=>{
+			 	this.pictLoading=false;
              
               if(res.data.data!=null){
                 if(res.data.data.deviceList.length==0){
                    that.addresslist=[]  
-                    debugger
+                 
                 }else{
                   that.clearBoth(res.data.data.deviceList)                 
                 return
@@ -80,21 +84,11 @@ export default{
 		      // 去重
       clearBoth(data){
         var that=this
-          var result = [], hash = {}, hashs = {}
-          for (var i = 0; i<data.length; i++) {          
-             var elem_ = data[i].blockId; 
-              if (!hash[elem_]) {
-                  if (!hashs[elem_]) {
-                      result.push(data[i]);
-                      hashs[elem_] = true;
-                  };
-                  hash[elem_] = true;
-              }
-          }                     
+                       
           var addresslist=[{
               name:that.$store.state.parame.roomname,
              }];
-          addresslist[0].children=result   
+          addresslist[0].children=data   
            that.addresslist=addresslist;
       },
 
@@ -104,24 +98,39 @@ export default{
 		sureadddialog(){			
 			var that=this;
 			 var list=[]
-            var listname=that.$refs.addresslist.getCheckedNodes()
+			 var listid=that.$refs.addresslist.getCheckedKeys()
+			  var arr=listid.filter(element=>element!= null)
+            // var listname=that.$refs.addresslist.getCheckedNodes()
 
           
-          if(listname.length!=0){
+          if(arr.length!=0){
 
-	            for(var i=0;i<listname[0].children.length;i++){
-	              list.push({
-	                id:listname[0].children[i].id,
-	                name:listname[0].children[i].name,
-	                deviceRoom:that.$store.state.parame.roomname,
-	                roomId:that.$store.state.parame.roomid,
+          	  for(var i=0;i<that.addresslist[0].children.length;i++){
+              for(var j=0;j<arr.length;j++){
+                if(arr[j]==that.addresslist[0].children[i].id){
+                   list.push({
+                      id:that.addresslist[0].children[i].id,
+                      name:that.addresslist[0].children[i].name,
+                      deviceRoom:that.$store.state.parame.roomname,
+                      roomId:that.$store.state.parame.roomid,
+                    })
+                }
+              }
+            }
 
-	              })
-	          }
+	          //   for(var i=0;i<listname[0].children.length;i++){
+	          //     list.push({
+	          //       id:listname[0].children[i].id,
+	          //       name:listname[0].children[i].name,
+	          //       deviceRoom:that.$store.state.parame.roomname,
+	          //       roomId:that.$store.state.parame.roomid,
+
+	          //     })
+	          // }
 
           }else{
 
-          that.$message.warning("请选择授权区域")
+          that.$message.warning("请选择授权设备")
           return;
        
 

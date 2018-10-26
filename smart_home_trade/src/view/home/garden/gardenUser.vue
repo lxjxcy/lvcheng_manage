@@ -58,7 +58,10 @@
           label="序号"
           width="55"
            align="center">
-          <template  slot-scope="scope"><span>{{scope.$index+(userParams.currentPage - 1) * userParams.pageSize + 1}} </span></template>
+          <template  slot-scope="scope">
+            <span  v-if="!startSearch">{{scope.$index+(userParams.currentPage - 1) * userParams.pageSize + 1}} </span>
+             <span v-if="startSearch">{{scope.$index+1}}</span>
+          </template>
         </el-table-column>
         <el-table-column
           prop="name"
@@ -96,7 +99,7 @@
 
         </el-table-column>
       </el-table>
-      <div class="block">
+      <div class="block" v-if="!startSearch">
         <el-pagination
           @size-change="handleSizeChange"
           @current-change="handleCurrentChange"
@@ -105,7 +108,17 @@
           layout="total, sizes, prev, pager, next, jumper"
           :total="total">
         </el-pagination>
+      
       </div>
+       <div class="block" v-if="startSearch">
+          <el-pagination
+          @size-change="handleSizeChange"
+          @current-change="handleCurrentChange"       
+          :page-size="100"
+          layout="total, prev, pager, next"
+          :total="total">
+       </el-pagination>
+       </div>
 
     </div>
 
@@ -132,6 +145,7 @@
     data() {
       return {
         templateRadio:'',//选中
+        startSearch:false,
          templateSelection:{},//选中的这条数据
         total:0,//总页数
         userParams:{//获取管理员列表参数
@@ -242,13 +256,23 @@
           that.formSearch.loginName=null
         }
         if(that.formSearch.name!=null||that.formSearch.userMobile!=null||that.formSearch.loginName!=null){
+
           that.loading=true;
+          
          
-              that.axios.post('/SmartHomeTrade/user/selectNextAdminByNmOrMobile',that.formSearch).then(function (res) {        
+              that.axios.post('/SmartHomeTrade/user/selectNextAdminByNmOrMobile',that.formSearch).then(function (res) {
+                    
               if(res.data.code==0){
+                that.startSearch=true;
+                 that.loading=false  
                 if(res.data.data!=null){
                  that.listNextAdmin=res.data.data.AdminList;
-                  that.loading=false
+                
+                 if(res.data.data.AdminList==null){
+                  that.total=0;
+                 }else{
+                   that.total=res.data.data.AdminList.length; 
+                 }
                 }
               }else{
                 that.$message.error(res.data.message)
@@ -261,9 +285,12 @@
       //清空查询
       resetForm() {
         var that=this;
-        that.formSearch.name=null,         
-        that.formSearch.userMobile=null,
-        that.formSearch.loginName=null,  
+        that.formSearch.name=null;        
+        that.formSearch.userMobile=null;
+        that.formSearch.loginName=null;
+           that.userParams.pageSize=10;
+        that.userParams.currentPage=1; 
+        that.startSearch=false; 
         that.getUserlist()
       },
  

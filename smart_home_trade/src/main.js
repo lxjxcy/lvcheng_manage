@@ -16,7 +16,7 @@ import goback from './view/home/goback/goback'
 import gobackequim from './view/home/goback/gobackequim'
 import gobackroom from './view/home/goback/gobackroom'
 import setUser from './components/setUser'
-import single from './components/single'
+
 
 import addAppuser from './components/addAppuser'
 
@@ -24,9 +24,13 @@ import createDepartment from './components/createDepartment'
 import addAuthrization from "./components/addAuthrization"
 import authorizationEq from "./components/authorizationEq"
 
-import multi from './components/multi'
 
-import iView from 'iview';
+
+// import iView from 'iview';
+// import {
+//   Breadcrumb,
+//   BreadcrumbItem
+// } from 'iview'
 import 'iview/dist/styles/iview.css';
 
 import axios from "./axiosconfig/axiosconfig.js"
@@ -39,7 +43,8 @@ import Export2Excel from './vendor/Export2Excel.js'
 axios.defaults.withCredentials = true;
 
 Vue.prototype.axios = axios;
-Vue.use(iView);
+// Vue.use(iView);
+// Vue.use(BreadcrumbItem);
 Vue.use(ElementUI);
 Vue.config.productionTip = false
 Vue.component(myHeader.name, myHeader)
@@ -49,8 +54,7 @@ Vue.component(gobackroom.name, gobackroom)
 Vue.component(gobackequim.name, gobackequim)
 
 Vue.component(setUser.name, setUser)
-Vue.component(single.name, single)
-Vue.component(multi.name, multi)
+
 Vue.component(addAuthrization.name, addAuthrization)
 Vue.component(createDepartment.name, createDepartment)
 Vue.component(authorizationEq.name, authorizationEq)

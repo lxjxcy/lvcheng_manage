@@ -1,17 +1,20 @@
 <template>
 	<div class="userAuthfloor">
 		<el-dialog
-		  title="用户授权"
+		  title="授权设备"
 		  :visible.sync="opendialog"
 		  width="30%"
 		  :before-close="handleClose">
-		  <div class="modelContain">
+		  <div class="modelContain" v-loading="pictLoading" element-loading-background="#fff"
+         element-loading-text="加载数据中......">
 		   <el-tree
-	        :data="addresslist"
+	        :data="regionList"
 	        show-checkbox
 	        ref="addresslist"
-	         default-expand-all	       
-	        node-key="floorId"
+	         :default-checked-keys="checkIdList"
+	           
+	        node-key="id"
+	        empty-text="该大楼下没有设备"
 	        :props="defaultProps"
 	        >
 	      </el-tree>		  
@@ -30,11 +33,13 @@ export default{
 		return{
 			opendialog:false,
 			 fullscreenLoading:false,
-			  addresslist:[],
+			  pictLoading:true,
+			  regionList:[],
+			  checkIdList:[],
 			  ucUserIdList:[],
 			   defaultProps: {
-		          children: 'children',
-		          label: 'deviceFloor'
+		          children: 'manageList',
+		          label: 'name'
 		        }
 		}
 	},
@@ -43,77 +48,111 @@ export default{
 	},
 	methods:{
 		 // 区域授权弹框
-		getAuthrization(e){
-          this.ucUserIdList=e;
-			this.opendialog=true;
-			this.getaddress()
-		},
-		getaddress(){
-			var that=this
-			 var param={
-             blockId:that.$store.state.parame.buildid,
-            action:2
-           } 
-			 that.axios.post("/SmartHomeTrade/device/blockAdUserDeviceList",param).then((res)=>{
-            
-              if(res.data.data!=null){
-                if(res.data.data.deviceList.length==0){
-                   that.addresslist=[]  
-                   
+		getAuthrization(e,regionList){
+			var that=this;
+          that.ucUserIdList=e;
+       if(that.ucUserIdList.length==1){
+            that.axios.post("/SmartHomeTrade/appUser/selectRoomAndUser",{
+              token:2,
+              ucUserId:that.ucUserIdList[0],
+            }).then(res=>{
+              if(res.data.code==0){
+              	that.pictLoading=false;
+                console.log(res.data.data)
+                
+                if(JSON.stringify(res.data.data)== "{}"){
+                  var regionList1=regionList;
+                  that.checkIdList=[];
+                  that.regionList=regionList1;
+                  return;
                 }else{
-                  that.clearBoth(res.data.data.deviceList)                 
-                return
-                }                
-              }else{
-                that.addresslist=[]
-                return
+                  var regionList1=regionList;
+
+                  that.checkIdList=res.data.data.authDeviceList;
+                    for(var i=0;i<regionList1.length;i++){
+                      for(var j=0;j<regionList1[i].manageList.length;j++){
+                        for(var e=0;e<regionList1[i].manageList[j].manageList.length;e++){
+                         
+                            for(var f=0;f<res.data.data.authDeviceList.length;f++){
+                              if(res.data.data.authDeviceList[f]==regionList1[i].manageList[j].manageList[e].id){
+                                  regionList1[i].manageList[j].manageList[e].disabled=true;
+                               }
+                           }
+                          
+                        }  
+                      }
+                    }
+                     that.regionList=regionList1;
+
+                }
               }
-            })     
+
+            })
+          }
+
+           // that.regionList=regionList;
+			that.opendialog=true;
+			
 		},
-		      // 去重
-      clearBoth(data){
-        var that=this
-          var result = [], hash = {}, hashs = {}
-          for (var i = 0; i<data.length; i++) {          
-             var elem_ = data[i].floorId;
-              if (!hash[elem_]) {
-                  if (!hashs[elem_]) {
-                      result.push(data[i]);
-                      hashs[elem_] = true;
-                  };
-                  hash[elem_] = true;
-              }
-          }                     
-           var addresslist=[{
-               deviceFloor:that.$store.state.parame.buildname,
-             }];
-          addresslist[0].children=result   
-           that.addresslist=addresslist;
-           debugger
-      },
+
 
 
 	
 // 提交
 		sureadddialog(){			
-			var that=this;
-			
-			var list=this.$refs.addresslist.getCheckedKeys()
-			if(list.length==0){
-	          that.$message.warning("请选择授权区域")
-	          return;
-	         }			
-			 var arr=list.filter((element)=> String(element))
-			 var arr=list.filter(element=>element!= null)
-             var param={
-             	floorIdList:arr,
+		var that=this;
+
+         var listid=that.$refs.addresslist.getCheckedKeys()
+
+         if(listid.length==0){
+          that.$message.warning("请选择授权的设备")
+          return;
+         }else{
+         var arr=listid.filter(element=>element!= null) 
+          // var arr=listid.filter(element=>element!= null)
+        // var q=that.checkIdList
+          for(var i=0;i<arr.length;i++){
+            for(var j=0;j<that.checkIdList.length;j++){
+              if(arr[i]==that.checkIdList[j]){
+                 arr.splice(i, 1)
+              }
+
+            }
+          }
+          // debugger
+          if(arr.length==0&&that.checkIdList.length!=0){
+             
+           that.$emit('refreshList');
+           // that.$emit('reload');
+          that.opendialog=false;
+          return;
+        }   
+
+            var list=[]
+            for(var i=0;i<that.regionList.length;i++){
+                for(var j=0;j<that.regionList[i].manageList.length;j++){
+                  for(var e=0;e<that.regionList[i].manageList[j].manageList.length;e++){
+                      for(var f=0;f<arr.length;f++){
+                        if(arr[f]==that.regionList[i].manageList[j].manageList[e].id){
+                           list.push({
+                              id:that.regionList[i].manageList[j].manageList[e].id,
+                              name:that.regionList[i].manageList[j].manageList[e].name,
+                              deviceRoom:that.regionList[i].manageList[j].manageList[e].inAddress,
+                              roomId:that.regionList[i].manageList[j].manageList[e].roomId,
+                            })
+                         }
+                     }
+                  }  
+                }
+              }
+
+               var param={
+             	deviceList:list,
              	ucUserIdList:that.ucUserIdList,
-             	addressId:that.$store.state.parame.buildid,
-             	token:4,
+             	token:6,             	
              	createUser:that.$store.state.userinfo.userMobile,
              }
-
-            that.fullscreenLoading=true;
+              that.fullscreenLoading=true;
             that.axios.post("/SmartHomeTrade/appUser/authDeviceAppUser",param).then(res=>{
             	that.fullscreenLoading=false;
             	if(res.data.code==0){
@@ -125,6 +164,10 @@ export default{
             		that.$message.error(res.data.message)
             	}
             })
+
+
+
+       }
 
 		
 		},

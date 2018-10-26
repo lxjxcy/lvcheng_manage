@@ -66,7 +66,11 @@
           label="序号"
           width="55"
           align="center">
-          <template  slot-scope="scope"><span>{{scope.$index+(floorParam.currentPage - 1) * floorParam.pageSize + 1}} </span></template>
+          <template  slot-scope="scope">
+            <span v-if="!startSearch">{{scope.$index+(floorParam.currentPage - 1) * floorParam.pageSize + 1}} </span>
+             <span v-if="startSearch">{{scope.$index+1}}</span>
+
+          </template>
         </el-table-column>
         <el-table-column
           prop="name"
@@ -101,16 +105,26 @@
           align="center">
         </el-table-column>
       </el-table>
-      <div class="block">
+       <div class="block" v-if="!startSearch">
         <el-pagination
           @size-change="handleSizeChange"
           @current-change="handleCurrentChange"
           :page-sizes="[10, 20, 30, 40]"
-          :page-size="100"
+          :page-size="10"
           layout="total, sizes, prev, pager, next, jumper"
           :total="total">
         </el-pagination>
+      
       </div>
+       <div class="block" v-if="startSearch">
+          <el-pagination
+          @size-change="handleSizeChange"
+          @current-change="handleCurrentChange"       
+          :page-size="100"
+          layout="total, prev, pager, next"
+          :total="total">
+       </el-pagination>
+       </div>
 
     </div>
 
@@ -133,6 +147,7 @@
       data() {
         return {
           hackReset:true,
+          startSearch:false,
             templateRadio:'',
         templateSelection:{},
           loading:true,
@@ -309,12 +324,14 @@
           }
            that.loading=true;
 
+
           that.axios.post("/SmartHomeTrade/floor/selectFloorCount",that.formSearch).then(function(res){
           
                 if(res.data.code==0){
+                  that.startSearch=true;
                   if(res.data.data!=null){
                      that.floorList=res.data.data.floorList;
-                    // that.total=res.data.count
+                    that.total=res.data.data.floorList.length;
                   }
                  
                     that.loading=false;
@@ -333,7 +350,10 @@
             that.formSearch.floorNum= null;
             that.formSearch.name=null;
              that.formSearch.buildingName=null;
-            that.formSearch.userName=null;          
+            that.formSearch.userName=null;   
+            that.startSearch=false; 
+            that.floorParam.pageSize=10;
+            that.floorParam.currentPage=1;   
             that.getfloorList()
         },
              // 情况选中

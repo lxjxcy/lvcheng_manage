@@ -58,17 +58,26 @@
             align="center">
           </el-table-column>
         </el-table>
-        <div class="block">
+        <div class="block" v-if="!startSearch">
+        <el-pagination
+          @size-change="handleSizeChange"
+          @current-change="handleCurrentChange"
+          :page-sizes="[10, 20, 30, 40]"
+          :page-size="10"
+          layout="total, sizes, prev, pager, next, jumper"
+          :total="total">
+        </el-pagination>
+      
+      </div>
+       <div class="block" v-if="startSearch">
           <el-pagination
-            @size-change="handleSizeChange"
-            @current-change="handleCurrentChange"
-            :page-sizes="[10, 20, 30, 40]"
-            :page-size="100"
-            layout="total, sizes, prev, pager, next, jumper"
-            :total="total">
-          </el-pagination>
-        </div>
-
+          @size-change="handleSizeChange"
+          @current-change="handleCurrentChange"       
+          :page-size="100"
+          layout="total, prev, pager, next"
+          :total="total">
+       </el-pagination>
+       </div>
       </div>
     </div>
 </template>
@@ -81,6 +90,7 @@
         return {
            total:0,
           loading:true,
+          startSearch:false,
               templateRadio:'',
           templateSelection:{},
           myFloorparam:{
@@ -171,17 +181,25 @@
            that.loading=true;             
           that.axios.post("/SmartHomeTrade/floor/selectMyFloor",that.formSearch).then(function(res){
               if(res.data.code==0){
-              that.floorList=res.data.data.floorList;
+                that.startSearch=true;
                 that.loading=false;  
+              that.floorList=res.data.data.floorList;
+              that.total=res.data.data.floorList.length;
+                
 
+            }else{
+              that.$message.error(that.data.message)
             }
           })
         },
         // 清空查询
         resetForm() {
         var that=this;
-            that.formSearch.name= null,
-            that.formSearch.floorNum=null,           
+            that.formSearch.name= null;
+            that.formSearch.floorNum=null;
+              that.paramRoom.pageSize=10;
+            that.paramRoom.currentPage=1;   
+           that.startSearch=false      
             that.getMyfloorlist()
         },
       },

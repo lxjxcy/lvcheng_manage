@@ -11,8 +11,19 @@
           <el-input v-model="formSearch.name" placeholder=""></el-input>
         </el-form-item>
         <el-form-item label="设备类型" class="formpark">
-          <el-input v-model="formSearch.typeName" placeholder=""></el-input>
+          <!-- <el-input v-model="formSearch.typeName" placeholder=""></el-input> -->
+          <el-select v-model="typeid" style="width:92%" @change="gettypeName">
+              <el-option
+                v-for="item in this.$store.state.typeList"
+                :key="item.typeid"
+                :label="item.typeName"
+                :value="item.typeid"
+               >
+              </el-option>
+          </el-select>
         </el-form-item>
+
+
 
 
 
@@ -52,6 +63,18 @@
               </el-option>
           </el-select>
         </el-form-item>
+        <el-form-item label="设备状态">
+          <el-select v-model="value" placeholder="请选择" style="width:92%">
+            <el-option
+              v-for="item in Statuslist"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value">
+            </el-option>
+          </el-select>
+        </el-form-item>
+
+
 
 
 
@@ -114,9 +137,13 @@
           prop="deviceNum"
           label="序号"
           width="55"
-           align="center">
-            <template  slot-scope="scope"><span>{{scope.$index+(equipmentParam.currentPage - 1) * equipmentParam.pageSize + 1}} </span></template>
+           align="center" >
+            <template  slot-scope="scope">
+              <span v-if="!startSearch">{{scope.$index+(equipmentParam.currentPage - 1) * equipmentParam.pageSize + 1}} </span>
+               <span v-if="startSearch">{{scope.$index+1}}</span>
+            </template>
         </el-table-column>
+         
         <el-table-column
           prop="name"
           label="设备名称"
@@ -167,7 +194,7 @@
         </el-table-column>
 
       </el-table>
-      <div class="block">
+      <div class="block" v-if="!startSearch">
         <el-pagination
           @size-change="handleSizeChange"
           @current-change="handleCurrentChange"
@@ -176,7 +203,17 @@
           layout="total, sizes, prev, pager, next, jumper"
           :total="total">
         </el-pagination>
+      
       </div>
+       <div class="block" v-if="startSearch">
+          <el-pagination
+          @size-change="handleSizeChange"
+          @current-change="handleCurrentChange"       
+          :page-size="100"
+          layout="total, prev, pager, next"
+          :total="total">
+       </el-pagination>
+       </div>
 
     </div>
 
@@ -225,6 +262,7 @@ import openClose from "./openClose.vue"
     data() {
       return {
         hackReset:true,
+        startSearch:false,
           templateRadio:'',
         templateSelection:{},
         total:0,
@@ -266,6 +304,20 @@ import openClose from "./openClose.vue"
         getLnformation:false,
 
         deviceList: [],
+        deviceListall:[],
+       
+        typeid:null,
+         Statuslist: [{
+          value: '1',
+          label: '开'
+        }, {
+          value: '2',
+          label: '关'
+        }, {
+          value: '3',
+          label: '停'
+        }, ],
+        value: null,//设备状态
         formation:{
           equipmentid:"SB002",
 
@@ -284,6 +336,7 @@ import openClose from "./openClose.vue"
           buildingId:"",
 
         },
+
         blockList:[],
         floorList:[],
         roomList:[],
@@ -350,7 +403,8 @@ import openClose from "./openClose.vue"
 
 
 
-        that.getequipmentlist()        
+        that.getequipmentlist() 
+        that.getequipmentlistall()       
       },
     methods: {
       // 获取设备列表
@@ -391,6 +445,7 @@ import openClose from "./openClose.vue"
      				that.total=res.data.data.count
      			}else{
      				that.deviceList=[]
+            that.Statuslist=[]
      			}
      			that.loading=false;
 
@@ -401,6 +456,56 @@ import openClose from "./openClose.vue"
          })
          
       },
+
+
+      //获取所有设备
+       getequipmentlistall(){
+        var that=this;
+      
+        var equipmentParam={
+            action:2,
+        }
+         if(that.$store.state.userinfo.userLevel==2){
+          var parkparam={
+          yardId:that.$store.state.parame.parkid,
+           }
+          var param=Object.assign(equipmentParam,parkparam)
+          that.classObject.wap=true;
+
+         }
+         if(that.$store.state.userinfo.userLevel==3){
+           var buildparam={
+             blockId:that.$store.state.parame.buildid,
+           }
+          var param=Object.assign(equipmentParam,buildparam)
+          that.classObject.floorwap=true;
+         }
+         if(that.$store.state.userinfo.userLevel==4){
+           var floorparam={
+            floorId:that.$store.state.parame.floorid,
+            addressId:that.$store.state.parame.flooraddressId,
+           }
+          var param=Object.assign(equipmentParam,floorparam)
+          
+         }
+         that.axios.post(that.url,param).then(function(res){
+        if(res.data.code==0){
+          if(res.data.data!=null){
+            that.deviceListall=res.data.data.deviceList;
+            // that.total=res.data.data.count
+          }else{
+            that.deviceListall=[]
+          }
+          // that.loading=false;
+
+
+        }else{
+          // that.$message.error(res.data.message)
+        }
+         })
+         
+      },
+
 
 
 
@@ -453,6 +558,16 @@ import openClose from "./openClose.vue"
         that.formSearch.deviceRoom=obj.name;
 
       },
+      // 选择设备类型
+      gettypeName(value){
+         var that=this;
+         let obj = {};  
+        obj = that.$store.state.typeList.find((item)=>{ 
+        return item.typeid === value;
+        });  
+        that.formSearch.typeName=obj.typeName;
+
+      },
       // 刷新组件
        reloadcom(){
         this.hackReset = false
@@ -476,6 +591,7 @@ import openClose from "./openClose.vue"
         //查询
         onSubmit() {
           var that=this;
+
          
            if(that.formSearch.name==''){
             that.formSearch.name=null
@@ -501,55 +617,115 @@ import openClose from "./openClose.vue"
            }
 
           if(that.$store.state.userinfo.userLevel==2){
-              if(that.formSearch.name==null&&that.formSearch.typeName==null&&that.formSearch.deviceRoom==null&&that.formSearch.deviceFloor==null&&that.formSearch.deviceBlock==null){
+            if(that.formSearch.name==null&&that.formSearch.typeName==null&&that.formSearch.deviceRoom==null&&that.formSearch.deviceFloor==null&&that.formSearch.deviceBlock==null&&that.value!=null){
+               that.startSearch=true;
+                  that.mainStatusnull()               
+                return;
+              }
+             if(that.formSearch.name==null&&that.formSearch.typeName==null&&that.formSearch.deviceRoom==null&&that.formSearch.deviceFloor==null&&that.formSearch.deviceBlock==null){
                  that.getequipmentlist()
                 return;
               }
+
+            
+             
              
               var parkparam={
                    yardId:that.$store.state.parame.parkid,
                }
               var param=Object.assign(parkparam,formSearch)
+              that.startSearch=true;
+
+              
               that.Search(param)
               
              
           }
            if(that.$store.state.userinfo.userLevel==3){
+             if(that.formSearch.name==null&&that.formSearch.typeName==null&&that.formSearch.deviceRoom==null&&that.formSearch.deviceFloor==null&&that.value!=null){
+              that.startSearch=true;
+                that.mainStatusnull() 
+                return;
+              }
               if(that.formSearch.name==null&&that.formSearch.typeName==null&&that.formSearch.deviceRoom==null&&that.formSearch.deviceFloor==null){
                  that.getequipmentlist()
                 return;
               }
-              
                var buildparam={
                blockId:that.$store.state.parame.buildid,
               }
     
               var param=Object.assign(buildparam,formSearch)
+              that.startSearch=true;
               that.Search(param)
           }
            if(that.$store.state.userinfo.userLevel==4){
+              if(that.formSearch.name==null&&that.formSearch.typeName==null&&that.formSearch.deviceRoom==null&&that.value!=null){
+                that.startSearch=true;
+                that.mainStatusnull() 
+                return;
+              }
               if(that.formSearch.name==null&&that.formSearch.typeName==null&&that.formSearch.deviceRoom==null){
                  that.getequipmentlist()
                 return;
               }
-             
               var floorparam={
                 floorId:that.$store.state.parame.floorid,
                 addressId:that.$store.state.parame.flooraddressId,
                }
              var paramd=Object.assign(floorparam,formSearch)
+             that.startSearch=true;
               that.Search(paramd)
           }
           
          
         },
+        //设备状态不为空时
+        mainStatusnull(){
+          var that=this;
+
+          var deviceList=[]
+                for(var i=0;i<that.deviceListall.length;i++){
+                  if(that.deviceListall[i].mainStatus==that.value){
+                    deviceList.push(that.deviceListall[i])
+                  }
+
+                }
+          that.deviceList=deviceList;
+          that.total=deviceList.length;
+           that.startSearch=true;
+
+        },
+
+
         // 查询方法
         Search(param){
           var that=this;
            that.loading=true;             
           that.axios.post(that.url,param).then(function(res){
               if(res.data.code==0){
-              that.deviceList=res.data.data.deviceList;
+              // that.deviceList=res.data.data.deviceList;
+             
+              if(that.value==null){
+                that.deviceList=res.data.data.deviceList;
+                that.total=res.data.data.deviceList.length;
+              }else{
+                 var deviceList=[]
+                for(var i=0;i<res.data.data.deviceList.length;i++){
+                  if(res.data.data.deviceList[i].mainStatus==that.value){
+                    deviceList.push(res.data.data.deviceList[i])
+                  }
+
+                }
+                 that.deviceList=deviceList;
+                  that.total=deviceList.length;
+                  that.startSearch=true;
+                  debugger
+
+
+              }
+
+
                 that.loading=false;  
                       
             }
@@ -561,15 +737,22 @@ import openClose from "./openClose.vue"
         // 清空查询
         resetForm() {
         var that=this;
-            that.formSearch.deviceNum= null,
-            that.formSearch.name=null,
-             that.formSearch.typeName=null, 
-             that.formSearch.deviceBlock=null,   
-             that.formSearch.deviceRoom=null,   
-             that.formSearch.deviceFloor=null,
-             that.build.buildingId="";  
-             that.floor.id="";
-              that.room.id="";  
+            that.formSearch.deviceNum= null;
+            that.formSearch.name=null;
+             that.formSearch.typeName=null;
+             that.formSearch.deviceBlock=null;  
+             that.formSearch.deviceRoom=null;  
+             that.formSearch.deviceFloor=null;
+             that.build.buildingId=null; 
+             that.value=null; 
+             that.floor.id=null;
+              that.room.id=null;
+              that.floorList=[],
+             that.roomList=[],  
+            that.typeid=null;
+              that.equipmentParam.pageSize=10;
+            that.equipmentParam.currentPage=1; 
+            that.startSearch=false;
             that.getequipmentlist()
         },
          //  转换状态
@@ -730,14 +913,11 @@ import openClose from "./openClose.vue"
             message: '请选择要授权的设备'
           });
         }else {
-          var changparam={
-               deviceId:that.templateSelection.id,
-               deviceName:that.templateSelection.name,
-               roomName:that.templateSelection.deviceRoom,
-               roomId:that.templateSelection.roomId,
-
-          }
+          var changparam=that.templateSelection
+              
+          
              that.$refs.mychild.getAuthrization(changparam);
+             
         }
         
       },

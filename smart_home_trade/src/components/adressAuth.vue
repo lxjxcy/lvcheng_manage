@@ -1,19 +1,20 @@
 <template>
 	<div class="adressAuth">
 		<el-dialog
-		  title="区域授权"
+		  title="授权用户"
 		  :visible.sync="opendialog"
 		  width="30%"
 		  :before-close="handleClose">
-		  <div class="modelContain">		  
+		  <div class="modelContain" v-loading="pictLoading" element-loading-background="#fff"
+         element-loading-text="加载数据中......">		  
 			    <div class="selectUser" v-if="sectionlist!=[]">
 			    	 <!-- default-expand-all -->
 					<el-tree
 					  :data="sectionlist"
 					  show-checkbox
-					 :default-expanded-keys="userIdlist"
+					
 					  node-key="ucUserId"
-					   :default-checked-keys="userIdlist"
+					  
 					  ref="tree"
 					  highlight-current
 					  :props="defaultProps">
@@ -32,8 +33,10 @@ export default{
 	data(){
 		return{
 			opendialog:false,
+			pictLoading:false,
 			 fullscreenLoading:false,
 			title:"sss",
+				blockIdList:[],
 			addresslist:[],
 			sectionlist:[],//部门信息
 			ucUserlist:[],
@@ -50,117 +53,52 @@ export default{
 	},
 	methods:{
 		 // 区域授权弹框
-		getAuthrization(e,q){
+		getAuthrization(e,q,blockIdList){
           this.addresslist=e;
+          if(this.$store.state.userinfo.userLevel==2){
+          	this.blockIdList=blockIdList;
+          }
           // this.deviceIdName=q,
-          this.userIdlist=q;
+          this.sectionlist=q;
           debugger
 		  this.opendialog=true;
-		  this.getDepinfo(q)
-		},
-		//获取部门下的用户信息
-		getDepinfo(q){
-	    	var that=this;
-	    	 var param={
-		          createUser:that.$store.state.userinfo.userMobile,
-		          action:2
-		        }
-	    	that.axios.post("/SmartHomeTrade/appUser/selectDptUser",param).then(function(res){
-	    		if(res.data.code==0){
-	    			if(res.data.data!=null){
-	    				that.sectionlist=res.data.data.dptUserList;
-	    				var userlist=res.data.data.dptUserList;
-		              for(var i=0;i<userlist.length;i++){
-		                userlist[i].name=userlist[i].buildingName;
-		                userlist[i].appUserInfoList=userlist[i].dptList;
-
-		              }
-		              var userlist=userlist;
-		              if(q.length>0){
-		              	for(var j=0;j<userlist.length;j++){
-			              	for(var k=0;k<userlist[j].appUserInfoList.length;k++){
-			              		for(var d=0;d<userlist[j].appUserInfoList[k].appUserInfoList.length;d++){
-			              			for(var w=0;w<q.length;w++){
-			              				if(q[w]==userlist[j].appUserInfoList[k].appUserInfoList[d].ucUserId){
-			              					userlist[j].appUserInfoList[k].appUserInfoList[d].disabled=true;
-			              				}
-			              			}
-			              		}
-			              	}
-			              }
-		              }
-		              
-		              that.sectionlist=userlist;
-		             
-	    			}
-	    		}
-	    	})
-
+		  // this.getDepinfo(q)
 		},
 // 提交
-		sureadddialog(){			
+		sureadddialog(){	
+		debugger		
 			var that=this;
+
 			
 			var list=this.$refs.tree.getCheckedKeys()			
 			 var arr=list.filter((element)=> String(element))
 			debugger
 			 var arr=list.filter(element=>element!= null)
-
-
-			 for(var i=0;i<arr.length;i++){
-
-	    		
-	    			for(var j=0;j<that.userIdlist.length;j++){
-	    				if(arr[i]==that.userIdlist[j]){
-	    					 arr.splice(i, 1)
-	    				}
-
-	    			}
-	    		}
-
-			if(that.$store.state.userinfo.userLevel==2){
-
-             var param={
-             	blockIdList:that.addresslist,
-             	ucUserIdList:arr,
-             	token:3,
-             	createUser:that.$store.state.userinfo.userMobile,
-             }
-
-            }
-             if(that.$store.state.userinfo.userLevel==3){
-             	var param={
-             	floorIdList:that.addresslist,
-             	ucUserIdList:arr,
-             	addressId:that.$store.state.parame.buildid,
-             	token:4,
-             	createUser:that.$store.state.userinfo.userMobile,
-             }
-              
-            }
-             if(that.$store.state.userinfo.userLevel==4){
-             	var param={
-             	roomIdList:that.addresslist,
-             	ucUserIdList:arr,
-             	addressId:that.$store.state.parame.flooraddressId,
-             	token:4,
-             	createUser:that.$store.state.userinfo.userMobile,
-             }
-              
-            }
-              if(that.$store.state.userinfo.userLevel==5){
-              	var param={
+			 if(arr.length==0){
+			 	that.$message.warning("请选择一个用户")
+			  	return;
+			  }	
+			  if(that.$store.state.userinfo.userLevel==2){
+			  	var param={
              	deviceList:that.addresslist,
              	ucUserIdList:arr,
              	token:6,
-             	
+                action:2,
+                blockIdList:that.blockIdList,	
              	createUser:that.$store.state.userinfo.userMobile,
-             }
-             debugger
+              }
 
-               
-            }
+			  }else{
+			  	var param={
+             	deviceList:that.addresslist,
+             	ucUserIdList:arr,
+             	token:6,	
+             	createUser:that.$store.state.userinfo.userMobile,
+              }
 
+			}	
+              	
+             
             that.fullscreenLoading=true;
             that.axios.post("/SmartHomeTrade/appUser/authDeviceAppUser",param).then(res=>{
             	that.fullscreenLoading=false;

@@ -75,11 +75,15 @@
               <el-radio :label="scope.row.uuid" v-model="templateRadio" @change.native="getTemplateRow(scope.$index,scope.row)">&nbsp</el-radio>
           </template>
         </el-table-column>
+       
         <el-table-column
           label="序号"
           width="55"
-           align="center">
-          <template  slot-scope="scope"><span>{{scope.$index+(appuserParam.currentPage - 1) * appuserParam.pageSize + 1}} </span></template>
+           align="center" >
+          <template  slot-scope="scope">
+            <span v-if="!startSearch">{{scope.$index+(appuserParam.currentPage - 1) * appuserParam.pageSize + 1}} </span>
+             <span v-if="startSearch">{{scope.$index+1}}</span>
+          </template>
         </el-table-column>
         <el-table-column
           prop="name"
@@ -113,7 +117,7 @@
           :formatter="formataction">
         </el-table-column>
       </el-table>
-      <div class="block">
+       <div class="block" v-if="!startSearch">
         <el-pagination
           @size-change="handleSizeChange"
           @current-change="handleCurrentChange"
@@ -122,7 +126,17 @@
           layout="total, sizes, prev, pager, next, jumper"
           :total="total">
         </el-pagination>
+      
       </div>
+       <div class="block" v-if="startSearch">
+          <el-pagination
+          @size-change="handleSizeChange"
+          @current-change="handleCurrentChange"       
+          :page-size="10"
+          layout="total, prev, pager, next"
+          :total="total">
+       </el-pagination>
+       </div>
 
     </div>
 
@@ -144,6 +158,7 @@ import load from "./load.vue"
       return {
          templateRadio:'',
          hackReset:true,
+         startSearch:false,
         templateSelection:{},
         // multipleSelection: [],
         total:0,
@@ -251,12 +266,18 @@ import load from "./load.vue"
              that.getApplist()
             return;
           }
+         
           that.axios.post("/SmartHomeTrade/appUser/selectUserByCreateUser",that.formSearch).then(function(res){
             
             if(res.data.code==0){
               that.loading=false;
+               that.startSearch=true;
               if(res.data.data!=null){
                 that.appUserList=res.data.data.appUserList;
+                that.total=res.data.data.appUserList.length;
+              }else{
+                that.appUserList==[]
+                that.total=0;
               }
               
              
@@ -269,8 +290,14 @@ import load from "./load.vue"
     //清空查询
       resetForm() {
         var that=this;
-            that.formSearch.name= null,
-            that.formSearch.userMobile=null,
+            that.formSearch.name= null;
+            that.formSearch.userMobile=null;
+            that.startSearch=false;
+           
+          that.appuserParam.pageSize=10;
+          that.appuserParam.currentPage=1;
+         
+       
         that.getApplist()
       },
       // 添加
