@@ -233,7 +233,8 @@
           that.formSearch.userName=null
         }
         if(that.formSearch.yardName==null&&that.formSearch.userName==null){
-          that.getlist()          
+          that.getlist()
+           that.startSearch=false;          
           return;
         }
         that.loading=true
@@ -254,13 +255,15 @@
       resetForm() {
         var that=this;
          that.params.pageSize=10;
-        that.params.currentPage=1;  
+        that.params.currentPage=1; 
+        that. startSearch=false; 
         that.formSearch={
           action:1,
           gardenNum:null,
           yardName:null,
           userName:null,
         }
+
         that.getlist()
       },
       // 取消选中

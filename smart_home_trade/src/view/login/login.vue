@@ -2,8 +2,8 @@
   <div class="login img1 note"  :style ="note" >
     <!-- :style ="note" -->
   <div class="lvcheng"> 
-    <div class="piclog"><img src="../../assets/logo2.png" style="height:40px;width:150px;"> </div>
-    <div style="font-size:36px;font-weight:500">智能楼宇管理后台</div>
+    <div class="piclog"><img src="../../assets/logo2.png" style="height:40px;width:115px;margin-bottom: 5px"> </div>
+    <div style="font-size:36px;font-weight:500;color:#4f5a6d">智能楼宇管理后台</div>
   </div>
     
         <div class="box">
@@ -221,7 +221,7 @@ import md5 from 'js-md5';
 </script>
 <style>
   .lvcheng{
-    height:240px;
+    height:139px;
     padding-top: 100px;
   }
   .my-username .el-input__inner{
@@ -230,11 +230,11 @@ import md5 from 'js-md5';
   .boxpic{
     position: absolute;
     left:6px;
-    top:10px;
+    top:7px;
     z-index:100;
     width:20px;
     height:20px;
-    padding-right: 30px;
+    padding-right: 13px;
     border-right:2px solid #ccc;
     padding-bottom: 5px;
 
@@ -265,7 +265,7 @@ import md5 from 'js-md5';
   display: inline-block;
   padding:0 20px;
   position: relative;
-  top:-3px;
+  
 }
 .home-name{
   font-size:30px;
@@ -277,7 +277,7 @@ import md5 from 'js-md5';
     width:100%;
   }
   .box{
-    width:350px;
+    width:22%;
     height:310px;
     background: #fff;
     display:inline-block;
@@ -318,7 +318,7 @@ i{
   }
   .check img{
     height:37px;
-    width:100%;
+    width:66%;
     position: relative;
     left:13%;
    

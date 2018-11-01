@@ -320,6 +320,8 @@
               that.formSearch.userName=null
            }
           if(that.formSearch.floorNum==null&&that.formSearch.name==null&&that.formSearch.buildingName==null&&that.formSearch.userName==null){
+             that.startSearch=false;
+              that.getfloorList()
             return;
           }
            that.loading=true;

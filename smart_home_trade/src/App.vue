@@ -180,7 +180,7 @@ body .el-table th.gutter{
     font-size: 16px;
     /*line-height: 0.6rem;*/
     border-bottom: 2px solid #2fc0fb ;
-    margin-bottom: 10px;
+    margin-bottom: 7px;
     /*background: #f0f0f0;*/
     padding-top:8px;
     /*padding-bottom: 45px;*/
@@ -200,7 +200,7 @@ body .el-table th.gutter{
   width:100% !important;
 }*/
 .top-nav .el-form-item{
-  margin-bottom: 8px !important;
+  margin-bottom: 6px !important;
 }
 
   .el-button--small, .el-button--small.is-round{
@@ -357,7 +357,7 @@ padding:10px 20px !important;
   }
   .goback{
     /*background: #faf8f7;*/
-    padding-top:9px;
+    padding-top:6px;
 
     /*line-height: 40px;*/
     z-index: 222

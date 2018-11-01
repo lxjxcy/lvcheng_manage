@@ -166,6 +166,7 @@
          }
           if(that.formSearch.name==null&&that.formSearch.roomNum==null){
             that.getroomList()
+             that.startSearch=false;
             return;
           }
            that.loading=true;             

@@ -259,6 +259,7 @@
           
           if(that.formSearch.buildingName==null&&that.formSearch.yardName==null&&that.formSearch.blockNum==null&&that.formSearch.userName==null){
             that.getBuildlist()
+            that.startSearch=false;
             return;
           }
            that.loading=true;

@@ -156,6 +156,9 @@
             that.formSearch.buildingName=null
          }
           if(that.formSearch.blockNum==null&&that.formSearch.buildingName==null){
+
+             that.startSearch=false;
+              that.getMybuildlist()
             return;
           }
            that.loading=true;             

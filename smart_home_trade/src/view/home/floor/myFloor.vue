@@ -176,6 +176,7 @@
           }
           if(that.formSearch.name==null&&that.formSearch.floorNum==null){
              that.getMyfloorlist()
+              that.startSearch=false;
             return;
           }
            that.loading=true;             

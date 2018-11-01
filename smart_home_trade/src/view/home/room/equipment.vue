@@ -375,6 +375,7 @@ import openClose from "../park/openClose.vue"
           }
           if(that.formSearch.deviceNum==null&&that.formSearch.name==null&&that.formSearch.typeName==null){
              that.getequipmentlist()
+              that.startSearch=false;
             return;
           }
            that.loading=true;  

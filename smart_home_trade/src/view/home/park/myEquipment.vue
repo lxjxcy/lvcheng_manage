@@ -622,8 +622,11 @@ import openClose from "./openClose.vue"
                   that.mainStatusnull()               
                 return;
               }
-             if(that.formSearch.name==null&&that.formSearch.typeName==null&&that.formSearch.deviceRoom==null&&that.formSearch.deviceFloor==null&&that.formSearch.deviceBlock==null){
+             if(that.formSearch.name==null&&that.formSearch.typeName==null&&that.formSearch.deviceRoom==null&&that.formSearch.deviceFloor==null&&that.formSearch.deviceBlock==null&&that.value==null){
+            
+               that.startSearch=false;
                  that.getequipmentlist()
+
                 return;
               }
 
@@ -648,6 +651,7 @@ import openClose from "./openClose.vue"
                 return;
               }
               if(that.formSearch.name==null&&that.formSearch.typeName==null&&that.formSearch.deviceRoom==null&&that.formSearch.deviceFloor==null){
+                that.startSearch=false;
                  that.getequipmentlist()
                 return;
               }
@@ -666,6 +670,7 @@ import openClose from "./openClose.vue"
                 return;
               }
               if(that.formSearch.name==null&&that.formSearch.typeName==null&&that.formSearch.deviceRoom==null){
+                that.startSearch=false;
                  that.getequipmentlist()
                 return;
               }

@@ -285,6 +285,7 @@ import changeRoom from "../../../components/changeRoom.vue"
            }
           if(that.formSearch.name==null&&that.formSearch.roomNum==null&&that.formSearch.userName==null){
             that.getroomlist()
+             that.startSearch=false;
             return;
           }
 

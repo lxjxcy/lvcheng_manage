@@ -50,6 +50,7 @@ export default{
 		getAuthrization(e,regionList){
       var that=this;
           that.ucUserIdList=e;
+
           if(that.ucUserIdList.length==1){
             that.axios.post("/SmartHomeTrade/appUser/selectRoomAndUser",{
               token:2,
@@ -87,6 +88,9 @@ export default{
               }
 
             })
+          }else{
+             that.regionList=regionList;
+             that.pictLoading=false;
           }
          
          
@@ -129,9 +133,6 @@ export default{
           that.opendialog=false;
           return;
         }   
-
-
-
             var list=[]
             var buildlist=[]
             for(var i=0;i<that.regionList.length;i++){
@@ -156,15 +157,13 @@ export default{
                 }
               }
               var blockIdList=buildlist.filter((element,index,self)=>self.indexOf(element) === index)
-
                var param={
                	action:2,
-             	deviceList:list,
-             	ucUserIdList:that.ucUserIdList,
-             	token:6,             	
-             	createUser:that.$store.state.userinfo.userMobile,
-             	blockIdList:blockIdList,
-
+                 	deviceList:list,
+                 	ucUserIdList:that.ucUserIdList,
+                 	token:6,             	
+                 	createUser:that.$store.state.userinfo.userMobile,
+                 	blockIdList:blockIdList,
              }
               that.fullscreenLoading=true;
             that.axios.post("/SmartHomeTrade/appUser/authDeviceAppUser",param).then(res=>{
@@ -174,7 +173,6 @@ export default{
             		that.opendialog=false;
                  that.$emit('reload');
             		that.$message.success(res.data.message)
-
             	}else{
             		that.$message.error(res.data.message)
             	}
@@ -184,41 +182,12 @@ export default{
 
        }
 
-			
-			// var list=this.$refs.addresslist.getCheckedKeys()
-			// if(list.length==0){
-	  //         that.$message.warning("请选择授权区域")
-	  //         return;
-	  //        }
-
-			//  var arr=list.filter((element)=> String(element))
-			//  var arr=list.filter(element=>element!= null)
-		
-
-   //           var param={
-   //           	blockIdList:arr,
-   //           	ucUserIdList:that.ucUserIdList,
-   //           	token:3,
-   //           	createUser:that.$store.state.userinfo.userMobile,
-   //           }
-
-   //          that.fullscreenLoading=true;
-   //          that.axios.post("/SmartHomeTrade/appUser/authDeviceAppUser",param).then(res=>{
-   //          	that.fullscreenLoading=false;
-   //          	if(res.data.code==0){
-   //          		that.$emit('refreshList');
-   //          		that.opendialog=false;
-   //          		that.$message.success(res.data.message)
-
-   //          	}else{
-   //          		that.$message.error(res.data.message)
-   //          	}
-   //          })
 
 		
 		},
 		handleClose(done) {
             done();
+             this.$emit('reload');
             this.$emit('refreshList');
       }
 	}

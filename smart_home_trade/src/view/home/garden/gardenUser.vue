@@ -34,8 +34,8 @@
       </ul>
         <adduser ref="mychild" @refreshList="getUserlist" @clearselect="clear"></adduser>
         <changeuser ref="mychangechild" @refreshList="getUserlist" @clearselect="clear"></changeuser>
-        <usersetScope ref="mysetScope" @refreshList="getUserlist" @clearselect="clear"></usersetScope>
-        <userlookScope ref="mylookScope" @refreshList="getUserlist" @clearselect="clear"></userlookScope>
+        <usersetScope ref="mysetScope" @refreshList="getUserlist" @clearselect="clear" v-if="hackReset" @reload="reloadcom"></usersetScope>
+        <userlookScope ref="mylookScope" @refreshList="getUserlist" @clearselect="clear" v-if="hackReset" @reload="reloadcom"></userlookScope>
         <usersetAccess ref="mysetAccess" @refreshList="getUserlist" @clearselect="clear"></usersetAccess>
 
     </div>
@@ -146,6 +146,7 @@
       return {
         templateRadio:'',//选中
         startSearch:false,
+        hackReset:true,
          templateSelection:{},//选中的这条数据
         total:0,//总页数
         userParams:{//获取管理员列表参数
@@ -215,6 +216,13 @@
           
           })  
       },
+         // 刷新组件
+       reloadcom(){
+        this.hackReset = false
+          this.$nextTick(() => {
+          this.hackReset = true
+          })
+       },
 
       //每页显示多少条
       handleSizeChange(val) {
@@ -280,6 +288,7 @@
             })
         }else{
            that.getUserlist()
+            that.startSearch=false;
         }
       },
       //清空查询

@@ -6,7 +6,8 @@ import Vue from 'vue'
 import store from './store/index.js'
 
 import 'babel-polyfill'
-import ElementUI from 'element-ui';
+// import ElementUI from 'element-ui';
+
 import 'element-ui/lib/theme-chalk/index.css';
 import App from './App'
 
@@ -23,7 +24,109 @@ import addAppuser from './components/addAppuser'
 import createDepartment from './components/createDepartment'
 import addAuthrization from "./components/addAuthrization"
 import authorizationEq from "./components/authorizationEq"
+import {
+  Pagination,
+  Dialog,
 
+  Dropdown,
+  DropdownMenu,
+  DropdownItem,
+  Menu,
+  Submenu,
+  MenuItem,
+  MenuItemGroup,
+  Input,
+  InputNumber,
+  Radio,
+  RadioGroup,
+  RadioButton,
+  Checkbox,
+  CheckboxButton,
+  CheckboxGroup,
+  Select,
+  Option,
+  OptionGroup,
+  Button,
+  ButtonGroup,
+  Table,
+  TableColumn,
+
+  Breadcrumb,
+  BreadcrumbItem,
+  Form,
+  FormItem,
+  Tree,
+  Alert,
+  Icon,
+  Row,
+  Col,
+  Upload,
+  Switch,
+  Container,
+  Header,
+  Aside,
+  Main,
+  Footer,
+  Loading,
+  MessageBox,
+  Message,
+  Notification
+} from 'element-ui';
+
+Vue.use(Pagination);
+Vue.use(Dialog);
+Vue.use(Switch);
+Vue.use(Dropdown);
+Vue.use(DropdownMenu);
+Vue.use(DropdownItem);
+Vue.use(Menu);
+Vue.use(Submenu);
+Vue.use(MenuItem);
+Vue.use(MenuItemGroup);
+Vue.use(Input);
+Vue.use(InputNumber);
+Vue.use(Radio);
+Vue.use(RadioGroup);
+Vue.use(RadioButton);
+Vue.use(Checkbox);
+Vue.use(CheckboxButton);
+Vue.use(CheckboxGroup);
+Vue.use(Select);
+Vue.use(Option);
+Vue.use(OptionGroup);
+Vue.use(Button);
+Vue.use(ButtonGroup);
+Vue.use(Table);
+Vue.use(TableColumn);
+
+Vue.use(Breadcrumb);
+Vue.use(BreadcrumbItem);
+Vue.use(Form);
+Vue.use(FormItem);
+
+
+Vue.use(Tree);
+Vue.use(Alert);
+
+Vue.use(Icon);
+Vue.use(Row);
+Vue.use(Col);
+Vue.use(Upload);
+Vue.use(Container);
+Vue.use(Header);
+Vue.use(Aside);
+Vue.use(Main);
+Vue.use(Footer);
+
+Vue.use(Loading.directive);
+
+Vue.prototype.$loading = Loading.service;
+Vue.prototype.$msgbox = MessageBox;
+Vue.prototype.$alert = MessageBox.alert;
+Vue.prototype.$confirm = MessageBox.confirm;
+Vue.prototype.$prompt = MessageBox.prompt;
+Vue.prototype.$notify = Notification;
+Vue.prototype.$message = Message;
 
 
 // import iView from 'iview';
@@ -31,7 +134,7 @@ import authorizationEq from "./components/authorizationEq"
 //   Breadcrumb,
 //   BreadcrumbItem
 // } from 'iview'
-import 'iview/dist/styles/iview.css';
+// import 'iview/dist/styles/iview.css';
 
 import axios from "./axiosconfig/axiosconfig.js"
 import router from './router'
@@ -45,7 +148,7 @@ axios.defaults.withCredentials = true;
 Vue.prototype.axios = axios;
 // Vue.use(iView);
 // Vue.use(BreadcrumbItem);
-Vue.use(ElementUI);
+// Vue.use(ElementUI);
 Vue.config.productionTip = false
 Vue.component(myHeader.name, myHeader)
 Vue.component(myFooter.name, myFooter)

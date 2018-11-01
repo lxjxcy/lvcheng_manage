@@ -264,6 +264,7 @@ import load from "./load.vue"
            }
           if(that.formSearch.name==null&&that.formSearch.userMobile==null){
              that.getApplist()
+              that.startSearch=false;
             return;
           }
          
@@ -386,7 +387,7 @@ import load from "./load.vue"
            return;
 
         }
-        debugger
+       
         if(that.templateRadio!=''){
           that.$confirm('您确定要暂停该用户么?', '提示', {
             confirmButtonText: '确定',

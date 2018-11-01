@@ -127,7 +127,7 @@ export default{
       this.deviceparam={
       	      deviceId:e.id,
                deviceName:e.name,
-               roomName:e.roomName,
+               roomName:e.inAddress,
                roomId:e.roomId,
       };
       debugger

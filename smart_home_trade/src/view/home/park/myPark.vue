@@ -149,6 +149,7 @@
           }
           if(that.formSearch.yardName==null&&that.formSearch.gardenNum==null){
             that.getMyparklist()
+             that.startSearch=false;
             return;
           }
           that.loading=true;             

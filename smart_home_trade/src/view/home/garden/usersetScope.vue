@@ -6,7 +6,8 @@
 		  :visible.sync="dialogVisible"
 		  width="30%"
 		  :before-close="handleClose">
-		  <div class="modelScope">
+		  <div class="modelScope" v-loading="pictLoading" element-loading-background="#fff"
+         element-loading-text="加载数据中......">
 		  	<el-tree
 				  :data="treeList"
 				  show-checkbox
@@ -33,6 +34,7 @@
 	      return {
 	        dialogVisible: false,
 	        fullscreenLoading:false,
+	        pictLoading:true,
 	        treeList:[],
 	         defaultProps: {
 		          children: 'manageList',
@@ -55,6 +57,8 @@
 	     	getopen(e){
 	     		var that=this;
 	     		that.nowUserinfo=e;
+	     		that.dialogVisible=true;
+	     		
 	     		if(that.$store.state.userinfo.userLevel==1){	     			
 	     			var param={
 	     			action:1,
@@ -62,7 +66,9 @@
 	     			manageScopeIdList:that.$store.state.userinfo.manageScopeIdList
 	     		   }
 	     		   that.axios.post("/SmartHomeTrade/garden/selectYardsAll",param).then(function(res){
+
 		     			if(res.data.code==0){
+		     					that.pictLoading=false;
 
 		     					if(res.data.data!=null){
 		     						var treeList=res.data.data.gdList;
@@ -77,7 +83,7 @@
 		     			}else{
 		     				that.$message.error(res.data.message);
 		     			}
-		     			that.dialogVisible=true;
+		     			
 	     		   })
 	     		   
 	     		}
@@ -237,7 +243,7 @@
 	     		   }
 	     		   that.axios.post("/SmartHomeTrade/garden/selectYardsAll",param).then(function(res){
 		     			if(res.data.code==0){
-
+	                    that.pictLoading=false;
 		     					if(res.data.data!=null){
 		     						// that.treeList=res.data.data.gdList;
 		     						var treeList=res.data.data.gdList;
@@ -256,7 +262,7 @@
 		     			}else{
 		     				that.$message.error(res.data.message);
 		     			}
-		     			that.dialogVisible=true;
+		     			
 	     		   })
 	     		}
 
@@ -268,6 +274,7 @@
 	     			}
 	     			 that.axios.post("/SmartHomeTrade/block/selectManageBlock",param).then(function(res){
 		     			if(res.data.code==0){
+		     					that.pictLoading=false;
 		     					if(res.data.data!=null){
 		     						// that.treeList=res.data.data.bList;
 		     						
@@ -284,7 +291,7 @@
 		     			}else{
 		     				that.$message.error(res.data.message);
 		     			}
-		     			that.dialogVisible=true;
+		     			
 	     		    })
 
 
@@ -302,6 +309,7 @@
 		            }
 		             that.axios.post("/SmartHomeTrade/floor/selectManageFloor",param).then(function(res){
 		     			if(res.data.code==0){
+		     					that.pictLoading=false;
 		     					if(res.data.data!=null){
 		     						// that.treeList=res.data.data.fList;
 		     						
@@ -318,7 +326,7 @@
 		     			}else{
 		     				that.$message.error(res.data.message);
 		     			}
-		     			that.dialogVisible=true;
+		     			
 	     		    })
 
 	     		}
@@ -332,6 +340,7 @@
 	        handleClose(done) {
 	            done();
 	            this.treeList=[];
+	            this.$emit('reload');
 	            this.checkedlist=[];
 	        },
 	        // 清空选中数据
@@ -661,6 +670,7 @@
 		     			     that.$message.success(res.data.message);
 		     			     that.$emit('refreshList');
 		     			     that.clearDAta()
+		     			     this.$emit('reload');
 		     			     that.dialogVisible=false;    								     			
 		     			}else{
 		     				that.clearDAta()

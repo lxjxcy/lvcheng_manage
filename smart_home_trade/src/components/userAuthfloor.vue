@@ -88,6 +88,9 @@ export default{
               }
 
             })
+          }else{
+             that.regionList=regionList;
+             that.pictLoading=false;
           }
 
            // that.regionList=regionList;
@@ -157,6 +160,7 @@ export default{
             	that.fullscreenLoading=false;
             	if(res.data.code==0){
             		that.$emit('refreshList');
+                that.$emit('reload');
             		that.opendialog=false;
             		that.$message.success(res.data.message)
 
@@ -173,6 +177,7 @@ export default{
 		},
 		handleClose(done) {
             done();
+             this.$emit('reload');
             this.$emit('refreshList');
       }
 	}

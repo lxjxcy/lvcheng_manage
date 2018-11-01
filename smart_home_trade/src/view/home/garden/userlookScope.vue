@@ -5,7 +5,8 @@
 		  :visible.sync="dialogVisible"
 		  width="30%"
 		  :before-close="handleClose">
-		  <div class="modelScope">
+		  <div class="modelScope" v-loading="pictLoading" element-loading-background="#fff"
+         element-loading-text="加载数据中......">
 		  	<el-tree
 				  :data="treeList"				 
 				  node-key="id"
@@ -30,7 +31,8 @@
 	      return {
 	        dialogVisible: false,
 	        treeList:[],
-	        clearData:true,
+	        pictLoading:true,
+	       
 	         defaultProps: {
 		          children: 'childen',
 		          label: 'name'
@@ -50,6 +52,7 @@
 	              manageScopeIdList:e.manageScopeIdList
 	              }
 	              that.axios.post("/SmartHomeTrade/garden/selectYardsAll",param).then(function(res){
+	              	that.pictLoading=false;
 		     			if(res.data.code==0){
 		     				// alert("sss")
 		     				if(res.data.data==null){
@@ -72,6 +75,7 @@
 	              manageScopeIdList:e.manageScopeIdList
 	              }
 	              that.axios.post("/SmartHomeTrade/block/selectManageBlock",param).then(function(res){
+	              	that.pictLoading=false;
 		     			if(res.data.code==0){
 		     				if(res.data.data==null){
 
@@ -113,6 +117,7 @@
 	                  floorAdrIdList:obj
 	                }
 	              that.axios.post("/SmartHomeTrade/floor/selectManageFloor",param).then(function(res){
+	              	that.pictLoading=false;
 
 		     			if(res.data.code==0){
 		     				if(res.data.data==null){
@@ -140,6 +145,7 @@
 		            	noPage:1,
 		            }
 	              that.axios.post("/SmartHomeTrade/room/selectMyRoom",param).then(function(res){
+	              	that.pictLoading=false;
 		     			if(res.data.code==0){
 		     				// alert("sss")
 		     				if(res.data.data==null){
@@ -161,11 +167,14 @@
 	     	  handleClose(done) {
 	            done()
 	            this.treeList=[];
-	            this.clearData=true;
+	            this.$emit('reload');
+	           
 	        },
 	        close(){
 	        	this.treeList=[];
-	            this.clearData=true;
+	        	this.$emit('reload');
+	        	this.dialogVisible=false;
+	           
 	        }
 	    }
 	}

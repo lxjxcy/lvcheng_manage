@@ -4,9 +4,9 @@
       <ul>
         <li class="l" @click="add()" ><i class="iconfont">&#xe637;</i>授权</li>
         <!-- v-if="this.$store.state.userinfo.userLevel==5&&this.$store.state.extendList.movequement==1" -->
-        <userAuthbuild ref="mybuildchild" @refreshList="getuserInfo"></userAuthbuild>
-         <userAuthroom ref="myroomchild" @refreshList="getuserInfo"></userAuthroom>
-          <userAuthfloor ref="myfloorchild" @refreshList="getuserInfo"></userAuthfloor>
+        <userAuthbuild ref="mybuildchild" @refreshList="getuserInfo" v-if="hackReset" @reload="reloadcom"></userAuthbuild>
+         <userAuthroom ref="myroomchild" @refreshList="getuserInfo" v-if="hackReset" @reload="reloadcom"></userAuthroom>
+          <userAuthfloor ref="myfloorchild" @refreshList="getuserInfo" v-if="hackReset" @reload="reloadcom"></userAuthfloor>
            <userAuthdevic ref="mydevicechild" @refreshList="getuserInfo"></userAuthdevic>
         <li class="l" @click="authInfo()"><i class="iconfont">&#xe606;</i>授权信息</li>
       </ul>
@@ -49,6 +49,7 @@ import userAuthdevic from "../../../components/userAuthdevic"
         manageScopeIdList:[],
         token:2,
          regionList:[],
+          hackReset:true,
 
         pictLoading:true,
          defaultProps: {
@@ -158,6 +159,13 @@ import userAuthdevic from "../../../components/userAuthdevic"
             }
           
         },
+           // 刷新组件
+       reloadcom(){
+        this.hackReset = false
+      this.$nextTick(() => {
+      this.hackReset = true
+      })
+       },
       // 添加授权
         add(){
            var listid=this.$refs.user.getCheckedKeys()            
