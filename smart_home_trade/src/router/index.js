@@ -129,11 +129,11 @@ export default new Router({
                         // component: roomAppuser
                     }, {
                         path: '/building/buildingLog',
-                        name: 'buildingLog',
+                        name: 'roomLog',
                         meta: {
                             Auth: true,
                         },
-                        component: resolve => require(['@/view/home/building/buildingLog'], resolve)
+                        component: resolve => require(['@/view/home/room/roomLog'], resolve)
                         // component: buildingLog
                     }, {
                         path: '/building/roomList',
@@ -225,11 +225,11 @@ export default new Router({
                         // component: gardenUser
                     }, {
                         path: '/garden/gardenLog',
-                        name: 'gardenLog',
+                        name: 'roomLog',
                         meta: {
                             Auth: true,
                         },
-                        component: resolve => require(['@/view/home/garden/gardenLog'], resolve)
+                        component: resolve => require(['@/view/home/room/roomLog'], resolve)
                         // component: gardenLog
                     },
 
@@ -279,11 +279,11 @@ export default new Router({
                         // component: roomAppuser
                     }, {
                         path: '/park/parkLog',
-                        name: 'parkLog',
+                        name: 'roomLog',
                         meta: {
                             Auth: true,
                         },
-                        component: resolve => require(['@/view/home/garden/gardenLog'], resolve)
+                        component: resolve => require(['@/view/home/room/roomLog'], resolve)
                         // component: gardenLog
                     }, {
                         path: '/park/floorList',
@@ -463,11 +463,11 @@ export default new Router({
                         // component: roomAppuser
                     }, {
                         path: '/floor/floorLog',
-                        name: 'floorLog',
+                        name: 'roomLog',
                         meta: {
                             Auth: true,
                         },
-                        component: resolve => require(['@/view/home/floor/floorLog'], resolve)
+                        component: resolve => require(['@/view/home/room/roomLog'], resolve)
                         // component: floorLog
                     }, {
                         path: '/floor/equimentList',

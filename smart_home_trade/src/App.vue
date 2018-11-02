@@ -43,7 +43,7 @@ export default {
     float: left;
 
   }
-  i{
+ .nav-middle i{
     padding-right:5px;
   }
   .r{
@@ -185,10 +185,36 @@ body .el-table th.gutter{
     padding-top:8px;
     /*padding-bottom: 45px;*/
   }
+/*  .el-range-editor.el-input__inner{
+    padding:0;
+  }*/
+   .top-nav .el-date-editor .el-range-input{
+    width:35%;
+  }
+  .top-nav .el-date-editor--datetimerange.el-input, .el-date-editor--datetimerange.el-input__inner{
+  padding-right: 0;
+  height:30px;
+ /* position: relative;
+  top:5px;*/
+}
+  .top-nav .el-date-editor .el-range-separator{
+  line-height: 22px;
+}
+  .top-nav .el-date-editor .el-range__icon{
+  line-height: 20px;
+}
+  .top-nav .el-date-editor .el-range__close-icon{
+   line-height: 20px;
+}
 
-  .top-nav .el-input__icon{
-  position: absolute !important;
-  right:20px !important;
+
+.el-date-range-picker{
+  width:520px;
+
+}
+
+.top-nav .el-col-2{
+  width:3.3% !important;
 }
 .top-nav .el-select>.el-input{
   width:200px !important;
@@ -316,7 +342,7 @@ padding:10px 20px !important;
   }
 
   /*设置权限*/
-  .active{
+  .main-table .active{
     height:500px;
     /*overflow: scroll;*/
 
@@ -380,9 +406,9 @@ padding:10px 20px !important;
   /*}*/
 
   /*登录*/
-  .el-form-item__content{
+/*  .el-form-item__content{
     line-height: 40px;
-  }
+  }*/
 
 /*404*/
 .ifshow4{

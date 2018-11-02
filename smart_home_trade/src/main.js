@@ -27,7 +27,11 @@ import authorizationEq from "./components/authorizationEq"
 import {
   Pagination,
   Dialog,
-
+  DatePicker,
+  TimePicker,
+  // DateTimePicker,
+  Autocomplete,
+  TimeSelect,
   Dropdown,
   DropdownMenu,
   DropdownItem,
@@ -75,6 +79,13 @@ import {
 
 Vue.use(Pagination);
 Vue.use(Dialog);
+
+Vue.use(Autocomplete);
+Vue.use(TimePicker);
+Vue.use(DatePicker);
+
+Vue.use(TimeSelect);
+
 Vue.use(Switch);
 Vue.use(Dropdown);
 Vue.use(DropdownMenu);

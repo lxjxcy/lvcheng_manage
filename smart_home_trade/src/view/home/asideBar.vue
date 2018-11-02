@@ -33,11 +33,11 @@
                      <!--  <el-menu-item index="1-3">
                         <i class="iconfont">&#xe607;</i>
                         <span slot="title">模板设置</span>
-                      </el-menu-item>
+                      </el-menu-item> -->
                       <el-menu-item index="1-4">
                         <i class="iconfont">&#xe60e;</i>
                         <span slot="title">日志管理</span>
-                      </el-menu-item> -->
+                      </el-menu-item>
                     </el-menu>
                 </div>
 
