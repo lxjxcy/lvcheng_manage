@@ -150,27 +150,35 @@
 			        		that.dptList=res.data.data.dptList
 			        	}
 			        })
-
-
-			       // 用户
-			       var userParams={
-			       	createUser:that.$store.state.userinfo.userMobile
-			       }
-				    if(that.$store.state.userinfo.userLevel==2){
-			          that.axios.post("/SmartHomeTrade/user/selectYardNxUser",{
-			          	createUser:that.$store.state.userinfo.userMobile,
-			          	action:2,
-
-			          }).then(function (res) {
-			            
-			              that.listNextAdmin =res.data.data.userList;
-			            })
-			        }else if(that.$store.state.userinfo.userLevel==3||that.$store.state.userinfo.userLevel==4){
-			            that.axios.post("/SmartHomeTrade/user/selectNextAdmin",userParams).then(function (res) {
+			         // 获取用户
+			          if(that.$store.state.userinfo.userLevel==2){
+			          	var beScopeId=that.$store.state.parame.parkid;
+			          }
+			          if(that.$store.state.userinfo.userLevel==3){
+			          	var beScopeId=that.$store.state.parame.buildid;
+			          }
+			          if(that.$store.state.userinfo.userLevel==4){
+			          	var beScopeId=that.$store.state.parame.floorid;
+			          }
+				       var userParams={
+				       	createUser:that.$store.state.userinfo.userMobile,
+				       	beScopeId:beScopeId,
+				       	 token:2,
+				       }
+				        that.axios.post("/SmartHomeTrade/user/selectNextAdmin",userParams).then(function (res) {
+			              
+			              if(res.data.code==0){
+			                if(res.data.data!=null){
+			                   that.listNextAdmin =res.data.data.listNextAdmin;		                   
 			             
-			              that.listNextAdmin =res.data.data.listNextAdmin;
-			            })
-			        }
+			                }
+
+			              }else{
+			                that.$message.error(res.data.message)
+			              } 
+			            })	    	
+
+			     
 
 			        if(that.$store.state.userinfo.userLevel==2){
 	    			var list=[]
@@ -312,6 +320,8 @@
 				    fd.append('userAddressId',userAddressId);
 				    // fd.append('departmentId',that.addB.departmentId);
 				    fd.append('createUser',that.addB.createUser);
+				     fd.append('executeUser',that.$store.state.userinfo.name);
+				    fd.append('createUserMobile',that.$store.state.userinfo.createUser);
 				    that.axios.post('/SmartHomeTrade/user/batchimportUser',fd).then(function(res){
 				    	that.fullscreenLoading=false;
 				            if(res.data.code==0){

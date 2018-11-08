@@ -68,7 +68,12 @@ export default {
       	that.$refs[changeFloorparam].validate((valid) => {
           if (valid) {
             that.fullscreenLoading=true;
-		      	 that.axios.post("/SmartHomeTrade/floor/updateFloor",that.changeFloorparam).then(function(res){
+             var log={
+                    executeUser:that.$store.state.userinfo.name,
+                    createUserMobile:that.$store.state.userinfo.createUser,
+                  }
+           var changeFloorparam=Object.assign(that.changeFloorparam,log)
+		      	 that.axios.post("/SmartHomeTrade/floor/updateFloor",changeFloorparam).then(function(res){
               that.fullscreenLoading=false;
                 if(res.data.code==0){
                   that.dialogVisible=false;

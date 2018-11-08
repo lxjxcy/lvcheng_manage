@@ -292,6 +292,8 @@ import lookDeviceInfo from "../../../components/lookDeviceInfo"
             var param={
               ucUserId:that.templateSelection.ucUserId,
               deviceIdList:list,
+               executeUser:that.$store.state.userinfo.name,
+              createUserMobile:that.$store.state.userinfo.createUser,
 
             }
             that.axios.post("/SmartHomeTrade/appUser/deleteUserDeviceInfo",param).then(function(res){

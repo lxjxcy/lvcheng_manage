@@ -56,7 +56,12 @@ export default {
       	that.$refs[changeParkparam].validate((valid) => {
           if (valid) {
             that.fullscreenLoading=true;
-		      	 that.axios.post("/SmartHomeTrade/garden/updateGarden",that.changeParkparam).then(function(res){
+            var log={
+                    executeUser:that.$store.state.userinfo.name,
+                    createUserMobile:that.$store.state.userinfo.createUser,
+                  }
+           var changeParkparam=Object.assign(that.changeParkparam,log)
+		      	 that.axios.post("/SmartHomeTrade/garden/updateGarden",changeParkparam).then(function(res){
               that.fullscreenLoading=false;
                 if(res.data.code==0){
                   that.dialogVisible=false;

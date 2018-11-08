@@ -113,6 +113,7 @@
 
 
 	    	},
+	    	//提交
 	    	dialogclose(){
 
 	    		var that=this;
@@ -124,7 +125,6 @@
 
 	    		 var arr=lists.filter(element=>element!= null)
 	    	     var listid=that.devicelist;
-	    		debugger
 	    		// that.param.deviceIdList=lists;
 	    		for(var i=0;i<arr.length;i++){
 
@@ -137,16 +137,19 @@
 	    			}
 	    		}
 	    		
-	    		debugger
-	    		
 	    		var listids=[]
 	    		for(var i=0;i<listid.length;i++){
 	    			listids.push(listid[i].deviceId)
 
 	    		}
 	    		that.param.deviceIdList=listids;
+	    		var log={
+                    executeUser:that.$store.state.userinfo.name,
+                    createUserMobile:that.$store.state.userinfo.createUser,
+                  }
+	    		 var changeparam=Object.assign(that.param,log)
 	    	   that.fullscreenLoading=true;
-	    		that.axios.post("/SmartHomeTrade/appUser/deleteUserDeviceInfo",that.param).then(function(res){
+	    		that.axios.post("/SmartHomeTrade/appUser/deleteUserDeviceInfo",changeparam).then(function(res){
 	    			that.fullscreenLoading=false;
 	    			if(res.data.code==0){
 	    				

@@ -85,84 +85,12 @@ export default {
       addgarden(){
         var that=this;    
         that.addGarden=true;
-     //    if(that.$store.state.userinfo.userLevel==4){
-
-     //        var list2=that.$store.state.userinfo.addrList;
-     //        var list1=that.$store.state.userinfo.manageScopeIdList;
-     //        var obj=[]
-     //        for(var i=0;i<list1.length;i++){
-     //            var obj2={
-     //              regionId:list1[i],
-     //              addressId:list2[i]
-     //            }
-     //            obj.push(obj2)
-     //        }
-
-     //       var param={
-     //       	action:1,
-     //        addRegionIdList:
-     //        // floorIdList:that.$store.state.userinfo.manageScopeIdList,
-     //        // buildingIdList:that.$store.state.userinfo.addrList
-     //      }
-
-
-     //      axios.post("/SmartHomeTrade/floor/selectMyFloor",param).then(function(res){
-     //      if(res.data.code==0){
-     //      	var result = [];
-			  //    var obj = {};
-			  //  for(var i =0; i<res.data.data.floorList.length; i++){
-			  //     if(!obj[res.data.data.floorList[i].buildingId]){
-			  //       result.push(res.data.data.floorList[i]);
-			  //       obj[res.data.data.floorList[i].buildingId] = true;
-			  //    }
-			  // }
-     //      	that.blockList=result;
-     //      	that.buildingIdList=res.data.data.floorList
-     //        }
-     //      })
-     //    }
-        // else{
+    
           that.addF.addressId=that.$store.state.parame.flooraddressId
           that.addF.id=that.$store.state.parame.floorid
         // }  
       },
-        // 获取大楼信息
-        // getbuildingId(value){
-        //   var that=this;
-        //   var list=[]
-        //   that.addF.addressId=value;
-        //   console.log(that.buildingIdList)
-        //   if(that.buildingIdList!=[]){
-        //   	 for(var i=0;i<that.buildingIdList.length;i++){
-        //   	 	console.log(that.buildingIdList[i].buildingId)
-        //   	 	console.log(value)
-        //   	if(that.buildingIdList[i].buildingId==that.addF.addressId){
-        //   		list.push(that.buildingIdList[i])
-        //   	}
-        //   	// list.pust({
-        //   	// 		name:buildingIdList[i].name,
-        //   	// 		id:buildingIdList[i].id
-        //   	// 	})
-        //   }
-        //   // console.log(list)
-        //   that.floorList=list;
-        //   }
-         
-
-
-
-          // let obj={};
-          // obj = this.blockList.find((item)=>{ 
-          //    return item.yardId === value;
-          // });
-          // that.addB.yardName=obj.yardName;
-          // console.log(that.addB.yardName+","+that.addB.yardId)
-        // },
-        // 获取楼层信息
-        // getfloorInfo(value){
-        //  this.addF.id=value;
-        // },
-
+      
 
  //提交添加房间信息
   add_build(addF){
@@ -176,7 +104,9 @@ export default {
                  var addparamGb={
                   addressId:that.addF.addressId,
                   id:that.addF.id,
-                  roomList:roomList1
+                  roomList:roomList1,
+                   executeUser:that.$store.state.userinfo.name,
+                    createUserMobile:that.$store.state.userinfo.createUser,
                  }
               that.axios.post('/SmartHomeTrade/floor/insertRoom',addparamGb).then(function (res) {
                 that.fullscreenLoading=false;

@@ -292,8 +292,13 @@ export default {
                     }
                     
                   }
+                   
               if(that.addbuild&&buildingNameList1!=[]){
-              
+
+                 var log={
+                    executeUser:that.$store.state.userinfo.name,
+                    createUserMobile:that.$store.state.userinfo.createUser,
+                  }
                  
                  var bul={
                   buildingNameList:buildingNameList1
@@ -301,10 +306,15 @@ export default {
                  var tel={
                   createOperator:that.$store.state.userinfo.userMobile
                  }
-                  var addparamGb=Object.assign(bul, tel, that.addG)
+                  var addparamGb=Object.assign(bul, tel, that.addG,log)
                   // var addparamGb=Object.assign(bul, tel, yardid)
               }else{
-                var addparamGb=that.addG
+                var log={
+                    executeUser:that.$store.state.userinfo.name,
+                    createUserMobile:that.$store.state.userinfo.createUser,
+                  }
+
+                var addparamGb=Object.assign(log ,that.addG)
 
               }
 

@@ -1,14 +1,15 @@
 <template>
   <div class="roomLog">
     <div class="top-nav">
-      <el-form :inline="true" :model="formSearch" class="demo-form-inline">
+      <el-form :inline="true" :model="formSearch" class="demo-form-inline"  label-width="70px">
         <el-form-item label="关键词">
           <el-input v-model="formSearch.keyword" placeholder=""></el-input>
         </el-form-item>
-        <el-form-item label="操作人">
+        <el-form-item label="操作人" style="margin-right: 20%">
           <el-input v-model="formSearch.operatep" placeholder=""></el-input>
         </el-form-item>
-        <el-form-item label="活动时间">
+
+        <el-form-item label="操作时间">
              <el-date-picker
               v-model="formSearch.date1"
               type="datetimerange"
@@ -28,7 +29,7 @@
     </div>
     <div class="main-table">
       <el-table
-        :data="logdate"
+        :data="logList"
          v-loading="loading"
         height="400"
         border
@@ -48,21 +49,27 @@
           </template>
         </el-table-column>
         <el-table-column
-          prop="operateName"
+          prop="logContent"
           label="操作名称"
-          width="180">
+          align="center">
         </el-table-column>
         <el-table-column
-          prop="operater"
+          prop="executeUser"
           label="操作人"
-          width="180">
+          align="center">
         </el-table-column>
         <el-table-column
-          prop="operateTime"
-          label="操作时间">
+          prop="createTime"
+          label="操作时间"
+           align="center">
+        </el-table-column>
+         <el-table-column
+          prop="createUserMobile"
+          label="操作人电话"
+           align="center">
         </el-table-column>
       </el-table>
-     <div class="block" v-if="!startSearch">
+     <div class="block">
         <el-pagination
           @size-change="handleSizeChange"
           @current-change="handleCurrentChange"
@@ -70,18 +77,8 @@
           :page-size="10"
           layout="total, sizes, prev, pager, next, jumper"
           :total="total">
-        </el-pagination>
-      
+        </el-pagination> 
       </div>
-       <div class="block" v-if="startSearch">
-          <el-pagination
-          @size-change="handleSizeChange"
-          @current-change="handleCurrentChange"       
-          :page-size="10"
-          layout="total, prev, pager, next"
-          :total="total">
-       </el-pagination>
-       </div>
 
     </div>
   </div>
@@ -101,80 +98,65 @@
           templateRadio:'',
           total:10,
         templateSelection:{},
-        loading:false,
+        loading:true,
         startSearch:false,
 
          logParam:{
           pageSize:10,
           currentPage:1,
+          createUserMobile:null
         },
 
         formSearch: {
-          keyword: '',
-          operatep:"",
+          logContent: null,
+          executeUser:null,
           date1:'',
+          startTime:null,
+          endTime:null,
+
+          
         },
         
-        logdate: []
+        logList: []
       }
     },
      mounted(){
+      this.logParam.createUserMobile=this.$store.state.userinfo.createUser;
       this.getLogdate()
 
      },
     methods: {
       getLogdate(){
-        this.logdate= [{
-          id:1,
-          operateName: '逸夫楼',
-          operater:"卢雪姣",
-          operateTime: '杭州市滨江区锦绣国际202'
-        }, {
-           id:2,
-          operateName: '逸夫楼',
-          operater:"卢雪姣",
-          operateTime: '杭州市滨江区锦绣国际202'
-        },
-          {
-             id:3,
-            operateName: '逸夫楼',
-            operater:"卢雪姣",
-            operateTime: '杭州市滨江区锦绣国际202'
-          },
-          {
-             id:4,
-            operateName: '逸夫楼',
-            operater:"卢雪姣",
-            operateTime: '杭州市滨江区锦绣国际202'
-          },
-          {
-             id:5,
-            operateName: '逸夫楼',
-            operater:"卢雪姣",
-            operateTime: '杭州市滨江区锦绣国际202'
-          },
-          {
-             id:6,
-            operateName: '逸夫楼',
-            operater:"卢雪姣",
-            operateTime: '杭州市滨江区锦绣国际202'
-          },
-          {
-             id:7,
-            operateName: '逸夫楼',
-            operater:"卢雪姣",
-            operateTime: '杭州市滨江区锦绣国际202'
-          },]
+        var that=this;
+        that.axios.post("/SmartHomeTrade/log/selectLogRecordList",that.logParam).then(res=>{
+          if(res.data.code=="0"){
+            that.loading=false;
+            if(res.data.data!=null){
+              that.logList=res.data.data.logList;
+              that.total=res.data.data.count;
 
+            }else{
+              that.logList=[]
+
+            }
+          }
+
+        })
+       
 
       },
-      //每页条数
+          //每页显示多少条
       handleSizeChange(val) {
-        console.log(`每页 ${val} 条`);
+        var that=this;
+        that.logParam.pageSize=val;
+        that.logParam.currentPage=1;
+        that.getLogdate()
       },
-      //总条数
+      //当前页
       handleCurrentChange(val) {
-        console.log(`当前页: ${val}`);
+        var that=this;
+        that.logParam.currentPage=val;
+        that.getLogdate()
       },
       // 单选
       getTemplateRow(index,row){                
@@ -183,36 +165,72 @@
       //查询
       onSubmit() {
            var that=this;
-           that.loading=false;
-           if(that.formSearch.keyword==''){
-            that.formSearch.keyword=null
+       
+           
+           
+          
+           if(that.formSearch.logContent==''){
+            that.formSearch.logContent=null
            }
-            if(that.formSearch.operatep==''){
-            that.formSearch.operatep=null
+            if(that.formSearch.executeUser==''){
+            that.formSearch.executeUser=null
            }
             if(that.formSearch.date1==''){
             that.formSearch.date1=null
            }
           if(that.formSearch.keyword==null&&that.formSearch.operatep==null&&that.formSearch.date1==null){
-              that.startSearch=false;
               that.getLogdate()
             return;
           }
-           that.startSearch=true;
+          var data0=that.formSearch.date1[0]
+          var startTime=data0.getFullYear()+'-'+that.gettime((data0.getMonth() + 1)) + '-' + that.gettime(data0.getDate())+ ' ' + that.gettime(data0.getHours())+ ':' + that.gettime(data0.getMinutes()) + ':' + that.gettime(data0.getSeconds())
+          var data1=that.formSearch.date1[1]
+          var endTime=data1.getFullYear()+'-'+that.gettime((data1.getMonth() + 1)) + '-' + that.gettime(data1.getDate())+ ' ' + that.gettime(data1.getHours())+ ':' + that.gettime(data1.getMinutes()) + ':' + that.gettime(data1.getSeconds())
+           var logSearch={
+             logContent:that.formSearch.logContent,
+             startTime:startTime,
+              endTime:endTime,
+             executeUser:that.formSearch.executeUser,
+             createUserMobile:that.logParam.createUserMobile,
+              pageSize:that.logParam.pageSize,
+            currentPage:that.logParam.currentPage,
+           }
+            console.log(logSearch)
+             that.loading=true;
+            that.axios.post("/SmartHomeTrade/log/selectLogContentKeyWord",logSearch).then(res=>{
+              if(res.data.code=="0"){
+                that.loading=false;
+                if(res.data.data!=null){
+                  that.logList=res.data.data.logList;
+                  that.total=res.data.data.logList.length;
 
+                }else{
+                  that.logList=[]
+
+                }
+              }
+
+            })
+
+          
+
+
+      },
+      gettime(date){
+      
+        return parseInt(date)<10?"0"+date:date
+
+      
       },
       //清空查询
       resetForm() {
         var that=this;
-            that.formSearch.keyword= null;
-            that.formSearch.operatep=null;
-            that.startSearch=false;
-           
-          that.logParam.pageSize=10;
-          that.logParam.currentPage=1;
-         
-       
-         that.getLogdate()
+            that.formSearch.logContent= null;
+            that.formSearch.executeUser=null;
+             that.formSearch.date1=null;
+            that.logParam.pageSize=10;
+            that.logParam.currentPage=1;
+            that.getLogdate()
       },
 
     },

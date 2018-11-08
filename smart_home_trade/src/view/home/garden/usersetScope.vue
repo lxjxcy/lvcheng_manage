@@ -473,6 +473,8 @@
 		        			userId:that.nowUserinfo.userId,
 		        			userMobile:that.nowUserinfo.userMobile,
 		        			createUser:that.$store.state.userinfo.userMobile,
+		        			executeUser:that.$store.state.userinfo.name,
+                            createUserMobile:that.$store.state.userinfo.createUser,
 		        		}
 		        	        		
 

@@ -185,7 +185,7 @@ export default{
 	    			}
 	    		}
 	    		  if(arr.length==0&&that.userIdList.length!=0){
-	    		  	debugger
+	    		  	
 			  	that.$emit('refreshList');
 					 that.$emit('reload');
 					 that.$emit('clearselect');
@@ -199,8 +199,10 @@ export default{
 				roomName:that.deviceparam.roomName,
 				roomId:that.deviceparam.roomId,
 				createUser:that.$store.state.userinfo.userMobile,
+				executeUser:that.$store.state.userinfo.name,
+                createUserMobile:that.$store.state.userinfo.createUser,
 			}
-			debugger
+			
 			that.fullscreenLoading=true;
 			that.axios.post("/SmartHomeTrade/appUser/deviceAuthorization",param).then(function(res){
 				that.fullscreenLoading=false;

@@ -99,36 +99,12 @@ export default {
        //添加楼层时获取大楼接口
       addgarden(){
         var that=this;
-        // axios.post("/SmartHomeTrade/user/selectCreateAdmin",{
-        //   userMobile:that.$store.state.userinfo.userMobile
-        // }).then(function(res){})       
         that.addGarden=true;
-        // if(that.$store.state.userinfo.userLevel==3){
-        //    var param={
-        //      action:1,
-        //     buildingIdList:that.$store.state.userinfo.manageScopeIdList
-        //   }
-        //    that.axios.post("/SmartHomeTrade/block/selectMyBlock",param).then(function(res){
-        //   if(res.data.code==0){
-        //     that.blockList=res.data.data.blockList;
-        //   
-        //     }
-        //   })
-        // }else{
+     
           that.addF.addressId=that.$store.state.parame.buildid
         // }  
       },
-        // // 获取园区信息
-        // getparkInfo(value){
-        //   var that=this;
-        //   that.addF.addressId=value;
-        //   // let obj={};
-        //   // obj = this.blockList.find((item)=>{ 
-        //   //    return item.yardId === value;
-        //   // });
-        //   // that.addB.yardName=obj.yardName;
-        //   // console.log(that.addB.yardName+","+that.addB.yardId)
-        // },
+    
 
  //提交添加楼层信息
   add_build(addF){
@@ -161,12 +137,16 @@ export default {
                     addressId:that.addF.addressId,
                     name:that.addF.name,
                     roomList:roomNameList1,
+                    executeUser:that.$store.state.userinfo.name,
+                    createUserMobile:that.$store.state.userinfo.createUser,
                  }
 
               }else{
                  var addparamGb={
                   addressId:that.addF.addressId,
                   name:that.addF.name,
+                  executeUser:that.$store.state.userinfo.name,
+                  createUserMobile:that.$store.state.userinfo.createUser,
                   
                  }
               }

@@ -235,7 +235,9 @@
 		              userEmail:that.addformValidate.userEmail,
 		              // userLevel:that.userLevelv,
 		              userDeviceAuth:that.addformValidate.resource,
-		              createUser:that.$store.state.userinfo.userMobile
+		              createUser:that.$store.state.userinfo.userMobile,
+		              executeUser:that.$store.state.userinfo.name,
+                      createUserMobile:that.$store.state.userinfo.createUser,
 		             }
 		             var param=Object.assign(userL,comparam)
 		            that.axios.post(that.url,param).then(function (res) {

@@ -33,7 +33,6 @@
                   </el-option>
                 </el-select>
               </el-form-item>
-
               <el-form-item label="可见用户" :label-width="formLabelWidth" v-if="this.$store.state.userinfo.userLevel!=5">
 	               <el-select
 					    v-model="addformValidate.authCreateUser"
@@ -256,7 +255,9 @@
 			          departmentId:that.addformValidate.departmentId,
 			          userAddressId:that.addformValidate.userAddressId,
 			          createUser:that.$store.state.userinfo.userMobile,
-			          authCreateUser:that.addformValidate.authCreateUser
+			          authCreateUser:that.addformValidate.authCreateUser,
+			          executeUser:that.$store.state.userinfo.name,
+			          createUserMobile:that.$store.state.userinfo.createUser,
 		          	}
 		          	that.axios.post("/SmartHomeTrade/appUser/insertAppUser",param).then(function(res){
 		          		that.fullscreenLoading=false;

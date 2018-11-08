@@ -270,7 +270,9 @@
 	        	
 	        	var param={
 	        		permitIdList:list,
-	        		userId:that.userId
+	        		userId:that.userId,
+	        		executeUser:that.$store.state.userinfo.name,
+                    createUserMobile:that.$store.state.userinfo.createUser,
 	        	}
 	        	that.fullscreenLoading=true;
 	        	that.axios.post("/SmartHomeTrade/user/insertUserPermit",param).then(function(res){

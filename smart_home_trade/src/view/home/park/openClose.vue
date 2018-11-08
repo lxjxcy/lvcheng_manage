@@ -82,7 +82,9 @@
 		            var commparam={
 		               userId: this.$store.state.userinfo.uuid,
 		               deviceId:e.id,
-		               userDeviceAuth:this.$store.state.userinfo.userDeviceAuth
+		               userDeviceAuth:this.$store.state.userinfo.userDeviceAuth,
+		               executeUser:that.$store.state.userinfo.name,
+                       createUserMobile:that.$store.state.userinfo.createUser,
 		            }
 
 		          var param = Object.assign(commparam, Swiparam);       

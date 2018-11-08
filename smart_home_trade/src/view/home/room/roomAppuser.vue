@@ -329,7 +329,9 @@ import load from "./load.vue"
           }).then(() => {
             var param={
               loginName:that.templateSelection.loginName,
-              ucUserId:that.templateSelection.ucUserId
+              ucUserId:that.templateSelection.ucUserId,
+              executeUser:that.$store.state.userinfo.name,
+              createUserMobile:that.$store.state.userinfo.createUser,
             }
             that.axios.post("/SmartHomeTrade/appUser/deleteUserState",param).then(function(res){
               if(res.data.code==0){
@@ -396,7 +398,9 @@ import load from "./load.vue"
           }).then(() => {
             var param={
               loginName:that.templateSelection.loginName,
-              ucUserId:that.templateSelection.ucUserId
+              ucUserId:that.templateSelection.ucUserId,
+              executeUser:that.$store.state.userinfo.name,
+              createUserMobile:that.$store.state.userinfo.createUser,
             }
             that.axios.post("/SmartHomeTrade/appUser/updateUserState",param).then(function(res){
               if(res.data.code==0){
@@ -441,7 +445,9 @@ import load from "./load.vue"
           }).then(() => {
             var param={
               loginName:that.templateSelection.loginName,
-              ucUserId:that.templateSelection.ucUserId
+              ucUserId:that.templateSelection.ucUserId,
+              executeUser:that.$store.state.userinfo.name,
+              createUserMobile:that.$store.state.userinfo.createUser,
             }
             that.axios.post("/SmartHomeTrade/appUser/recoverUserState",param).then(function(res){
               if(res.data.code==0){

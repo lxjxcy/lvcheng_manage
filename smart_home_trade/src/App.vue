@@ -251,6 +251,9 @@ body .el-table th.gutter{
     width:90%;
     border:1px solid #eceef4
   }
+  .top-nav .el-input__suffix{
+    right:26px;
+  }
   .top-nav button{
 padding:8px 26px;
   }

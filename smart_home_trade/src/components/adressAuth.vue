@@ -86,6 +86,8 @@ export default{
                 action:2,
                 blockIdList:that.blockIdList,	
              	createUser:that.$store.state.userinfo.userMobile,
+             	executeUser:that.$store.state.userinfo.name,
+                createUserMobile:that.$store.state.userinfo.createUser,
               }
 
 			  }else{
@@ -94,6 +96,8 @@ export default{
              	ucUserIdList:arr,
              	token:6,	
              	createUser:that.$store.state.userinfo.userMobile,
+             	executeUser:that.$store.state.userinfo.name,
+                createUserMobile:that.$store.state.userinfo.createUser,
               }
 
 			}	

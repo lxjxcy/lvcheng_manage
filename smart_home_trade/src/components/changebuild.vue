@@ -71,8 +71,13 @@ export default {
               return;
             }
             that.fullscreenLoading=true;
+            var log={
+                    executeUser:that.$store.state.userinfo.name,
+                    createUserMobile:that.$store.state.userinfo.createUser,
+                  }
+           var changeBuildparam=Object.assign(that.changeBuildparam,log)
 
-		      	 that.axios.post("/SmartHomeTrade/block/updateBlock",that.changeBuildparam).then(function(res){
+		      	 that.axios.post("/SmartHomeTrade/block/updateBlock",changeBuildparam).then(function(res){
               that.fullscreenLoading=false;
                 if(res.data.code==0){
                   that.dialogVisible=false;

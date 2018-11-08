@@ -87,7 +87,12 @@
 		        that.$refs[changeformValidate].validate((valid) => {
 		          if (valid) {
 		          	that.fullscreenLoading=true;
-		           that.axios.post('/SmartHomeTrade/user/updateNextAdmin',that.changeformValidate).then(function (res) {
+		          	var log={
+                    executeUser:that.$store.state.userinfo.name,
+                    createUserMobile:that.$store.state.userinfo.createUser,
+                  }
+                 var changeformValidate=Object.assign(that.changeformValidate,log)
+		           that.axios.post('/SmartHomeTrade/user/updateNextAdmin',changeformValidate).then(function (res) {
 		           	that.fullscreenLoading=false;
 		                 
 		                  if(res.data.code==0){

@@ -164,6 +164,8 @@ export default{
                  	token:6,             	
                  	createUser:that.$store.state.userinfo.userMobile,
                  	blockIdList:blockIdList,
+                  executeUser:that.$store.state.userinfo.name,
+                  createUserMobile:that.$store.state.userinfo.createUser,
              }
               that.fullscreenLoading=true;
             that.axios.post("/SmartHomeTrade/appUser/authDeviceAppUser",param).then(res=>{

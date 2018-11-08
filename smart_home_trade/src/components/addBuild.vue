@@ -149,7 +149,9 @@ export default {
                   yardName:that.$store.state.parame.parkname,
                   buildingNameList:getbuildingNameList,
                   floorList:floorNameList1,
-                  createOperator:that.$store.state.userinfo.userMobile
+                  createOperator:that.$store.state.userinfo.userMobile,
+                   executeUser:that.$store.state.userinfo.name,
+                createUserMobile:that.$store.state.userinfo.createUser,
                  }
 
               }else{
@@ -157,7 +159,9 @@ export default {
                   yardId:that.$store.state.parame.parkid,
                   yardName:that.$store.state.parame.parkname,
                   buildingNameList:getbuildingNameList,
-                  createOperator:that.$store.state.userinfo.userMobile
+                  createOperator:that.$store.state.userinfo.userMobile,
+                   executeUser:that.$store.state.userinfo.name,
+                createUserMobile:that.$store.state.userinfo.createUser,
                  }
 
 

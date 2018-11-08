@@ -286,7 +286,9 @@
 		          		loginName:that.addformValidate.loginName,
 		          		authCreateUser:that.addformValidate.authCreateUser,
 		          		userAddressId:that.addformValidate.userAddressId,
-		          		userMobile:that.addformValidate.userMobile
+		          		userMobile:that.addformValidate.userMobile,
+		          		executeUser:that.$store.state.userinfo.name,
+                        createUserMobile:that.$store.state.userinfo.createUser,
 		          	}
 		          	that.axios.post("/SmartHomeTrade/appUser/updateAppUserInfo",param).then(function(res){
 		          		that.fullscreenLoading=false;

@@ -66,7 +66,12 @@ export default {
         that.$refs[changeRoomparam].validate((valid) => {
           if (valid) {
             that.fullscreenLoading=true;
-             that.axios.post("/SmartHomeTrade/room/updateRoom",that.changeRoomparam).then(function(res){
+            var log={
+                    executeUser:that.$store.state.userinfo.name,
+                    createUserMobile:that.$store.state.userinfo.createUser,
+                  }
+           var changeRoomparam=Object.assign(that.changeRoomparam,log)
+             that.axios.post("/SmartHomeTrade/room/updateRoom",changeRoomparam).then(function(res){
               that.fullscreenLoading=false;
                 if(res.data.code==0){
                   that.dialogVisible=false;

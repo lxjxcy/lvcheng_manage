@@ -35,7 +35,7 @@
                         <span slot="title">模板设置</span>
                       </el-menu-item> -->
                       <el-menu-item index="1-4">
-                        <i class="iconfont">&#xe60e;</i>
+                        <i class="iconfont">&#xe503;</i>
                         <span slot="title">日志管理</span>
                       </el-menu-item>
                     </el-menu>
@@ -101,10 +101,10 @@
                         <span slot="title">App用户管理</span>
                       </el-menu-item>
                       
-                     <!--  <el-menu-item index="2-5">
-                        <i class="iconfont">&#xe60e;</i>
+                      <el-menu-item index="2-5">
+                        <i class="iconfont">&#xe503;</i>
                         <span slot="title"> 日志管理</span>
-                      </el-menu-item> -->
+                      </el-menu-item>
                   </el-menu>
                 
               </div>
@@ -140,10 +140,10 @@
                         <i class="iconfont">&#xe604;</i>
                         <span slot="title">App用户管理</span>
                       </el-menu-item>
-                    <!--   <el-menu-item index="3-5">
-                        <i class="iconfont">&#xe60e;</i>
+                      <el-menu-item index="3-5">
+                        <i class="iconfont">&#xe503;</i>
                         <span slot="title">日志管理</span>
-                      </el-menu-item> -->
+                      </el-menu-item>
                   </el-menu>
                       
               </div>
@@ -179,10 +179,10 @@
                       <i class="iconfont">&#xe604;</i>
                       <span slot="title">App用户管理</span>
                     </el-menu-item>
-                  <!--   <el-menu-item index="4-5">
-                      <i class="iconfont">&#xe60e;</i>
+                    <el-menu-item index="4-5">
+                      <i class="iconfont">&#xe503;</i>
                       <span slot="title">日志管理</span>
-                    </el-menu-item> -->
+                    </el-menu-item>
                 </el-menu>
                 
               </div>
@@ -210,10 +210,10 @@
                       <i class="iconfont">&#xe604;</i>
                       <span slot="title">App用户管理</span>
                     </el-menu-item>
-                   <!--  <el-menu-item index="5-5">
-                      <i class="iconfont">&#xe60e;</i>
+                    <el-menu-item index="5-5">
+                      <i class="iconfont">&#xe503;</i>
                       <span slot="title">日志管理</span>
-                    </el-menu-item> -->
+                    </el-menu-item>
                 </el-menu>
               </div>
              
