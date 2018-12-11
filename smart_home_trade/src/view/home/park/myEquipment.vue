@@ -1,8 +1,3 @@
-<!-- <template>
-	<div class="myEquipment">
-		dddd
-	</div>
-</template> -->
 <template>
   <div class="myEquipment">
     <div class="top-nav">
@@ -22,14 +17,7 @@
               </el-option>
           </el-select>
         </el-form-item>
-
-
-
-
-
-         <!-- <el-form-item label="所在大楼" v-if="this.$store.state.userinfo.userLevel==2" class="formpark">
-          <el-input v-model="formSearch.deviceBlock" placeholder=""></el-input>
-        </el-form-item> -->
+        </el-form-item> 
         <el-form-item label="所在大楼" v-if="this.$store.state.userinfo.userLevel==2" class="formpark">
           <el-select v-model="build.buildingId" style="width:92%" @change="getBuildinfo">
               <el-option
@@ -73,24 +61,6 @@
             </el-option>
           </el-select>
         </el-form-item>
-
-
-
-
-
-         <!-- <el-form-item label="所在楼层" v-if="this.$store.state.userinfo.userLevel==2||this.$store.state.userinfo.userLevel==3" class="formpark floorform">
-          <el-input v-model="formSearch.deviceFloor" placeholder=""></el-input>
-        </el-form-item> -->
-
-       <!--   <el-form-item label="所在房间" class="formpark roomform">
-          <el-input v-model="formSearch.deviceRoom" placeholder=""></el-input>
-        </el-form-item> -->
-
-
-       <!--  <el-form-item label="设备状态">
-          <el-input v-model="deviceAddress.deviceState" placeholder=""></el-input>
-        </el-form-item> -->
-
          <el-form-item  class="formpark">
           <el-button type="primary" @click="onSubmit" >查询</el-button>
         </el-form-item>
@@ -104,11 +74,12 @@
 
     <div class="nav-middle">
       <ul>
-        <li class="l"  @click="eAuthorization()"></i>设备授权</li>
+        <li class="l"  @click="eAuthorization()"><i class="el-icon-news"></i>设备授权</li>
+         <li class="l"  @click="movedev()"><i class="el-icon-edit"></i>设备迁移</li>
         <authorizationEq ref="mychild" @refreshList="getequipmentlist"  @clearselect="clear" v-if="hackReset" @reload="reloadcom"></authorizationEq>
+
         <openClose ref="myopenchild" @refreshList="getequipmentlist"  @clearselect="clear"></openClose>
-
-
+				<deviceMove ref="mymovechild" @refreshList="getequipmentlist" @clearselect="clear"  v-if="hackReset" @reload="reloadcom"></deviceMove>
 
       </ul>
     </div>
@@ -124,10 +95,6 @@
         tooltip-effect="dark"
         height="380"
         border>
-       <!--  <el-table-column
-          type="selection"
-          width="50">
-        </el-table-column> -->
          <el-table-column label="" width="50">
           <template slot-scope="scope">
               <el-radio :label="scope.row.id" v-model="templateRadio" @change.native="getTemplateRow(scope.$index,scope.row)">&nbsp</el-radio>
@@ -161,15 +128,6 @@
           label="设备状态"
          :formatter="mainStatus"
            align="center">
-         <!--  <template slot-scope="scope">
-
-            <el-switch
-              v-model="scope.mainStatus"
-             disabled>
-            </el-switch>
-
-
-          </template> -->
         </el-table-column>
         <el-table-column
           prop="inAddress"
@@ -253,10 +211,12 @@
 <script>
 // import axios from "axios"
 import openClose from "./openClose.vue"
+import deviceMove from "../../../components/device_move.vue"
   export default {
     name: "myEquipment",
      components:{
-         openClose
+         openClose,
+				 deviceMove
     },
 
     data() {
@@ -725,7 +685,7 @@ import openClose from "./openClose.vue"
                  that.deviceList=deviceList;
                   that.total=deviceList.length;
                   that.startSearch=true;
-                  debugger
+                 
 
 
               }
@@ -895,8 +855,6 @@ import openClose from "./openClose.vue"
 
       getTemplateRow(index,row){                
         this.templateSelection = row;
-        debugger
-       
        },
       //关闭设备信息框
       handleClose(done) {
@@ -926,12 +884,25 @@ import openClose from "./openClose.vue"
         }
         
       },
+			
+			    //  设备迁移
+			      movedev(){
+			        var that=this;
+			        if(that.templateRadio==''){
+			          that.$message({
+			            type: 'info',
+			            message: '请选择要迁移的设备'
+			          });
+			        }else {
+			          var changparam=that.templateSelection
+			             that.$refs.mymovechild.getmove(changparam);
+			             
+			        }
+			        
+			      },
       //  查看设备
       lookInfo(row){
-        // if(this.$store.state.userinfo.userDeviceAuth!=1){
-        //   this.$message.info("抱歉,您没有查看设备的权限")
-        //   return
-        // }
+
           this.getLnformation=true;
           this.equipmenInfo=row;
         },

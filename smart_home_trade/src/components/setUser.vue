@@ -117,6 +117,8 @@
                 createUser:that.$store.state.userinfo.userMobile,
                 token:2,
                 beScopeId:beScopeId,
+                executeUser:that.$store.state.userinfo.name,
+                createUserMobile:that.$store.state.userinfo.createUser,
                }
 				that.axios.post("/SmartHomeTrade/user/selectNextAdmin",userParams).then(function(res){
 					if(res.data.code==0){

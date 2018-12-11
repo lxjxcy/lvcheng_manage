@@ -210,10 +210,10 @@
                       <i class="iconfont">&#xe604;</i>
                       <span slot="title">App用户管理</span>
                     </el-menu-item>
-                    <el-menu-item index="5-5">
+                   <!--  <el-menu-item index="5-5">
                       <i class="iconfont">&#xe503;</i>
                       <span slot="title">日志管理</span>
-                    </el-menu-item>
+                    </el-menu-item> -->
                 </el-menu>
               </div>
              

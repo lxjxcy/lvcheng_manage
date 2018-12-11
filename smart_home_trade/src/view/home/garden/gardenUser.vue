@@ -25,7 +25,7 @@
         <li class="l" @click="createUser()"  v-if="this.$store.state.userinfo.userLevel==1||(this.$store.state.userinfo.userLevel==2&&this.$store.state.extendList.parkAdduser==1)||(this.$store.state.userinfo.userLevel==3&&this.$store.state.extendList.buildAdduser==1)||(this.$store.state.userinfo.userLevel==4&&this.$store.state.extendList.floorAdduser==1)"><i class="el-icon-plus" ></i>添加</li>
 
         <!--修改-->
-        <li class="l"  @click="change()"  v-if="this.$store.state.userinfo.userLevel==1||(this.$store.state.userinfo.userLevel==2&&this.$store.state.extendList.parkChangeuser==1)||(this.$store.state.userinfo.userLevel==3&&this.$store.state.extendList.buildChangeuser==1)||(this.$store.state.userinfo.userLevel==4&&this.$store.state.extendList.floorChangeuser==1)"><i class="el-icon-edit" ></i>修改</li>
+      <!--   <li class="l"  @click="change()"  v-if="this.$store.state.userinfo.userLevel==1||(this.$store.state.userinfo.userLevel==2&&this.$store.state.extendList.parkChangeuser==1)||(this.$store.state.userinfo.userLevel==3&&this.$store.state.extendList.buildChangeuser==1)||(this.$store.state.userinfo.userLevel==4&&this.$store.state.extendList.floorChangeuser==1)"><i class="el-icon-edit" ></i>修改</li> -->
         <!--删除-->
       <!--   <li class="l"  @click="deleted()" v-if="this.$store.state.userinfo.userLevel==1||(this.$store.state.userinfo.userLevel==2&&this.$store.state.extendList.parkDeleteuser==1)||(this.$store.state.userinfo.userLevel==3&&this.$store.state.extendList.buildDeleteuser==1)||(this.$store.state.userinfo.userLevel==4&&this.$store.state.extendList.floorDeleteuser==1)"><i class="el-icon-close" ></i>删除</li> -->
 

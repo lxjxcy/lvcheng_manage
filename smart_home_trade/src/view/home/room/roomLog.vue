@@ -2,11 +2,11 @@
   <div class="roomLog">
     <div class="top-nav">
       <el-form :inline="true" :model="formSearch" class="demo-form-inline"  label-width="70px">
-        <el-form-item label="关键词">
-          <el-input v-model="formSearch.keyword" placeholder=""></el-input>
+        <el-form-item label="日志内容">
+          <el-input v-model="formSearch.logContent" placeholder=""></el-input>
         </el-form-item>
-        <el-form-item label="操作人" style="margin-right: 20%">
-          <el-input v-model="formSearch.operatep" placeholder=""></el-input>
+        <el-form-item label="操作人" style="margin-right: 50%">
+          <el-input v-model="formSearch.executeUser" placeholder=""></el-input>
         </el-form-item>
 
         <el-form-item label="操作时间">
@@ -50,7 +50,7 @@
         </el-table-column>
         <el-table-column
           prop="logContent"
-          label="操作名称"
+          label="日志内容"
           align="center">
         </el-table-column>
         <el-table-column
@@ -63,11 +63,11 @@
           label="操作时间"
            align="center">
         </el-table-column>
-         <el-table-column
+        <!--  <el-table-column
           prop="createUserMobile"
           label="操作人电话"
            align="center">
-        </el-table-column>
+        </el-table-column> -->
       </el-table>
      <div class="block">
         <el-pagination
@@ -92,7 +92,7 @@
 
         pickerOptions0: {
           disabledDate(time) {
-            return time.getTime() > Date.now() - 8.64e6
+            return time.getTime() > Date.now() 
           }
         },  
           templateRadio:'',
@@ -121,7 +121,13 @@
       }
     },
      mounted(){
-      this.logParam.createUserMobile=this.$store.state.userinfo.createUser;
+      if(this.$store.state.userinfo.userLevel==1){
+         this.logParam.createUserMobile=null;
+      }else{
+         this.logParam.createUserMobile=this.$store.state.userinfo.userMobile;
+      }
+     
+
       this.getLogdate()
 
      },
@@ -178,14 +184,22 @@
             if(that.formSearch.date1==''){
             that.formSearch.date1=null
            }
-          if(that.formSearch.keyword==null&&that.formSearch.operatep==null&&that.formSearch.date1==null){
+          if(that.formSearch.logContent==null&&that.formSearch.executeUser==null&&that.formSearch.date1==null){
               that.getLogdate()
+               // debugger
             return;
           }
-          var data0=that.formSearch.date1[0]
-          var startTime=data0.getFullYear()+'-'+that.gettime((data0.getMonth() + 1)) + '-' + that.gettime(data0.getDate())+ ' ' + that.gettime(data0.getHours())+ ':' + that.gettime(data0.getMinutes()) + ':' + that.gettime(data0.getSeconds())
-          var data1=that.formSearch.date1[1]
-          var endTime=data1.getFullYear()+'-'+that.gettime((data1.getMonth() + 1)) + '-' + that.gettime(data1.getDate())+ ' ' + that.gettime(data1.getHours())+ ':' + that.gettime(data1.getMinutes()) + ':' + that.gettime(data1.getSeconds())
+          if(that.formSearch.date1==''||that.formSearch.date1==null){
+            var startTime=null;
+            var endTime=null;
+
+          }else{
+               var data0=that.formSearch.date1[0]
+              var startTime=data0.getFullYear()+'-'+that.gettime((data0.getMonth() + 1)) + '-' + that.gettime(data0.getDate())+ ' ' + that.gettime(data0.getHours())+ ':' + that.gettime(data0.getMinutes()) + ':' + that.gettime(data0.getSeconds())
+              var data1=that.formSearch.date1[1]
+              var endTime=data1.getFullYear()+'-'+that.gettime((data1.getMonth() + 1)) + '-' + that.gettime(data1.getDate())+ ' ' + that.gettime(data1.getHours())+ ':' + that.gettime(data1.getMinutes()) + ':' + that.gettime(data1.getSeconds())
+              }
+       
            var logSearch={
              logContent:that.formSearch.logContent,
              startTime:startTime,
@@ -196,6 +210,7 @@
             currentPage:that.logParam.currentPage,
            }
             console.log(logSearch)
+
              that.loading=true;
             that.axios.post("/SmartHomeTrade/log/selectLogContentKeyWord",logSearch).then(res=>{
               if(res.data.code=="0"){

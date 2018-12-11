@@ -240,7 +240,7 @@
 	     			var param={
 	     			action:1,
 	     			manageScopeIdList:list
-	     		   }
+	     		  }
 	     		   that.axios.post("/SmartHomeTrade/garden/selectYardsAll",param).then(function(res){
 		     			if(res.data.code==0){
 	                    that.pictLoading=false;
@@ -302,7 +302,6 @@
 			            id:that.$store.state.parame.floorid,
 			            addressId:that.$store.state.parame.flooraddressId
 			          };
-
 			        obj.push(obj1)
 		            var param={
 		            	floorAdrIdList:obj
